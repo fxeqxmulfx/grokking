@@ -414,6 +414,35 @@ export function witnessCurve(N: number, a: readonly number[], b: readonly number
   return Array.from({length: samples + 1}, (_, k) => witnessAt(N, a, b, v, k / samples));
 }
 
+export interface ExactWitness {
+  /** k = |R| and l = |C|, with k + l > N. */
+  readonly k: number;
+  readonly l: number;
+  /** g² = k l (N − k)(N − l), an integer. */
+  readonly g2: number;
+  /** The best t = s²: 1 − g/(k l). */
+  readonly t: number;
+  /** The least cost over every real t: √(k (N − l)) + √(l (N − k)). */
+  readonly least: number;
+}
+
+/**
+ * Lean's exact cost of the witness for equal weights, X = J − t 1_R 1_Cᵀ with t = s²:
+ * ‖X‖²_S1 = N² − 2t (k l − g) + t² k l for t ≥ 0 (`nuclearNorm_onesSubBlock_sq_of_nonneg`), least
+ * at t = 1 − g/(k l), where it is √(k (N − l)) + √(l (N − k)) (`nuclearNorm_onesSubBlock_best`,
+ * `isLeast_nuclearNorm_onesSubBlock`). A violator has k, l ≥ 1 and, for equal weights, k + l > N.
+ */
+export function witnessExact(N: number, v: Violation): ExactWitness {
+  const k = v.R.length, l = v.C.length, g2 = k * l * (N - k) * (N - l);
+  return {k, l, g2, t: 1 - Math.sqrt(g2) / (k * l), least: Math.sqrt(k * (N - l)) + Math.sqrt(l * (N - k))};
+}
+
+/** The exact cost at s, from Lean's formula with t = s². */
+export function witnessExactAt(N: number, w: ExactWitness, s: number): number {
+  const t = s * s, kl = w.k * w.l;
+  return Math.sqrt(N * N - 2 * t * (kl - Math.sqrt(w.g2)) + t * t * kl);
+}
+
 /* Springs: gradient descent on a rank-2 bilinear layer X = U Vᵀ with weight decay, fitted on
    the kept cells only. Its points are x_i = u_i / a_i and y_j = v_j / b_j. */
 export const SPRING_RATE = 0.08;

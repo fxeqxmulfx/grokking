@@ -42,6 +42,33 @@ test('the witness of a missed block costs less than the table for small s (E.3)'
   }
 });
 
+test('for equal weights the computed cost of the witness is Lean’s exact formula, least at its best s', () => {
+  const random = Core.rng(5);
+  let checked = 0;
+  for (let draw = 0; draw < 300; draw++) {
+    const N = 3 + (draw % 3);
+    const mask = Array.from({length: N}, () => Array.from({length: N}, () => random() < 0.35));
+    const v = Core.analyze(N, mask, ones(N), ones(N)).violation;
+    if (!v) continue;
+    const w = Core.witnessExact(N, v);
+    assert.ok(w.k + w.l > N && w.t > 0 && w.t <= 1, `draw ${draw}: k ${w.k}, l ${w.l}, t ${w.t}`);
+    for (const s of [0, 0.3, 0.7, 1, Math.sqrt(w.t)]) {
+      const actual = Core.witnessAt(N, ones(N), ones(N), v, s).actual;
+      assert.ok(Math.abs(actual - Core.witnessExactAt(N, w, s)) < 1e-9, `draw ${draw}, s ${s}: ${actual}`);
+      assert.ok(actual >= w.least - 1e-9, `draw ${draw}, s ${s}: ${actual} < ${w.least}`);
+    }
+    assert.ok(Math.abs(Core.witnessAt(N, ones(N), ones(N), v, Math.sqrt(w.t)).actual - w.least) < 1e-9);
+    assert.ok(w.least < N);
+    checked++;
+  }
+  assert.ok(checked > 100, `${checked} violators`);
+  // The cross of 4 × 4: k = l = 3, least 2√3 at s² = 2/3.
+  const v = Core.analyze(4, Core.pattern(4, {kind: 'cross', i0: 0, j0: 0}), ones(4), ones(4)).violation;
+  assert.ok(v);
+  const w = Core.witnessExact(4, v);
+  assert.ok(Math.abs(w.least - 2 * Math.sqrt(3)) < 1e-12 && Math.abs(w.t - 2 / 3) < 1e-12);
+});
+
 test('the cross of (i₀, j₀) carries a plan exactly when α_i₀ + β_j₀ ≥ 1', () => {
   const random = Core.rng(11);
   const seen = {plan: 0, none: 0};

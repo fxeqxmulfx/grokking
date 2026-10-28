@@ -52,6 +52,10 @@ export interface RecoveryStrings {
   readonly witnessActual: string;
   readonly witnessLegendActual: string;
   readonly witnessLegendBound: string;
+  /** Lean's exact cost for equal weights: g as √n or an integer, t and least with `=` or `≈`, sum as `= √a + √b ` or empty. */
+  readonly witnessExact: (w: {readonly k: number; readonly l: number; readonly g: string; readonly t: string; readonly sum: string; readonly least: string}) => string;
+  /** The least cost with `=` or `≈`. */
+  readonly witnessLeastRef: (least: string) => string;
   readonly convTitle: string;
   readonly convAria: string;
   readonly step: string;
@@ -138,6 +142,9 @@ const en: RecoveryStrings = {
   witnessActual: '‖X(s)‖, computed',
   witnessLegendActual: `‖X(s)‖${S1}, computed`,
   witnessLegendBound: 'the bound from its factors',
+  witnessExact: w =>
+    `Lean gives this cost exactly. Here <span class="m">k = |R| = ${w.k}</span> and <span class="m">l = |C| = ${w.l}</span>, so <span class="m">g = √(k l (N − k)(N − l)) = ${w.g}</span> and <span class="m">‖X(s)‖²${S1} = N² − 2s² (k l − g) + s⁴ k l</span>. It is least at <span class="m">s² = 1 − g/(k l) ${w.t}</span>, where <span class="m">‖X(s)‖${S1} = √(k (N − l)) + √(l (N − k))</span> <span class="m">${w.sum}${w.least}</span>, the lower line.`,
+  witnessLeastRef: least => `least ${least}`,
   convTitle: 'M’s error off Ω',
   convAria: 'The error of M off Ω against the step',
   step: 'step',
@@ -222,6 +229,9 @@ const fr: RecoveryStrings = {
   witnessActual: '‖X(s)‖, calculée',
   witnessLegendActual: `‖X(s)‖${S1}, calculée`,
   witnessLegendBound: 'la borne tirée de ses facteurs',
+  witnessExact: w =>
+    `Lean donne ce coût exactement. Ici <span class="m">k = |R| = ${w.k}</span> et <span class="m">l = |C| = ${w.l}</span>, donc <span class="m">g = √(k l (N − k)(N − l)) = ${w.g}</span> et <span class="m">‖X(s)‖²${S1} = N² − 2s² (k l − g) + s⁴ k l</span>. Il est minimal en <span class="m">s² = 1 − g/(k l) ${w.t}</span>, où <span class="m">‖X(s)‖${S1} = √(k (N − l)) + √(l (N − k))</span> <span class="m">${w.sum}${w.least}</span> : la ligne du bas.`,
+  witnessLeastRef: least => `minimum ${least}`,
   convTitle: 'L’erreur de M hors de Ω',
   convAria: 'L’erreur de M hors de Ω en fonction du pas',
   step: 'pas',
@@ -306,6 +316,9 @@ const ru: RecoveryStrings = {
   witnessActual: '‖X(s)‖, вычислено',
   witnessLegendActual: `‖X(s)‖${S1}, вычислено`,
   witnessLegendBound: 'оценка через множители',
+  witnessExact: w =>
+    `Lean даёт эту стоимость точно. Здесь <span class="m">k = |R| = ${w.k}</span> и <span class="m">l = |C| = ${w.l}</span>, поэтому <span class="m">g = √(k l (N − k)(N − l)) = ${w.g}</span> и <span class="m">‖X(s)‖²${S1} = N² − 2s² (k l − g) + s⁴ k l</span>. Она наименьшая при <span class="m">s² = 1 − g/(k l) ${w.t}</span>, где <span class="m">‖X(s)‖${S1} = √(k (N − l)) + √(l (N − k))</span> <span class="m">${w.sum}${w.least}</span>: нижняя линия.`,
+  witnessLeastRef: least => `минимум ${least}`,
   convTitle: 'Ошибка M вне Ω',
   convAria: 'Ошибка M вне Ω в зависимости от шага',
   step: 'шаг',

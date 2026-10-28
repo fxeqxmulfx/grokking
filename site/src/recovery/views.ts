@@ -201,12 +201,14 @@ function witnessChart(lab: Lab, hoverX: number | null | undefined, t: RecoverySt
   const v = lab.info.violation, curve = lab.curve;
   if (!v || !curve) return '';
   const now = Core.witnessAt(lab.N, lab.a, lab.b, v, lab.s);
-  const ys = curve.flatMap(p => [p.actual, p.bound]), lo = Math.min(...ys, lab.N), hi = lab.N * 1.02, pad = (hi - lo) * 0.08;
+  const exact = lab.info.uniform ? Core.witnessExact(lab.N, v) : null;
+  const ys = curve.flatMap(p => [p.actual, p.bound]), lo = Math.min(...ys, lab.N, exact?.least ?? lab.N);
+  const hi = lab.N * 1.02, pad = (hi - lo) * 0.08;
   return lineChart({
     key: `${lab.id}:witness`, label: t.witnessChart, width: 560, height: 200,
     xDomain: [0, 1], yDomain: [lo - pad, hi], xTicks: [0, 0.25, 0.5, 0.75, 1], yTicks: niceTicks(lo - pad, hi, 4),
     fmtX: x => `s = ${num(lang, x, 2)}`, fmtY: y => num(lang, y, 2), fmtTip: y => num(lang, y, 4),
-    refs: [{y: lab.N, label: `‖K‖ = ${lab.N}`}],
+    refs: [{y: lab.N, label: `‖K‖ = ${lab.N}`}, ...(exact ? [{y: exact.least, label: t.witnessLeastRef(rel(lang, exact.least, 4)), start: true}] : [])],
     series: [
       {name: t.witnessBound, label: t.witnessBoundShort, color: 'var(--ink-3)', points: curve.map(p => [p.s, p.bound] as const)},
       {name: t.witnessActual, label: '‖X(s)‖', color: 'var(--ink)', points: curve.map(p => [p.s, p.actual] as const)},
@@ -215,10 +217,34 @@ function witnessChart(lab: Lab, hoverX: number | null | undefined, t: RecoverySt
   });
 }
 
-function witnessSkeleton(lab: Lab, t: RecoveryStrings): string {
+/** `= x` in its shortest form when x has at most `digits` decimals, `≈ x` otherwise. */
+function rel(lang: Lang, x: number, digits: number): string {
+  for (let d = 0; d <= digits; d++) if (Math.abs(x - Math.round(x * 10 ** d) / 10 ** d) < 1e-9) return `= ${num(lang, x, d)}`;
+  return `≈ ${num(lang, x, digits)}`;
+}
+
+/** √n, written as an integer when n is a perfect square. */
+function root(n: number): string {
+  const r = Math.round(Math.sqrt(n));
+  return r * r === n ? String(r) : `√${n}`;
+}
+
+/** For equal weights, Lean's exact cost of this block. */
+function witnessExactText(lab: Lab, t: RecoveryStrings, lang: Lang): string {
+  const v = lab.info.violation;
+  if (!v || !lab.info.uniform) return '';
+  const w = Core.witnessExact(lab.N, v), N = lab.N;
+  const terms = [w.k * (N - w.l), w.l * (N - w.k)].filter(x => x > 0).map(root);
+  return `<p class="sub">${t.witnessExact({
+    k: w.k, l: w.l, g: root(w.g2), t: rel(lang, w.t, 4), sum: terms.length ? `= ${terms.join(' + ')} ` : '',
+    least: rel(lang, w.least, 4),
+  })}</p>`;
+}
+
+function witnessSkeleton(lab: Lab, t: RecoveryStrings, lang: Lang): string {
   const form = lab.info.uniform ? 'J − s² 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>' : 'a b<sup>T</sup> − s² a<sub>R</sub> b<sub>C</sub><sup>T</sup>';
   return `<div class="panel-title">${esc(t.witnessTitle)}</div>` +
-    `<p class="sub">${t.witnessLead(form)} <span data-w="text"></span></p>` +
+    `<p class="sub">${t.witnessLead(form)} <span data-w="text"></span></p>` + witnessExactText(lab, t, lang) +
     `<div class="slider-row"><span>s</span><input type="range" min="0" max="1" step="0.01" aria-label="s" data-send-value='${messageAttr({type: 'lab/witness', id: lab.id})}'><span class="readout" data-w="s"></span></div>` +
     '<div class="chart" data-w="chart"></div>' +
     `<div class="legend"><span><span class="sq" style="background:var(--ink)"></span>${t.witnessLegendActual}</span><span><span class="sq" style="background:var(--ink-3)"></span>${esc(t.witnessLegendBound)}</span></div>`;
@@ -311,7 +337,7 @@ export function mountLab(kernel: AppKernel, el: HTMLElement, id: LabId, lang: La
     if (!was) part(el, 'legend').innerHTML = legendHTML(lab, t);
     if (config.witness) {
       const box = part(el, 'witness');
-      if (changed('curve')) box.innerHTML = lab.curve ? witnessSkeleton(lab, t) : '';
+      if (changed('curve')) box.innerHTML = lab.curve ? witnessSkeleton(lab, t, lang) : '';
       if (lab.curve && (changed('curve', 's') || hw !== hoverW)) {
         const slider = box.querySelector('input'), text = box.querySelector('[data-w="text"]');
         const value = box.querySelector('[data-w="s"]'), chart = box.querySelector('[data-w="chart"]');

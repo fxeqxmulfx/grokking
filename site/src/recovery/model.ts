@@ -214,7 +214,8 @@ function refresh(
   return {
     ...lab, info, solver, running: solver !== null,
     flipped: keep?.flipped ?? false,
-    s: keep?.s ?? (v ? Core.witnessBest(v) : 0.5),
+    // Equal weights start at Lean's best s, other weights at the bound's.
+    s: keep?.s ?? (v ? (info.uniform ? Math.sqrt(Core.witnessExact(lab.N, v).t) : Core.witnessBest(v)) : 0.5),
     curve: v && config.witness ? Core.witnessCurve(lab.N, lab.a, lab.b, v) : null,
     grab: lab.grab ?? null,
   };

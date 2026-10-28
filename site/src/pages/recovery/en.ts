@@ -62,9 +62,15 @@ const body = [
   beats ${m('N')}. At a minimum all these vectors coincide, and rigidity spreads the equality to every cell.</p>
   <p>When no permutation exists, Hall's theorem names the culprit: rows ${m('R')} that together see fewer than ${m('|R|')}
   columns. Then ${m('Ω')} misses the block ${m('R × C')}, where ${m('C')} holds the columns they do not see, and
-  ${m('|R| + |C| > N')}. Lowering that block gives ${m('J − s² 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>')}, which still agrees with
-  ${m('Ω')} and costs at most ${m('N − ½ s² (|R| + |C| − N − |R| s²)')}, less than ${m('N')} for small ${m('s > 0')}. Slide
-  ${m('s')} below and watch the cost drop under the table's.</p>
+  ${m('k + l > N')} for ${m('k = |R|')} and ${m('l = |C|')}. Lowering that block gives
+  ${m('X(s) = J − s² 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>')}, which still agrees with ${m('Ω')}. Its factors from E.3 cost
+  at most ${m('N − ½ s² (k + l − N − k s²)')}, less than ${m('N')} for small ${m('s > 0')} ${lean('E.3')}. Lean also computes
+  the cost exactly: with ${m('g = √(k l (N − k)(N − l))')},</p>
+  ${eq(`<span class="nobr">‖X(s)‖²${S1} = N² − 2s² (k l − g)</span> <span class="nobr">+ s⁴ k l,</span>`)}
+  <p>least at ${m('s² = 1 − g/(k l)')}, where ${m(`‖X(s)‖${S1} = √(k (N − l)) + √(l (N − k))`)}. For any block ${m('R × C')},
+  some real ${m('t')} gives ${m(`‖J − t 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>‖${S1} < N`)} exactly when ${m('k + l > N')}
+  ${lean('E.3, exact')}. For the cross, ${m('k = l = N − 1')}, the least is the ${m('2√(N − 1)')} of D.9. Slide ${m('s')}
+  below: the dark curve is the cost, the grey one the bound from the factors, and the lower line Lean's least value.</p>
   ${widget('lab', 'hall')}
   ${widget('quiz', 'q3')}`),
 
@@ -197,6 +203,7 @@ export const en: RecoveryText = {
     d8: {title: 'D.8: two diagonals ⇔ s₂ − s₁ a unit', detail: 'M recovers ψ(a + b) from exactly the diagonals of offsets s₁ and s₂ if and only if s₂ − s₁ is a unit of ℤ/p.'},
     d9: {title: 'D.9: the cross fails for N ≥ 3', detail: 'The cross is rigid and fixes every rank-one completion, yet its least nuclear norm is 2√(N − 1) < N.'},
     e: {title: 'Theorem E: rigid and a permutation', detail: `For entries of modulus one: a permutation in Ω gives ‖X‖${S1} ≥ N (E.1); with rigidity M recovers the table (E.2); without a permutation a cheaper witness exists (E.3); together, an equivalence (E.4).`},
+    e3w: {title: 'E.3, exact: the cost of the lowered block', detail: `For k = |R|, l = |C| and g = √(k l (N − k)(N − l)): the factors of J − s² 1_R 1_Cᵀ cost at most N − ½ s² (k + l − N − k s²); its nuclear norm is exactly √(N² − 2s² (k l − g) + s⁴ k l), least at s² = 1 − g/(k l), where it is √(k (N − l)) + √(l (N − k)); some real t gives ‖J − t 1_R 1_Cᵀ‖${S1} < N exactly when k + l > N. Lean proves the exact norm for every m × n block and every real t. For the cross the least is 2√(N − 1). On main since commits 4943eec7 and a9e36f03.`},
     f12: {title: 'F.1–F.2: a plan ⇒ recovered', detail: `A transport plan from α to β on Ω gives ‖X‖${S1} ≥ ‖a‖ ‖b‖; with rigidity M recovers a bᵀ. On main since commit 7f7423c9.`},
     f3a: {title: 'F.3: not rigid ⇒ a flip, any sizes', detail: `The phases u_i v_j = 1 on Ω, with u_i₀ v_j₀ = −1, give a second table with the same moduli. Since ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, it costs the same. On main since commit b6577f53.`},
     f3b: {title: 'F.3: overfull rows ⇒ a cheaper witness', detail: 'If rows R hold more sand than their columns N(R) take, Ω misses R × N(R)ᶜ, and U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ from E.3, with p² = ‖b‖/‖a‖, cost less than ‖a‖ ‖b‖. On main since commit b6577f53.'},

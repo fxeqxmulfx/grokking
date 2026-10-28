@@ -28,7 +28,8 @@ export interface ChartSpec {
   readonly fmtY: (y: number) => string;
   readonly fmtTip: (y: number) => string;
   readonly series: readonly Series[];
-  readonly refs?: readonly {readonly y: number; readonly label: string}[];
+  /** Horizontal reference lines, labelled at the right end unless `start` puts the label at the left. */
+  readonly refs?: readonly {readonly y: number; readonly label: string; readonly start?: boolean}[];
   readonly markers?: readonly (readonly [number, number])[];
   readonly hoverX: number | null | undefined;
 }
@@ -57,7 +58,10 @@ export function lineChart(o: ChartSpec): string {
     out.push(`<text x="${X(t)}" y="${bottom + 16}" text-anchor="${anchor}" class="axis-t">${o.fmtX(t)}</text>`);
   }
   out.push(`<line x1="${ml}" x2="${right}" y1="${bottom}" y2="${bottom}" class="axis"/>`);
-  for (const r of o.refs ?? []) out.push(`<line x1="${ml}" x2="${right}" y1="${Y(r.y)}" y2="${Y(r.y)}" class="ref"/><text x="${right}" y="${Y(r.y) - 5}" text-anchor="end" class="axis-t">${esc(r.label)}</text>`);
+  for (const r of o.refs ?? []) {
+    const [x, anchor] = r.start ? [ml + 4, 'start'] : [right, 'end'];
+    out.push(`<line x1="${ml}" x2="${right}" y1="${Y(r.y)}" y2="${Y(r.y)}" class="ref"/><text x="${x}" y="${Y(r.y) - 5}" text-anchor="${anchor}" class="axis-t">${esc(r.label)}</text>`);
+  }
   for (const s of o.series) {
     if (s.points.length < 2) continue;
     const d = s.points.map((p, k) => `${k ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');

@@ -67,9 +67,16 @@ const body = [
   fait mieux que ${m('N')}. En un minimum, tous ces vecteurs coïncident, et la rigidité étend l’égalité à toutes les cases.</p>
   <p>Quand aucune permutation n’existe, le théorème de Hall désigne le coupable : des lignes ${m('R')} qui voient ensemble
   moins de ${m('|R|')} colonnes. Alors ${m('Ω')} manque le bloc ${m('R × C')}, où ${m('C')} réunit les colonnes qu’elles ne
-  voient pas, et ${m('|R| + |C| > N')}. Abaisser ce bloc donne ${m('J − s² 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>')}, qui
-  coïncide toujours avec ${m('Ω')} et coûte au plus ${m('N − ½ s² (|R| + |C| − N − |R| s²)')}, moins que ${m('N')} pour
-  ${m('s > 0')} petit. Faites glisser ${m('s')} ci-dessous et regardez le coût passer sous celui de la table.</p>
+  voient pas, et ${m('k + l > N')} pour ${m('k = |R|')} et ${m('l = |C|')}. Abaisser ce bloc donne
+  ${m('X(s) = J − s² 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>')}, qui coïncide toujours avec ${m('Ω')}. Ses facteurs de E.3
+  coûtent au plus ${m('N − ½ s² (k + l − N − k s²)')}, moins que ${m('N')} pour ${m('s > 0')} petit ${lean('E.3')}. Lean
+  calcule aussi le coût exactement : avec ${m('g = √(k l (N − k)(N − l))')},</p>
+  ${eq(`<span class="nobr">‖X(s)‖²${S1} = N² − 2s² (k l − g)</span> <span class="nobr">+ s⁴ k l,</span>`)}
+  <p>minimal en ${m('s² = 1 − g/(k l)')}, où ${m(`‖X(s)‖${S1} = √(k (N − l)) + √(l (N − k))`)}. Pour tout bloc ${m('R × C')},
+  il existe un réel ${m('t')} avec ${m(`‖J − t 1<sub>R</sub> 1<sub>C</sub><sup>T</sup>‖${S1} < N`)} si et seulement si
+  ${m('k + l > N')} ${lean('E.3, exact')}. Pour la croix, ${m('k = l = N − 1')}, le minimum est le ${m('2√(N − 1)')} de D.9.
+  Faites glisser ${m('s')} ci-dessous : la courbe foncée est le coût, la grise la borne tirée des facteurs, et la ligne du
+  bas la valeur minimale de Lean.</p>
   ${widget('lab', 'hall')}
   ${widget('quiz', 'q3')}`),
 
@@ -208,6 +215,7 @@ export const fr: RecoveryText = {
     d8: {title: 'D.8 : deux diagonales ⇔ s₂ − s₁ inversible', detail: 'M retrouve ψ(a + b) à partir exactement des diagonales de décalages s₁ et s₂ si et seulement si s₂ − s₁ est inversible dans ℤ/p.'},
     d9: {title: 'D.9 : la croix échoue pour N ≥ 3', detail: 'La croix est rigide et fixe toute complétion de rang un, mais sa plus petite norme nucléaire vaut 2√(N − 1) < N.'},
     e: {title: 'Théorème E : rigide et une permutation', detail: `Pour des entrées de module un : une permutation dans Ω donne ‖X‖${S1} ≥ N (E.1) ; avec la rigidité, M retrouve la table (E.2) ; sans permutation, un témoin moins cher existe (E.3) ; ensemble, une équivalence (E.4).`},
+    e3w: {title: 'E.3, exact : le coût du bloc abaissé', detail: `Pour k = |R|, l = |C| et g = √(k l (N − k)(N − l)) : les facteurs de J − s² 1_R 1_Cᵀ coûtent au plus N − ½ s² (k + l − N − k s²) ; sa norme nucléaire vaut exactement √(N² − 2s² (k l − g) + s⁴ k l), minimale en s² = 1 − g/(k l), où elle vaut √(k (N − l)) + √(l (N − k)) ; il existe un réel t avec ‖J − t 1_R 1_Cᵀ‖${S1} < N si et seulement si k + l > N. Lean démontre la norme exacte pour tout bloc m × n et tout réel t. Pour la croix, le minimum est 2√(N − 1). Sur main depuis les commits 4943eec7 et a9e36f03.`},
     f12: {title: 'F.1–F.2 : un plan ⇒ reconstruction', detail: `Un plan de transport de α vers β sur Ω donne ‖X‖${S1} ≥ ‖a‖ ‖b‖ ; avec la rigidité, M retrouve a bᵀ. Sur main depuis le commit 7f7423c9.`},
     f3a: {title: 'F.3 : non rigide ⇒ un retournement, toutes tailles', detail: `Les phases u_i v_j = 1 sur Ω, avec u_i₀ v_j₀ = −1, donnent une seconde table de mêmes modules. Comme ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, elle coûte autant. Sur main depuis le commit b6577f53.`},
     f3b: {title: 'F.3 : des lignes trop chargées ⇒ un témoin moins cher', detail: 'Si des lignes R portent plus de sable que leurs colonnes N(R) n’en prennent, Ω évite R × N(R)ᶜ, et U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ tirés de E.3, avec p² = ‖b‖/‖a‖, coûtent moins que ‖a‖ ‖b‖. Sur main depuis le commit b6577f53.'},
