@@ -9,7 +9,7 @@ import type {Kernel} from '../kernel.ts';
 import {LANGS, LANG_NAMES, type Lang, type Localized} from '../i18n.ts';
 import {esc, part} from '../markup.ts';
 import {HOME, MISSING, hrefOf, type Route} from '../router.ts';
-import {HOME_NAV, HOME_TITLE, MISSING_TITLE, homeHTML, missingHTML} from '../pages/home.ts';
+import {HOME_NAV, HOME_TITLE, MISSING_TITLE, homeHTML, missingHTML} from '../pages/home/index.ts';
 import {PAGES, PART_NAMES, pageById} from '../pages/registry.ts';
 import type {Page} from '../pages/types.ts';
 import {isLabId} from '../recovery/model.ts';

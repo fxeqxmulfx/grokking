@@ -3,7 +3,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {LANGS} from '../src/i18n.ts';
-import {homeHTML, missingHTML} from '../src/pages/home.ts';
+import {homeHTML, missingHTML} from '../src/pages/home/index.ts';
 import {OUTLINE, PAGES, PAGE_IDS, PLANNED} from '../src/pages/registry.ts';
 import {LABS, SPRINGS, isLabId} from '../src/recovery/model.ts';
 import {RECOVERY_STRINGS} from '../src/recovery/strings.ts';
