@@ -9,3 +9,6 @@ class TorchDraws:
 
     def uniform(self, count: int) -> list[float]:
         return torch.rand(count, generator=self.generator, dtype=torch.float64).tolist()
+
+    def permutation(self, count: int) -> list[int]:
+        return torch.randperm(count, generator=self.generator).tolist()

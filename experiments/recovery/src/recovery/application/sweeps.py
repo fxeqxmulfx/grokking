@@ -1,6 +1,7 @@
 """The checks: every pattern of a small table, sorted into the classes a theorem names, and
 model M solved on each. Theorem E is `forall_isMinOn_vecMulVec_iff` and Theorem G
-`forall_isMinOn_vecMulVec_iff_support` in the transformer repository."""
+`forall_isMinOn_vecMulVec_iff_support` in the transformer repository; the checks of Theorem F
+are in `weights`."""
 
 import math
 from collections.abc import Callable, Iterator, Sequence
@@ -9,7 +10,7 @@ from dataclasses import dataclass
 from recovery.application.ports import Completion, Draws, Solver
 from recovery.application.summary import RECOVERED, ClassSummary, summarize
 from recovery.domain.patterns import (
-    Pattern, gale, gale_slack, hall_and_surplus, patterns, rigid, rigid_on_supports,
+    Pattern, gale, hall_and_surplus, patterns, rigid, rigid_on_supports,
 )
 
 
@@ -64,27 +65,6 @@ class Table:
     a: list[complex]
     b: list[complex]
     groups: dict[str, list[Pattern]]
-
-
-def weighted_tables(draws: Draws, size: int, count: int) -> list[Table]:
-    """`count` draws of a and b without zero entries, moduli uniform in [0.3, 2]; the nonempty
-    patterns of each table but the full one, by rigidity and by Gale's condition."""
-    tables = []
-    for k in range(count):
-        r = [0.3 + 1.7 * u for u in draws.uniform(size)]
-        s = [0.3 + 1.7 * u for u in draws.uniform(size)]
-        th = [2 * math.pi * u for u in draws.uniform(2 * size)]
-        a = [r[i] * complex(math.cos(th[i]), math.sin(th[i])) for i in range(size)]
-        b = [s[j] * complex(math.cos(th[size + j]), math.sin(th[size + j])) for j in range(size)]
-        pa, pb = [abs(x) ** 2 / norm(a) ** 2 for x in a], [abs(x) ** 2 / norm(b) ** 2 for x in b]
-        groups: dict[str, list[Pattern]] = {}
-        for pattern in patterns(size, size):
-            if any(any(row) for row in pattern):
-                plan = gale_slack(pattern, pa, pb) >= -1e-12
-                name = f"{'rigid' if rigid(pattern) else 'not rigid'}, {'plan' if plan else 'no plan'}"
-                groups.setdefault(name, []).append(pattern)
-        tables.append(Table(f"draw {k}", a, b, dict(sorted(groups.items()))))
-    return tables
 
 
 #: The generic tables with zero entries: shape, zero rows of a, zero columns of b.

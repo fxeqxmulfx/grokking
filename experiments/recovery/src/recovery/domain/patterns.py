@@ -8,7 +8,9 @@ repository, proved in Lean in `Transformer.Grokking.FlatSpectrum`:
 - Hall: every set of rows R meets at least |R| columns, so the pattern contains a
   permutation (Theorem E);
 - Gale: every set of rows fits into the columns it meets, weighted (Theorems F and G,
-  `exists_isTransportPlan_iff`).
+  `exists_isTransportPlan_iff`);
+- the cross of row 0 and column 0, where Gale's condition is one inequality (Theorem F,
+  item 4, `forall_isMinOn_vecMulVec_cross_iff`).
 """
 
 from collections.abc import Iterator, Sequence
@@ -101,3 +103,25 @@ def gale_slack(pattern: Pattern, pa: Sequence[float], pb: Sequence[float]) -> fl
         for r in range(1, len(pa) + 1)
         for rows in combinations(range(len(pa)), r)
     )
+
+
+def cross(size: int) -> Pattern:
+    """The kept cells of row 0 and column 0 of a size x size table."""
+    return tuple(tuple(i == 0 or j == 0 for j in range(size)) for i in range(size))
+
+
+def cross_margin(wa: Sequence[float], wb: Sequence[float]) -> float:
+    """`wa[0]/sum(wa) + wb[0]/sum(wb) - 1` for the weights `|a_i|²` and `|b_j|²`. With no zero
+    entry, M recovers a bᵀ from the cross exactly when it is not negative
+    (`forall_isMinOn_vecMulVec_cross_iff`: `‖a‖² ‖b‖² ≤ |a_0|² ‖b‖² + ‖a‖² |b_0|²`)."""
+    return wa[0] / sum(wa) + wb[0] / sum(wb) - 1
+
+
+def diagonals(size: int, offsets: Sequence[int]) -> Pattern:
+    """The cells (a, b) with b − a mod size among the offsets."""
+    return tuple(tuple((b - a) % size in offsets for b in range(size)) for a in range(size))
+
+
+def without(pattern: Pattern, i: int, j: int) -> Pattern:
+    """The pattern with the cell (i, j) hidden."""
+    return tuple(tuple(kept and (r, c) != (i, j) for c, kept in enumerate(row)) for r, row in enumerate(pattern))

@@ -2,8 +2,9 @@
 
 import unittest
 
-from recovery.application.sweeps import equal_classes, weighted_tables, zero_tables
-from recovery.domain.patterns import gale, rigid_on_supports
+from recovery.application.sweeps import equal_classes, zero_tables
+from recovery.application.weights import cross_tables, tight_tables, weighted_tables
+from recovery.domain.patterns import cross, cross_margin, gale, rigid_on_supports
 from recovery.infrastructure.draws import TorchDraws
 
 
@@ -35,6 +36,21 @@ class Classes(unittest.TestCase):
     def test_random_weights(self) -> None:
         for table in weighted_tables(TorchDraws(0), 3, 3):
             self.assertEqual(counts(table.groups), {"not rigid, no plan": 306, "rigid, no plan": 114, "rigid, plan": 90})
+
+    def test_tight_weights(self) -> None:
+        a = {"not rigid, no plan": 282, "not rigid, plan": 24, "rigid, no plan": 60, "rigid, plan": 144}
+        c = {"not rigid, no plan": 298, "not rigid, plan": 8, "rigid, no plan": 94, "rigid, plan": 110}
+        for table, expected in zip(tight_tables(TorchDraws(1)), [a, a, c]):
+            self.assertEqual(counts(table.groups), expected, table.name)
+
+    def test_cross_margin_is_gale(self) -> None:
+        # forall_isMinOn_vecMulVec_cross_iff: on the cross, Gale's condition is the sign of the margin.
+        draws = TorchDraws(0)
+        for size in (3, 4, 5, 6):
+            for a, b in cross_tables(draws, size, 100):
+                wa, wb = [abs(x) ** 2 for x in a], [abs(x) ** 2 for x in b]
+                self.assertTrue(0.05 < wa[0] / sum(wa) < 0.95 and 0.05 < wb[0] / sum(wb) < 0.95)
+                self.assertEqual(gale(cross(size), wa, wb), cross_margin(wa, wb) >= 0)
 
     def test_lean_examples(self) -> None:
         # forall_isMinOn_vecMulVec_iff_support: the cell (0, 0) recovers (1)(1, 0)ᵀ, not (1)(1, 1)ᵀ.
