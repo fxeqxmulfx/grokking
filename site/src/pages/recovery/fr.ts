@@ -1,4 +1,4 @@
-/** The recovery page in French. Source: review/flat_spectrum.md, Theorems D, E, F and G. */
+/** The recovery page in French. Source: review/flat_spectrum.md, Theorems D, E, F and G and the failure margin. */
 
 import {box, eq, heuristic, lean, m, numbers, numerical, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
@@ -78,6 +78,20 @@ const body = [
   Faites glisser ${m('s')} ci-dessous : la courbe foncée est le coût, la grise la borne tirée des facteurs, et la ligne du
   bas la valeur minimale de Lean.</p>
   ${widget('lab', 'hall')}
+  <p>De combien la réponse peut-elle être moins chère ? La ligne du bas ci-dessus est le coût minimal de toutes les matrices
+  qui coïncident avec ${m('J')} hors de ${m('R × C')}, pas seulement des blocs abaissés ${lean('marge d’échec')} : la matrice
+  égale à ${m('1/√(k (N − l))')} sur ${m('R × Cᶜ')}, à ${m('1/√(l (N − k))')} sur ${m('Rᶜ × C')} et nulle ailleurs est une
+  contraction, son produit scalaire avec toute matrice égale à 1 sur ces deux bandes vaut
+  ${m('√(k (N − l)) + √(l (N − k))')}, et un produit scalaire avec une contraction ne dépasse jamais la norme nucléaire. On
+  peut prendre les lignes de Hall avec ${m('k + l = N + 1')}, et Cauchy–Schwarz borne alors ce coût par ${m('√(N² − 1)')}.
+  À ${m('k + l')} fixé, il croît avec ${m('k l')}, qui est maximal quand ${m('k')} et ${m('l')} diffèrent d’au plus un.
+  Multiplier les lignes et les colonnes par des nombres de module un ne change aucun coût.</p>
+  ${box(`<strong>La marge d’échec</strong> ${lean('marge d’échec')}. Supposons que ${m('Ω')} ne contienne aucune
+  permutation, et soit ${m('K')} la table ${m('J')} ou toute autre table de rang un d’entrées de module un, de sorte que
+  ${m(`‖K‖${S1} = N`)}. Alors une certaine matrice qui coïncide avec ${m('K')} sur ${m('Ω')} coûte au plus
+  ${m('√(N² − 1) < N − 1/(2N)')}. Pour ${m('N ≥ 1')}, soit ${m('k + l = N + 1')} avec ${m('k ≤ l ≤ k + 1')}. Tout tel
+  ${m('Ω')} en a une qui coûte au plus ${m('√(k (k − 1)) + √(l (l − 1))')}, et pour l’un d’eux c’est le coût minimal :
+  ${m('√(N² − 1)')} pour ${m('N')} impair, ${m('√2 + √6 ≈ 3,864')} pour ${m('N = 4')}.`)}
   ${widget('quiz', 'q3')}`),
 
   section('weights', 5, 'Des poids : du sable et des trous', `
@@ -139,7 +153,7 @@ const body = [
     ['rigide, sans plan', '114', '−1,63 à −3·10<sup>−6</sup>', '1,7·10<sup>−3</sup> à 0,88', 'F.3'],
     ['non rigide, sans plan', '306', '−6,16 à −3·10<sup>−6</sup>', '0,44 à 1,00', 'F.3'],
   ])}
-  <p class="sub">Les neuf motifs rigides sans permutation sont les croix, et −0,172 = 2√2 − 3. Dans les trois tirages, aucun
+  <p class="sub">Les neuf motifs rigides sans permutation sont les croix, et −0,172 = 2√2 − 3, le pire cas démontré de la section 4 pour N = 3. Dans les trois tirages, aucun
   motif ne porte de plan sans être rigide. Avec les modules ${m('(√2, 1, 1)')} pour ${m('a')} comme pour ${m('b')}, de sorte
   que ${m('α = β = (½, ¼, ¼)')} et qu’un ensemble propre de lignes peut remplir exactement les colonnes qu’il voit, les motifs
   rigides avec plan convergent lentement : leur plus grande erreur vaut 2,4·10<sup>−4</sup>, 5,0·10<sup>−5</sup> et
@@ -152,7 +166,23 @@ const body = [
     ['non rigide, permutation', '3970', 'à 2·10<sup>−14</sup> près de 0', '0,775–1,00', 'E.1, D.7'],
     ['non rigide, sans permutation', '25 249', '−4,00 à −0,136', '0,632–1,00', 'E.3'],
   ])}
-  <p class="sub">Le théorème E prouve que M retrouve J à partir de tout motif rigide avec une permutation : l’erreur jusqu’à 8,5·10<sup>−5</sup> de la première ligne du tableau est donc la lenteur d’ADMM. Elle vient des 27 068 de ces motifs où un ensemble propre de lignes voit exactement autant de colonnes qu’il a de lignes ; sur les 6784 autres, l’erreur est sous 10<sup>−13</sup>, une erreur d’arrondi. Après 20 000 pas, 4464 des 27 068 ont encore une erreur au-dessus de 10<sup>−6</sup>. Prolongés, ils continuent de converger : leur erreur reste sous 3,5·10<sup>−5</sup>, 1,8·10<sup>−5</sup> et 8,9·10<sup>−6</sup> après 50 000, 100 000 et 200 000 pas, environ deux fois plus petite à chaque doublement du nombre de pas, et leur écart est positif et sous 2,3·10<sup>−8</sup> ${numerical('2026-10-29', L)}.</p>
+  <p class="sub">Les bornes −0,536 et −0,136 de la deuxième ligne sont, à trois décimales, 2√3 − 4, la croix de D.9, et √2 + √6 − 4, le pire cas démontré pour N = 4, que la dernière ligne atteint aussi. Le théorème E prouve que M retrouve J à partir de tout motif rigide avec une permutation : l’erreur jusqu’à 8,5·10<sup>−5</sup> de la première ligne du tableau est donc la lenteur d’ADMM. Elle vient des 27 068 de ces motifs où un ensemble propre de lignes voit exactement autant de colonnes qu’il a de lignes ; sur les 6784 autres, l’erreur est sous 10<sup>−13</sup>, une erreur d’arrondi. Après 20 000 pas, 4464 des 27 068 ont encore une erreur au-dessus de 10<sup>−6</sup>. Prolongés, ils continuent de converger : leur erreur reste sous 3,5·10<sup>−5</sup>, 1,8·10<sup>−5</sup>, 8,9·10<sup>−6</sup> et 4,5·10<sup>−6</sup> après 50 000, 100 000, 200 000 et 400 000 pas, environ deux fois plus petite à chaque doublement du nombre de pas, et à la fin leur écart est positif et sous 7,9·10<sup>−9</sup> ${numerical('2026-10-29', L)}.</p>
+  <p>La marge d’échec sur des tables de uns ${m('N × N')}, ${m('N')} de 3 à 7, 20 000 pas ${numerical('2026-10-29', L)}.
+  Hors de chaque bloc de ${m('k')} lignes et ${m('l')} colonnes avec ${m('k + l > N')}, ADMM atteint le coût minimal
+  ${m('√(k (N − l)) + √(l (N − k))')} à 5·10<sup>−15</sup> près, une erreur d’arrondi. Puis 2000 motifs aléatoires de chaque
+  taille sans permutation, chacun gardant chaque case avec sa propre probabilité, tirée uniformément dans
+  ${m('[0,3 ; 0,9]')} :</p>
+  ${numbers(['Marge d’échec', 'rigides / non rigides', 'plus grand écart, rigides', 'plus grand écart, non rigides', 'pire cas démontré'], [
+    ['3 × 3', '65 / 1935', '−0,172', '−0,172', '√8 − 3 = −0,172'],
+    ['4 × 4', '117 / 1883', '−0,136', '−0,136', '√2 + √6 − 4 = −0,136'],
+    ['5 × 5', '178 / 1822', '−0,101', '−0,101', '√24 − 5 = −0,101'],
+    ['6 × 6', '242 / 1758', '−0,0864', '−0,0864', '√6 + √12 − 6 = −0,0864'],
+    ['7 × 7', '268 / 1732', '−0,0718', '−0,0784', '√48 − 7 = −0,0718'],
+  ])}
+  <p class="sub">Les plus grands écarts coïncident avec le pire cas démontré à six décimales, dans les deux classes pour
+  ${m('N')} de 3 à 6 et dans la classe rigide pour ${m('N = 7')} ; là, les motifs non rigides n’atteignent que le bloc
+  ${m('3 × 5')}, √6 + √20 − 7 = −0,0784. ADMM ne finit jamais plus de 7,7·10<sup>−7</sup> au-dessus du coût du bloc manqué
+  le moins cher.</p>
   <p>Tables à entrées nulles : tous les motifs sauf le motif plein de 13 tables de tailles ${m('2 × 3')}, ${m('3 × 2')},
   ${m('3 × 3')}, ${m('2 × 4')} et ${m('3 × 4')}, toutes sauf une avec des zéros à des places fixées, phases aléatoires,
   30 000 pas ${numerical('2026-10-28', L)}. Rigide veut dire ici que les cases avec ${m(`${ai} ≠ 0`)} et ${m(`${bj} ≠ 0`)}
@@ -174,7 +204,7 @@ const body = [
   <p>Chaque énoncé de cette page, rangé selon la façon dont il est connu. Cliquez sur une carte pour voir ses noms Lean.</p>
   ${widget('status')}
   <p class="sub">Source : <code>review/flat_spectrum.md</code> du dépôt transformer, section « Exact recovery of a rank-one
-  kernel », théorèmes D, E, F et G. Lean : <code>Transformer.Grokking.FlatSpectrum</code>. Les solveurs de cette page tournent
+  kernel », théorèmes D, E, F et G et la marge d’échec. Lean : <code>Transformer.Grokking.FlatSpectrum</code>. Les solveurs de cette page tournent
   dans votre navigateur : ADMM pour M, descente de gradient pour les ressorts.</p>`),
 ].join('\n');
 
@@ -216,6 +246,7 @@ export const fr: RecoveryText = {
     d9: {title: 'D.9 : la croix échoue pour N ≥ 3', detail: 'La croix est rigide et fixe toute complétion de rang un, mais sa plus petite norme nucléaire vaut 2√(N − 1) < N.'},
     e: {title: 'Théorème E : rigide et une permutation', detail: `Pour des entrées de module un : une permutation dans Ω donne ‖X‖${S1} ≥ N (E.1) ; avec la rigidité, M retrouve la table (E.2) ; sans permutation, un témoin moins cher existe (E.3) ; ensemble, une équivalence (E.4).`},
     e3w: {title: 'E.3, exact : le coût du bloc abaissé', detail: `Pour k = |R|, l = |C| et g = √(k l (N − k)(N − l)) : les facteurs de J − s² 1_R 1_Cᵀ coûtent au plus N − ½ s² (k + l − N − k s²) ; sa norme nucléaire vaut exactement √(N² − 2s² (k l − g) + s⁴ k l), minimale en s² = 1 − g/(k l), où elle vaut √(k (N − l)) + √(l (N − k)) ; il existe un réel t avec ‖J − t 1_R 1_Cᵀ‖${S1} < N si et seulement si k + l > N. Lean démontre la norme exacte pour tout bloc m × n et tout réel t. Pour la croix, le minimum est 2√(N − 1). Sur main depuis les commits 4943eec7 et a9e36f03.`},
+    margin: {title: 'La marge d’échec : sous N − 1/(2N)', detail: 'Toute matrice égale à J hors d’un bloc de k lignes et l colonnes avec k + l > N coûte au moins √(k (N − l)) + √(l (N − k)) : une contraction, constante sur chacune des deux bandes qui bordent le bloc et nulle ailleurs, le certifie, et le bloc abaissé l’atteint. Sans permutation, le bloc de Hall a k + l = N + 1, et Cauchy–Schwarz borne son coût par √(N² − 1) < N − 1/(2N). Pour N ≥ 1 et k + l = N + 1 avec k ≤ l ≤ k + 1, le plus grand coût minimal sans permutation est √(k (k − 1)) + √(l (l − 1)) : √(N² − 1) pour N impair, √2 + √6 pour N = 4. Une remise à l’échelle porte les deux bornes à toute table de rang un d’entrées de module un. Sur main depuis les commits f192a4aa, da5f79ce et 58f6f140.'},
     f12: {title: 'F.1–F.2 : un plan ⇒ reconstruction', detail: `Un plan de transport de α vers β sur Ω donne ‖X‖${S1} ≥ ‖a‖ ‖b‖ ; avec la rigidité, M retrouve a bᵀ. Sur main depuis le commit 7f7423c9.`},
     f3a: {title: 'F.3 : non rigide ⇒ un retournement, toutes tailles', detail: `Les phases u_i v_j = 1 sur Ω, avec u_i₀ v_j₀ = −1, donnent une seconde table de mêmes modules. Comme ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, elle coûte autant. Sur main depuis le commit b6577f53.`},
     f3b: {title: 'F.3 : des lignes trop chargées ⇒ un témoin moins cher', detail: 'Si des lignes R portent plus de sable que leurs colonnes N(R) n’en prennent, Ω évite R × N(R)ᶜ, et U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ tirés de E.3, avec p² = ‖b‖/‖a‖, coûtent moins que ‖a‖ ‖b‖. Sur main depuis le commit b6577f53.'},
@@ -225,6 +256,7 @@ export const fr: RecoveryText = {
     g: {title: 'Théorème G : entrées nulles permises', detail: 'Pour a ≠ 0 et b ≠ 0, zéros permis : M retrouve a bᵀ ⇔ les cases de Ω avec a_i ≠ 0 et b_j ≠ 0 relient ces lignes à ces colonnes, et Σ_R α_i ≤ Σ_N(R) β_j pour tout ensemble de lignes R. Une ligne ou une colonne de zéros n’a besoin d’aucune case. Exemple : dans une table 1 × 2, la case (0, 0) retrouve (1)(1, 0)ᵀ mais pas (1)(1, 1)ᵀ. Sur main depuis les commits 1c4bed77 et 6574a220.'},
     n3: {title: 'Tous les motifs 3 × 3', detail: 'Les 511 motifs sauf le plein à poids égaux et, dans chacun des trois tirages de poids aléatoires, les 510 non vides, résolus par ADMM par lots : chaque classe se comporte comme le disent les théorèmes (section 7).'},
     n4: {title: 'Tous les motifs 4 × 4', detail: 'Les 65 535 motifs sauf le plein, à poids égaux, résolus par ADMM par lots : chaque classe se comporte comme le dit le théorème E. Les 4464 motifs rigides avec une permutation dont l’erreur dépasse encore 10⁻⁶ après 20 000 pas continuent de converger quand on prolonge le calcul (section 7).'},
+    nmargin: {title: 'La marge d’échec, de 3 × 3 à 7 × 7', detail: 'Hors de chaque bloc avec k + l > N, ADMM atteint le coût minimal démontré à une erreur d’arrondi près. Sur 2000 motifs aléatoires de chaque taille sans permutation, les plus grands écarts coïncident avec le pire cas démontré à six décimales, sauf pour les motifs non rigides à N = 7 (section 7).'},
     zeros: {title: 'Tables à entrées nulles', detail: 'Les 12 211 motifs, sauf les pleins, de 13 tables, toutes sauf une avec des zéros à des places fixées, résolus par ADMM par lots : chaque classe se comporte comme le dit le théorème G (section 7).'},
     train: {title: 'L’entraînement atteint M', detail: 'La pénalité sur les poids à son optimum est M (lemme 1). Que l’entraînement atteigne cet optimum est une étape de modélisation, pas un théorème.'},
   },

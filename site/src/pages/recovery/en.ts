@@ -1,4 +1,4 @@
-/** The recovery page in English. Source: review/flat_spectrum.md, Theorems D, E, F and G. */
+/** The recovery page in English. Source: review/flat_spectrum.md, Theorems D, E, F and G and the failure margin. */
 
 import {box, eq, heuristic, lean, m, numbers, numerical, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
@@ -72,6 +72,19 @@ const body = [
   ${lean('E.3, exact')}. For the cross, ${m('k = l = N − 1')}, the least is the ${m('2√(N − 1)')} of D.9. Slide ${m('s')}
   below: the dark curve is the cost, the grey one the bound from the factors, and the lower line Lean's least value.</p>
   ${widget('lab', 'hall')}
+  <p>How much cheaper can the answer be? The lower line above is the least cost of every matrix that agrees with ${m('J')}
+  off ${m('R × C')}, not only of the lowered blocks ${lean('failure margin')}: the matrix equal to ${m('1/√(k (N − l))')} on
+  ${m('R × Cᶜ')}, to ${m('1/√(l (N − k))')} on ${m('Rᶜ × C')} and zero elsewhere is a contraction, its inner product with
+  any matrix equal to 1 on these two strips is ${m('√(k (N − l)) + √(l (N − k))')}, and an inner product with a contraction
+  never exceeds the nuclear norm. Hall's rows can be taken with ${m('k + l = N + 1')}, and then Cauchy–Schwarz bounds this
+  cost by ${m('√(N² − 1)')}. With ${m('k + l')} fixed, it grows with ${m('k l')}, which is largest when ${m('k')} and
+  ${m('l')} differ by at most one. Multiplying rows and columns by numbers of modulus one changes no cost.</p>
+  ${box(`<strong>The failure margin</strong> ${lean('failure margin')}. Let ${m('Ω')} contain no permutation, and let
+  ${m('K')} be ${m('J')} or any other table of rank one with entries of modulus one, so that ${m(`‖K‖${S1} = N`)}. Then
+  some matrix that agrees with ${m('K')} on ${m('Ω')} costs at most ${m('√(N² − 1) < N − 1/(2N)')}. For ${m('N ≥ 1')}, let
+  ${m('k + l = N + 1')} with ${m('k ≤ l ≤ k + 1')}. Every such ${m('Ω')} has one that costs at most
+  ${m('√(k (k − 1)) + √(l (l − 1))')}, and for some such ${m('Ω')} that is the least cost: ${m('√(N² − 1)')} for odd
+  ${m('N')}, ${m('√2 + √6 ≈ 3.864')} for ${m('N = 4')}.`)}
   ${widget('quiz', 'q3')}`),
 
   section('weights', 5, 'Weights: sand and holes', `
@@ -129,7 +142,7 @@ const body = [
     ['rigid, no plan', '114', '−1.63 to −3·10<sup>−6</sup>', '1.7·10<sup>−3</sup> to 0.88', 'F.3'],
     ['not rigid, no plan', '306', '−6.16 to −3·10<sup>−6</sup>', '0.44 to 1.00', 'F.3'],
   ])}
-  <p class="sub">The nine rigid patterns without a permutation are the crosses, and −0.172 = 2√2 − 3. In the three draws no
+  <p class="sub">The nine rigid patterns without a permutation are the crosses, and −0.172 = 2√2 − 3, the proved worst case of section 4 for N = 3. In the three draws no
   pattern carries a plan without being rigid. With moduli ${m('(√2, 1, 1)')} for both ${m('a')} and ${m('b')}, so that
   ${m('α = β = (½, ¼, ¼)')} and a proper set of rows can fill the columns it sees exactly, the rigid patterns with a plan
   converge slowly: their largest error is 2.4·10<sup>−4</sup>, 5.0·10<sup>−5</sup> and 1.0·10<sup>−5</sup> after 6000,
@@ -141,7 +154,22 @@ const body = [
     ['not rigid, permutation', '3970', 'within 2·10<sup>−14</sup> of 0', '0.775–1.00', 'E.1, D.7'],
     ['not rigid, no permutation', '25 249', '−4.00 to −0.136', '0.632–1.00', 'E.3'],
   ])}
-  <p class="sub">Theorem E proves that M recovers J from every rigid pattern with a permutation, so the error up to 8.5·10<sup>−5</sup> in the first row is ADMM’s slowness. It comes from the 27 068 of these patterns in which a proper set of rows sees exactly as many columns as it has rows; on the other 6784 the error is below 10<sup>−13</sup>, a rounding error. After 20 000 steps, 4464 of the 27 068 still have an error above 10<sup>−6</sup>. Run on, they keep converging: their error stays below 3.5·10<sup>−5</sup>, 1.8·10<sup>−5</sup> and 8.9·10<sup>−6</sup> after 50 000, 100 000 and 200 000 steps, about half as large each time the steps double, and their gap is positive and below 2.3·10<sup>−8</sup> ${numerical('2026-10-29', L)}.</p>
+  <p class="sub">The ends −0.536 and −0.136 of the second row are, to three decimals, 2√3 − 4, the cross of D.9, and √2 + √6 − 4, the proved worst case for N = 4, which the last row reaches too. Theorem E proves that M recovers J from every rigid pattern with a permutation, so the error up to 8.5·10<sup>−5</sup> in the first row is ADMM’s slowness. It comes from the 27 068 of these patterns in which a proper set of rows sees exactly as many columns as it has rows; on the other 6784 the error is below 10<sup>−13</sup>, a rounding error. After 20 000 steps, 4464 of the 27 068 still have an error above 10<sup>−6</sup>. Run on, they keep converging: their error stays below 3.5·10<sup>−5</sup>, 1.8·10<sup>−5</sup>, 8.9·10<sup>−6</sup> and 4.5·10<sup>−6</sup> after 50 000, 100 000, 200 000 and 400 000 steps, about half as large each time the steps double, and at the end their gap is positive and below 7.9·10<sup>−9</sup> ${numerical('2026-10-29', L)}.</p>
+  <p>The failure margin on ${m('N × N')} tables of ones, ${m('N')} from 3 to 7, 20 000 steps ${numerical('2026-10-29', L)}.
+  Off every block of ${m('k')} rows and ${m('l')} columns with ${m('k + l > N')}, ADMM meets the least cost
+  ${m('√(k (N − l)) + √(l (N − k))')} to within 5·10<sup>−15</sup>, a rounding error. Then 2000 random patterns of each size
+  without a permutation, each keeping every cell with its own probability, drawn uniformly from ${m('[0.3, 0.9]')}:</p>
+  ${numbers(['Failure margin', 'rigid / not rigid', 'largest gap, rigid', 'largest gap, not rigid', 'proved worst case'], [
+    ['3 × 3', '65 / 1935', '−0.172', '−0.172', '√8 − 3 = −0.172'],
+    ['4 × 4', '117 / 1883', '−0.136', '−0.136', '√2 + √6 − 4 = −0.136'],
+    ['5 × 5', '178 / 1822', '−0.101', '−0.101', '√24 − 5 = −0.101'],
+    ['6 × 6', '242 / 1758', '−0.0864', '−0.0864', '√6 + √12 − 6 = −0.0864'],
+    ['7 × 7', '268 / 1732', '−0.0718', '−0.0784', '√48 − 7 = −0.0718'],
+  ])}
+  <p class="sub">The largest gaps agree with the proved worst case to six decimals, in both classes for ${m('N')} from 3 to 6
+  and in the rigid one for ${m('N = 7')}; there the patterns that are not rigid reach only the ${m('3 × 5')} block,
+  √6 + √20 − 7 = −0.0784. ADMM never ends more than 7.7·10<sup>−7</sup> above the cost of the cheapest block a pattern
+  misses.</p>
   <p>Tables with zero entries: every pattern but the full one of 13 tables of sizes ${m('2 × 3')}, ${m('3 × 2')},
   ${m('3 × 3')}, ${m('2 × 4')} and ${m('3 × 4')}, all but one with zeros at fixed places, random phases, 30 000 steps
   ${numerical('2026-10-28', L)}. Rigid means here that the cells with ${m(`${ai} ≠ 0`)} and ${m(`${bj} ≠ 0`)} connect these
@@ -162,7 +190,7 @@ const body = [
   <p>Every claim of this page, sorted by how it is known. Click a card for its Lean names.</p>
   ${widget('status')}
   <p class="sub">Source: <code>review/flat_spectrum.md</code> in the transformer repository, the section “Exact recovery of a
-  rank-one kernel”, Theorems D, E, F and G. Lean: <code>Transformer.Grokking.FlatSpectrum</code>. The solvers on this page run in
+  rank-one kernel”, Theorems D, E, F and G and the failure margin. Lean: <code>Transformer.Grokking.FlatSpectrum</code>. The solvers on this page run in
   your browser: ADMM for M, gradient descent for the springs.</p>`),
 ].join('\n');
 
@@ -204,6 +232,7 @@ export const en: RecoveryText = {
     d9: {title: 'D.9: the cross fails for N ≥ 3', detail: 'The cross is rigid and fixes every rank-one completion, yet its least nuclear norm is 2√(N − 1) < N.'},
     e: {title: 'Theorem E: rigid and a permutation', detail: `For entries of modulus one: a permutation in Ω gives ‖X‖${S1} ≥ N (E.1); with rigidity M recovers the table (E.2); without a permutation a cheaper witness exists (E.3); together, an equivalence (E.4).`},
     e3w: {title: 'E.3, exact: the cost of the lowered block', detail: `For k = |R|, l = |C| and g = √(k l (N − k)(N − l)): the factors of J − s² 1_R 1_Cᵀ cost at most N − ½ s² (k + l − N − k s²); its nuclear norm is exactly √(N² − 2s² (k l − g) + s⁴ k l), least at s² = 1 − g/(k l), where it is √(k (N − l)) + √(l (N − k)); some real t gives ‖J − t 1_R 1_Cᵀ‖${S1} < N exactly when k + l > N. Lean proves the exact norm for every m × n block and every real t. For the cross the least is 2√(N − 1). On main since commits 4943eec7 and a9e36f03.`},
+    margin: {title: 'The failure margin: below N − 1/(2N)', detail: 'Every matrix equal to J off a block of k rows and l columns with k + l > N costs at least √(k (N − l)) + √(l (N − k)): a contraction, constant on each of the two strips beside the block and zero elsewhere, certifies it, and the lowered block reaches it. Without a permutation, Hall’s block has k + l = N + 1, and Cauchy–Schwarz bounds its cost by √(N² − 1) < N − 1/(2N). For N ≥ 1 and k + l = N + 1 with k ≤ l ≤ k + 1, the largest least cost without a permutation is √(k (k − 1)) + √(l (l − 1)): √(N² − 1) for odd N, √2 + √6 for N = 4. Rescaling carries both bounds to every rank-one table with entries of modulus one. On main since commits f192a4aa, da5f79ce and 58f6f140.'},
     f12: {title: 'F.1–F.2: a plan ⇒ recovered', detail: `A transport plan from α to β on Ω gives ‖X‖${S1} ≥ ‖a‖ ‖b‖; with rigidity M recovers a bᵀ. On main since commit 7f7423c9.`},
     f3a: {title: 'F.3: not rigid ⇒ a flip, any sizes', detail: `The phases u_i v_j = 1 on Ω, with u_i₀ v_j₀ = −1, give a second table with the same moduli. Since ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, it costs the same. On main since commit b6577f53.`},
     f3b: {title: 'F.3: overfull rows ⇒ a cheaper witness', detail: 'If rows R hold more sand than their columns N(R) take, Ω misses R × N(R)ᶜ, and U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ from E.3, with p² = ‖b‖/‖a‖, cost less than ‖a‖ ‖b‖. On main since commit b6577f53.'},
@@ -213,6 +242,7 @@ export const en: RecoveryText = {
     g: {title: 'Theorem G: zero entries allowed', detail: 'For a ≠ 0 and b ≠ 0, zeros allowed: M recovers a bᵀ ⇔ the cells of Ω with a_i ≠ 0 and b_j ≠ 0 connect these rows to these columns, and Σ_R α_i ≤ Σ_N(R) β_j for every set of rows R. A row or a column of zeros needs no cell. Example: in a 1 × 2 table the cell (0, 0) recovers (1)(1, 0)ᵀ but not (1)(1, 1)ᵀ. On main since commits 1c4bed77 and 6574a220.'},
     n3: {title: 'Every 3 × 3 pattern', detail: 'All 511 patterns but the full one with equal weights and, in each of three draws of random weights, the 510 nonempty ones, solved by batched ADMM: each class behaves as the theorems say (section 7).'},
     n4: {title: 'Every 4 × 4 pattern', detail: 'All 65 535 patterns but the full one, with equal weights, solved by batched ADMM: each class behaves as Theorem E says. The 4464 rigid patterns with a permutation whose error is still above 10⁻⁶ after 20 000 steps keep converging when run on (section 7).'},
+    nmargin: {title: 'The failure margin, 3 × 3 to 7 × 7', detail: 'Off every block with k + l > N, ADMM meets the proved least cost to within a rounding error. On 2000 random patterns of each size without a permutation, the largest gaps agree with the proved worst case to six decimals, except for the patterns that are not rigid at N = 7 (section 7).'},
     zeros: {title: 'Tables with zero entries', detail: 'All 12 211 patterns but the full ones of 13 tables, all but one with zeros at fixed places, solved by batched ADMM: each class behaves as Theorem G says (section 7).'},
     train: {title: 'Training reaches M', detail: 'Weight decay at its optimum is M (Lemma 1). That training reaches this optimum is a modeling step, not a theorem.'},
   },

@@ -24,6 +24,7 @@ export const STATUS_BASE = {
   d9: {kind: 'lean', lean: 'rigid_cross, isLeast_nuclearNorm_vecMulVec_cross, vecMulVec_cross_determined_not_isMinOn'},
   e: {kind: 'lean', lean: 'card_le_nuclearNorm_of_perm, isMinOn_vecMulVec_iff_of_perm, exists_nuclearNorm_lt_of_not_perm, not_isMinOn_onesMatrix_of_not_perm, forall_isMinOn_vecMulVec_iff, forall_isMinOn_addKernel_iff'},
   e3w: {kind: 'lean', lean: 'nuclearNorm_blockWitness_le, nuclearNorm_onesSubBlock, nuclearNorm_onesSubBlock_sq_of_nonneg, nuclearNorm_onesSubBlock_best, isLeast_nuclearNorm_onesSubBlock, exists_nuclearNorm_onesSubBlock_lt_card_iff, isLeast_nuclearNorm_onesSubBlock_cross'},
+  margin: {kind: 'lean', lean: 'isContraction_blockCert, sqrt_add_sqrt_le_nuclearNorm_of_block, isLeast_nuclearNorm_compl_block_card, exists_nuclearNorm_le_sqrt_of_not_perm, failureMargin, failureMargin_odd, failureMargin_four, image_nuclearNorm_vecMulVec, exists_nuclearNorm_le_sqrt_vecMulVec_of_not_perm, failureMargin_vecMulVec'},
   f12: {kind: 'lean', lean: 'sum_norm_sq_le_nuclearNorm_of_transport, isMinOn_vecMulVec_iff_of_transport'},
   f3a: {kind: 'lean', lean: 'nuclearNorm_vecMulVec, exists_vecMulVec_ne_of_not_rigid_of_ne_zero, not_forall_isMinOn_vecMulVec_of_not_rigid'},
   f3b: {kind: 'lean', lean: 'exists_nuclearNorm_lt_of_weighted_block, exists_nuclearNorm_lt_of_nbhd, not_isMinOn_vecMulVec_of_nbhd'},
@@ -33,6 +34,7 @@ export const STATUS_BASE = {
   g: {kind: 'lean', lean: 'forall_isMinOn_vecMulVec_iff_support, forall_isMinOn_vecMulVec_iff_exists_transport_support, rigid_support_iff_connected'},
   n3: {kind: 'numerical'},
   n4: {kind: 'numerical'},
+  nmargin: {kind: 'numerical'},
   zeros: {kind: 'numerical'},
   train: {kind: 'heuristic'},
 } as const satisfies Readonly<Record<string, StatusBase>>;
