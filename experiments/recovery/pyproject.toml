@@ -1,0 +1,26 @@
+[project]
+name = "recovery"
+version = "0.1.0"
+description = "Numerical checks of when the least nuclear norm recovers a table from some of its cells"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "torch==2.14.1",
+]
+
+[project.scripts]
+recovery = "recovery.interfaces.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14"]
+build-backend = "uv_build"
+
+# The CUDA 12.6 build of torch, the one the transformer repository's lab uses, so that one
+# download in uv's cache serves both.
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
