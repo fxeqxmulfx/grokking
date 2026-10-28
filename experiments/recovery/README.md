@@ -15,6 +15,12 @@ For a table of rank one, `K = a bᵀ`:
   rigidity asked only on the rows and columns where `a` and `b` are not zero. With moduli one
   there, the condition is a bijection between these rows and columns inside `Ω`
   (`forall_isMinOn_vecMulVec_iff_equiv_support`).
+- **The failure margin**, ones on an `N × N` table: off a `k × l` block with `k + l > N` the
+  least norm is `√(k (N − l)) + √(l (N − k))` (`isLeast_nuclearNorm_compl_block_card`), and
+  the cells off it contain no permutation. Every `Ω` without a permutation has a completion of
+  norm at most `√(N² − 1) < N − 1/(2N)` (`exists_nuclearNorm_le_sqrt_of_not_perm`). For
+  `N ≥ 1` and `a + b = N + 1` with `a ≤ b ≤ a + 1`, every such `Ω` has one of norm at most
+  `√(a (a − 1)) + √(b (b − 1))`, and some such `Ω` has it as least norm (`failureMargin`).
 
 On `p × p` tables at a prime `p`, with `ψ(x) = e^{2πix/p}`:
 
@@ -40,6 +46,7 @@ the training halves of `grok-simple.py` (`~/rust_projects/grokking_abmod/scripts
 uv run --locked recovery equal 3 20000               # Theorem E, 3 × 3
 uv run --locked recovery equal 4 20000               # Theorem E, 4 × 4: about two hours
 uv run --locked recovery slow 4 20000 50000 100000 200000 400000
+uv run --locked recovery margin 20000 --sizes 3 4 5 6 7 --count 2000   # the failure margin
 uv run --locked recovery weighted 3 6000             # Theorem F, random weights
 uv run --locked recovery tight 6000                  # Theorem F, weights with exact ties
 uv run --locked recovery tight-slow 6000 30000 150000
@@ -69,6 +76,7 @@ a `4 × 4` table took 30 s on the CPU and 555 s on an RTX 3050.
 | `zeros` | nine: 2 × 3, 3 × 2, 3 × 3, 2 × 4, 3 × 4, eight of them with zeros at fixed places | 6583 | moduli uniform in [0.3, 2], random phases, seed 0 | 30 000 | `‖X − K‖` off `Ω` over `‖K‖` |
 | `zeros --tight` | four: three 3 × 3, one 3 × 4 | 5628 | the moduli of `TIGHT_MODULI`, random phases, seed 0 | 30 000 | `‖X − K‖` off `Ω` over `‖K‖` |
 | `slow 4` | one 4 × 4 | the 27 068 rigid ones with a tight Hall condition; after the first checkpoint, those with error above `10⁻⁶` | ones | up to 400 000 | `‖X − K‖/‖K‖` off `Ω` |
+| `margin` | one `N × N` of each size, `N` = 3 to 7 | the cells off every `k × l` block of the first rows and columns with `k + l > N`; 2000 random patterns without a permutation, each drawing a density uniform in [0.3, 0.9] and keeping each cell with it, seed 0 | ones | 20 000 | none: `‖Z‖_S1` against Lean's values |
 | `tight` | three 3 × 3: A, B, C of `TIGHT_WEIGHTS` | the 510 nonempty ones of each | moduli with exact ties, random phases, seed 1 | 6000 | `‖X − K‖/‖K‖` off `Ω` |
 | `tight-slow` | table A | its 144 rigid patterns with a plan | as in `tight` | up to 150 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `cross` | 400 of each size 3 × 3 to 6 × 6 | row 0 and column 0 | moduli uniform in [0.3, 2], random phases, then `\|a_0\|` and `\|b_0\|` set so that the shares `α₀`, `β₀` are uniform in (0.05, 0.95), seed 0 | 100 000 | `‖X − K‖/‖K‖` off `Ω` |
@@ -129,6 +137,39 @@ hours):
 | rigid, no permutation | 2464 | −0.536 to −0.136 | 0.345 to 0.667 |
 | not rigid, a permutation | 3970 | −9.77e-15 to 1.60e-14 | 0.775 to 1.00 |
 | not rigid, no permutation | 25 249 | −4.00 to −0.136 | 0.632 to 1.00 |
+
+`slow 4 20000 50000 100000 200000 400000`, the 27 068 rigid patterns with a tight Hall
+condition: after 20 000 steps 22 604 are recovered, and the largest gap 6.62e-7 and the
+largest error 8.46e-5 are those of the first run. The other 4464 run on:
+
+| steps | gap | error |
+| --- | --- | --- |
+| 20 000 | 3.09e-10 to 6.62e-7 | 2.03e-5 to 8.46e-5 |
+| 50 000 | 1.19e-10 to 1.73e-7 | 1.26e-5 to 3.47e-5 |
+| 100 000 | 4.49e-11 to 6.20e-8 | 7.74e-6 to 1.75e-5 |
+| 200 000 | 1.43e-11 to 2.21e-8 | 4.34e-6 to 8.83e-6 |
+| 400 000 | 4.07e-12 to 7.84e-9 | 2.17e-6 to 4.43e-6 |
+
+The largest error about halves each time the steps double, and the gap stays positive. Theorem E
+proves that `J` is the only solution of M there, so the slowness is ADMM's.
+
+The failure margin (`margin 20000 --sizes 3 4 5 6 7 --count 2000`). Off each `k × l` block with
+`k + l > N`, `‖Z‖_S1` is Lean's least norm `√(k (N − l)) + √(l (N − k))` to within `5·10⁻¹⁵`, a
+rounding error. A random pattern's least block value is the least of these values over the
+blocks with `k + l > N` it misses; a completion has this norm
+(`exists_nuclearNorm_eq_of_block`). The worst block is the `a × b` of `failureMargin`:
+
+| `N` | worst block | its value − `N` | rigid | not rigid | largest gap, rigid | largest gap, not rigid | largest `‖Z‖_S1` − least block value |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 3 | 2 × 2 | `√8 − 3` = −0.172 | 65 | 1935 | −0.172 | −0.172 | below 1e-14, rounding |
+| 4 | 2 × 3 | `√2 + √6 − 4` = −0.136 | 117 | 1883 | −0.136 | −0.136 | below 1e-14, rounding |
+| 5 | 3 × 3 | `√24 − 5` = −0.101 | 178 | 1822 | −0.101 | −0.101 | 2.08e-9 |
+| 6 | 3 × 4 | `√6 + √12 − 6` = −0.0864 | 242 | 1758 | −0.0864 | −0.0864 | 7.63e-7 |
+| 7 | 4 × 4 | `√48 − 7` = −0.0718 | 268 | 1732 | −0.0718 | −0.0784 | 4.65e-7 |
+
+In each class the largest gap is, to six decimals, the largest least block value of its
+patterns, and so at most the worst block's value. For `N = 7` the largest least block value of
+the patterns that are not rigid is that of the `3 × 5` block.
 
 Theorem F, `3 × 3`, the same counts in each of the three draws (gaps and errors over all
 three):

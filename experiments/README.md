@@ -4,4 +4,4 @@ Each experiment is a uv project; run it with `uv run --locked …` inside its di
 
 | experiment | question |
 | --- | --- |
-| [`recovery/`](recovery/) | When does model M, the least nuclear norm that agrees with a table on the kept cells, give the table back? Every pattern of small tables against Theorems E, F and G; ψ(a + b), ψ(a³ + ab) and characters on prime tables, from diagonals, random cells and the training halves, against Theorem D. |
+| [`recovery/`](recovery/) | When does model M, the least nuclear norm that agrees with a table on the kept cells, give the table back? Every pattern of small tables against Theorems E, F and G, and the failure margin on 3 × 3 to 7 × 7; ψ(a + b), ψ(a³ + ab) and characters on prime tables, from diagonals, random cells and the training halves, against Theorem D. |

@@ -8,8 +8,10 @@ from recovery.application.sweeps import G_CLASSES, Table, equal_weights, slow_ti
 from recovery.application.weights import cross_check, slow_tight_weights, tight_tables, weighted_tables
 from recovery.application.additive import Filled, cubic_splits, diagonal_certificate, long_diagonals, long_runs, survey, theorem_d
 from recovery.application.characters import character_check
+from recovery.application.margins import off_blocks, random_margins
 from recovery.infrastructure.admm import TorchADMM
 from recovery.infrastructure.certificates import TorchCertificates
+from recovery.domain.margins import block_value, worst_block
 from recovery.infrastructure.draws import TorchDraws
 
 
@@ -78,6 +80,11 @@ def main() -> None:
     chars = checks.add_parser("characters", help="Theorem G: chi(ab) and chi(a + ab) from the training splits")
     chars.add_argument("primes", type=int, nargs="+")
     chars.add_argument("--cap", type=int, default=20000)
+    margin = checks.add_parser("margin", help="the failure margin: J off a block, and random patterns without a permutation")
+    margin.add_argument("steps", type=int)
+    margin.add_argument("--sizes", type=int, nargs="+", default=[3, 4, 5, 6])
+    margin.add_argument("--count", type=int, default=1000, help="random patterns of each size")
+    margin.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
     solver = TorchADMM(args.device)
     print(f"device {solver.device}", flush=True)
@@ -155,6 +162,19 @@ def main() -> None:
             for name, parts in totals.items():
                 if parts:
                     print(line(merge(name, parts)))
+        case "margin":
+            draws = TorchDraws(args.seed)
+            for size in args.sizes:
+                k, l = worst_block(size)
+                print(f"{size} x {size}, {args.steps} steps: the largest value with k + l = N + 1 is at k = {k}, l = {l},"
+                      f" value - N = {block_value(size, k, l) - size:+.6f}; sqrt(N^2 - 1) - N = {(size * size - 1) ** 0.5 - size:+.6f}")
+                for b in off_blocks(solver, size, args.steps):
+                    print(f"  off the {b.k} x {b.l} block: value - N = {b.value - size:+.6f},"
+                          f" ||Z||_S1 - value = {b.nuclear - b.value:+.2e}", flush=True)
+                for r in random_margins(solver, draws, size, args.count, args.steps):
+                    print(f"  random, {r.name:9s}: {r.count:5d} patterns without a permutation, largest gap {r.gap:+.6f},"
+                          f" largest least block value - N {r.value:+.6f}, largest ||Z||_S1 - its value {r.over_value:+.2e}",
+                          flush=True)
         case "slow":
             for stop, s in slow_tight_hall(solver, args.size, args.checkpoints):
                 print(f"after {stop:7d} steps:", line(s).strip(), flush=True)
