@@ -29,7 +29,8 @@ Its mathematics is proved in Lean in `~/lean_projects/transformer`.
   interface, so a missing text does not compile. The tests check that the three languages
   have the same sections, widgets, quizzes, answers and status cards.
 - `npm run typecheck` and `npm test` pass before every commit. Look at a changed page in a
-  browser, at desktop and at phone width, before committing it.
+  browser, at desktop and at phone width, before committing it. With `npm start` running,
+  `npm run overflow` lists every formula and tag that leaves its column at 360 px.
 
 ## Computation
 

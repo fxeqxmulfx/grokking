@@ -52,10 +52,6 @@ fast-forward and check `main`'s head before submitting.
       `forall_isMinOn_vecMulVec_iff_support`,
       `forall_isMinOn_vecMulVec_iff_exists_transport_support`,
       `rigid_support_iff_of_ne_zero`), with the zero-entry numbers.
-- [ ] Keep the phone-width probe:
-      `/tmp/claude-1000/-home-misha-lean-projects-transformer/7f8c1b5b-fb83-40a0-b148-1aad6935ee9c/scratchpad/overflow.mjs`
-      loads pages at a set width in headless Chrome (DevTools protocol, `Emulation.setDeviceMetricsOverride`) and
-      lists every formula or tag that leaves its column. Move it to `site/scripts/`.
 - [ ] Recovery page: the N = 4 card goes from `running` to `numerical`. Waits for the N = 4
       sweep (below).
 - [ ] Step 2: Rust compiled to `wasm32-unknown-unknown` in `crates/` for the heavy
