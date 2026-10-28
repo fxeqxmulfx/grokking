@@ -10,6 +10,7 @@ import {en} from '../src/pages/home/en.ts';
 import {fr} from '../src/pages/home/fr.ts';
 import {homeHTML, missingHTML} from '../src/pages/home/index.ts';
 import {ru} from '../src/pages/home/ru.ts';
+import {glueTags, hand, heuristic, lean, numerical, open} from '../src/pages/markup.ts';
 import {OUTLINE, PAGES, PAGE_IDS, PLANNED} from '../src/pages/registry.ts';
 import {STATUS_BASE} from '../src/pages/recovery/spec.ts';
 import {LABS, SPRINGS, isLabId} from '../src/recovery/model.ts';
@@ -157,4 +158,12 @@ test('the outline holds every written and every planned page exactly once', () =
   assert.equal(new Set(ids).size, ids.length);
   assert.deepEqual([...ids].sort(), [...OUTLINE].sort());
   for (const id of PAGE_IDS) assert.ok(homeHTML('en').includes(`href="#/en/${id}"`), id);
+});
+
+test('a tag stays on one line with the punctuation after it', () => {
+  for (const tag of [lean('A'), hand('B', 'en'), numerical('C', 'fr'), open('D', 'ru'), heuristic('E', 'en')]) {
+    assert.equal(glueTags(`x ${tag}. y`), `x <span class="nobr">${tag}.</span> y`);
+    assert.equal(glueTags(`x ${tag}; y`), `x <span class="nobr">${tag};</span> y`);
+    assert.equal(glueTags(`x ${tag} y`), `x ${tag} y`);
+  }
 });

@@ -10,6 +10,7 @@ import {LANGS, LANG_NAMES, type Lang, type Localized} from '../i18n.ts';
 import {esc, part} from '../markup.ts';
 import {HOME, MISSING, hrefOf, type Route} from '../router.ts';
 import {HOME_NAV, HOME_TITLE, MISSING_TITLE, homeHTML, missingHTML} from '../pages/home/index.ts';
+import {glueTags} from '../pages/markup.ts';
 import {PAGES, PART_NAMES, pageById} from '../pages/registry.ts';
 import type {Page} from '../pages/types.ts';
 import {isLabId} from '../recovery/model.ts';
@@ -94,7 +95,7 @@ export function mountShell(kernel: AppKernel, root: HTMLElement): Unmount {
     document.documentElement.lang = lang;
     top.innerHTML = headerHTML(route);
     foot.innerHTML = `<p>${WORDS[lang].foot}</p>`;
-    outlet.innerHTML = page ? pageHTML(page, lang) : route.page === HOME ? homeHTML(lang) : missingHTML(lang);
+    outlet.innerHTML = glueTags(page ? pageHTML(page, lang) : route.page === HOME ? homeHTML(lang) : missingHTML(lang));
     const title = page ? page.text[lang].title : route.page === MISSING ? MISSING_TITLE[lang] : HOME_TITLE[lang];
     document.title = `${plain(title)} · ${WORDS[lang].site}`;
     if (route.page !== MISSING) history.replaceState(null, '', hrefOf(route));

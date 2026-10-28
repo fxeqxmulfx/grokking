@@ -11,6 +11,15 @@ const HEURISTIC: Localized<string> = {en: 'heuristic', fr: 'heuristique', ru: '�
 const mark = (kind: string, symbol: string, text: string): string =>
   `<span class="tag"><span class="icon ${kind}" aria-hidden="true">${symbol}</span>${text}</span>`;
 
+/** One tag as `mark` writes it, then the punctuation right after it. */
+const TAG_THEN_PUNCTUATION = /(<span class="tag"><span class="icon [a-z]+" aria-hidden="true">[^<]*<\/span>[^<]*<\/span>)([.,;:])/g;
+
+/**
+ * Keeps each tag on one line with the punctuation after it. A tag is an inline box, and a
+ * browser may break the line after such a box even before a period.
+ */
+export const glueTags = (html: string): string => html.replace(TAG_THEN_PUNCTUATION, '<span class="nobr">$1$2</span>');
+
 /** A claim proved in Lean. */
 export const lean = (label: string): string => mark('good', '✓', `${label} · Lean`);
 /** A claim proved by hand, not yet in Lean. */
