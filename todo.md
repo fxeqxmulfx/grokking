@@ -22,6 +22,19 @@ them in step.
       numbers in the three languages.
 - [x] Checked at 1280 px, 390 px and 360 px: no formula leaves its column.
 
+## Done: the home page states two theorems and what follows
+
+`b890d34`: one sentence, then its terms made exact (the table, weight decay at its optimum,
+which is model M by Lemma 1, rank one and flat, connecting and containing a permutation),
+then **Theorem 1** (no incomplete set recovers a flat table without zero entries) and
+**Theorem 2** (a rank-one table of modulus-one entries is recovered exactly from the sets
+that connect its rows to its columns and contain a permutation), then six conclusions: the
+fewest cells, a function with discontinuities of the second kind from an incomplete set,
+the readout decides, one hidden cell, the training data, the network. Every Lean claim
+lists its declarations; a test checks each against the transformer `INDEX.md`. French and
+Russian match the English piece by piece. `c8cae25`: a tag no longer leaves its period
+alone at the start of a line.
+
 ## Lean, in the transformer repository
 
 Work in the worktree `.claude/worktrees/rank-one-recovery`; land each commit on `main` by
@@ -33,9 +46,19 @@ fast-forward and check `main`'s head before submitting.
       `forall_isMinOn_taskKernel_mul_mulChar_iff`, and for `χ(a + ab) = χ(a) χ(1 + b)`
       `forall_isMinOn_taskKernel_add_mul_mulChar_iff`. The home page says `lean('G and Hall')`
       in three languages; the χ check (12 splits) is in `review/flat_spectrum.md`.
-- [ ] **Rigidity is connectivity.** Rigid on the supports ⇔ the bipartite graph of Ω on the
-      nonzero rows and columns is connected; so a rigid pattern has at least `2N − 1` cells.
-      The home page marks it `hand('graphs')`.
+- [x] **Rigidity is connectivity.** `6574a220`: `rigid_support_iff_connected`, and Theorems
+      E and G restated with graphs. `6b77e8ee`: no set of fewer than `2N − 1` cells recovers
+      every rank-one table of modulus-one entries
+      (`two_mul_card_le_ncard_add_one_of_forall_isMinOn`).
+- [x] **Weight decay at its optimum is M.** `1aed20a5`: `IsOptimalFit`,
+      `forall_isMinOn_iff_iff_isOptimalFit`; `a675e2aa`: Theorems 1 and 2 of the home page in
+      that form (`not_exists_isOptimalFit_of_singularValues_eq`,
+      `isOptimalFit_vecMulVec_iff_connected`). That training reaches the optimum stays a
+      heuristic.
+- [x] **The readout decides.** `785e838f`: `not_isMinOn_taskKernel_mul` (the table of `ab`
+      itself is recovered from no incomplete set). `679c008b`: `2p − 3` cells recover the
+      table of `χ(ab)` for every `χ` (`forall_isMinOn_taskKernel_mul_mulChar_productCells`),
+      and no fewer do (`two_mul_sub_three_le_ncard_of_forall_isMinOn`).
 - [ ] **The discontinuity.** `frac(pxy)` converges as `p → ∞` through primes iff `2xy ∈ ℤ`.
       The home page marks it `hand('Dirichlet, Vinogradov')`. The rational case needs
       Dirichlet's theorem (look it up with `dt`). The irrational case needs Vinogradov's
