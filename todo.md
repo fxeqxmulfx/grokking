@@ -64,17 +64,23 @@ fast-forward and check `main`'s head before submitting.
       Dirichlet's theorem (look it up with `dt`). The irrational case needs Vinogradov's
       equidistribution of `pα` over primes, which Mathlib lacks: find a weaker argument, or
       it stays `hand`.
-- [ ] The rest of *Not formalized* in `review/flat_spectrum.md`: two diagonals minus one cell
-      are rigid; `‖Y − Q‖_op = cos(π/p)`; the exact norm of the witness `J − t 1_R 1_Cᵀ`.
+- [x] Two diagonals minus any one cell still recover `ψ(a + b)` (`63617153`).
+- [x] **The exact witness.** `4943eec7`, `a9e36f03`: `‖J − t 1_R 1_Cᵀ‖²_S1 =
+      m n − 2t k l + t² k l + 2|t| g` for every real `t`, least `√(k (n − l)) + √(l (m − k))`
+      at `t = 1 − g/(k l)`; some `t` beats `J` iff `k + l > N`. On the site: `eef763e`.
+- [ ] **The failure margin.** Cauchy–Schwarz on the exact witness: a missed block with
+      `k + l > N` gives `√(k (N − l)) + √(l (N − k)) ≤ √((k + l)(2N − k − l)) ≤ √(N² − 1)`, so
+      every pattern without a permutation lets M miss `J` by more than `1/(2N)`. The 4 × 4 sweep
+      fits: its largest gap without a permutation, −0.136, is `√2 + √6 − 4`. Sharp for odd `N`
+      if the complement of a `(N + 1)/2` square block has least norm exactly `√(N² − 1)`:
+      averaging over the permutations of `R` and of `C` makes the best fill constant on the
+      block.
+- [ ] `‖Y − Q‖_op = cos(π/p)`, the last item of *Not formalized* in `review/flat_spectrum.md`.
 
 ## Site
 
-- [ ] Recovery page: Theorem G in its status, in three languages (`spec.ts`, Lean names
-      `forall_isMinOn_vecMulVec_iff_support`,
-      `forall_isMinOn_vecMulVec_iff_exists_transport_support`,
-      `rigid_support_iff_of_ne_zero`), with the zero-entry numbers.
-- [ ] Recovery page: the N = 4 card goes from `running` to `numerical`. Waits for the N = 4
-      sweep (below).
+- [x] Recovery page: Theorem G with the zero-entry numbers, and the N = 4 card (`177fa3b`).
+- [ ] Recovery page: the slow check's 400 000-step point, when `slow 4` ends.
 - [ ] Step 2: Rust compiled to `wasm32-unknown-unknown` in `crates/` for the heavy
       computations (nuclear-norm completion, singular values, κ), then the planned pages of
       `site/src/pages/registry.ts`: `start`, `fourier`, `spectrum`, `model`, `flat`,
@@ -86,14 +92,12 @@ fast-forward and check `main`'s head before submitting.
 
 ## Numerics
 
-- [ ] **Keep the checks.** The scripts behind the numbers of `review/flat_spectrum.md` and
-      of the site (`complete.py`, `patterns.py`, `small.py`, `chi_check.py`, `weighted.py`,
-      `cross_weights.py`, `zeros_check.py` and others) exist only in a session scratchpad:
-      `/tmp/claude-1000/-home-misha-lean-projects-transformer/7f8c1b5b-fb83-40a0-b148-1aad6935ee9c/scratchpad/rec/`.
-      The peak κ and the training predictions come from another scratchpad:
+- [x] **Keep the checks**, recovery part: `experiments/recovery` (`7517446`, `c630fdd`).
+- [ ] **Keep the checks**, training part. The peak κ and the training predictions come from a
+      session scratchpad:
       `/tmp/claude-1000/-home-misha-lean-projects-transformer/f59a2e8a-748c-4f77-9056-88503d0b17c1/scratchpad/train/`
       (`kappa.py`, `tasks.py`, `drive.py`, `kappa.json`, `runs/`, `train.log`).
-      Move both into `experiments/` here, as a uv project, before those directories go.
+      Move them into `experiments/` here, as a uv project, before that directory goes.
 - [ ] **The optimizer.** The course's network trains with Schedule-Free AdamW, but the runs
       it quotes (the ten κ predictions, parity-cubic) used AdamW: `grok-simple.py` in
       `~/rust_projects/grokking_abmod/scripts`, lr 1e-3, betas 0.9/0.98, weight decay 1,
@@ -101,9 +105,8 @@ fast-forward and check `main`'s head before submitting.
       the GPU, or keep saying AdamW. `ScheduleFreeAdamW` is in
       `~/lean_projects/transformer/optimizers/src/lean_optim`; `compare-rotate90.py` in the
       same `scripts/` directory shows how it is wired (`optimizer: schedule_free_adamw`).
-- [ ] **The N = 4 sweep** of every pattern runs in the background, into `small4_out.txt` in
-      the scratchpad above; three of its four classes are printed (56 287 patterns). When it
-      ends: the table in `review/flat_spectrum.md` (*Exhaustive check*) and the site's card.
+- [x] **The N = 4 sweep** of every pattern: all four classes, on the site (`177fa3b`).
+- [ ] The N = 4 table and the slow check in `review/flat_spectrum.md` (*Exhaustive check*).
 
 ## Open, for the next cycles
 
