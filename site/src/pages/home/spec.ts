@@ -21,10 +21,13 @@ export const THEOREM_LEAN = {
 } as const;
 export type TheoremId = keyof typeof THEOREM_LEAN;
 
+/** The Lean declarations behind the limit of `frac(pxy)` through the primes, for rational `xy`. */
+const DISCONTINUITY_LEAN = 'fract_mul_of_odd, tendsto_fract_mul_of_two_mul_eq, infinite_setOf_prime_fract_mul_eq, exists_tendsto_fract_mul_iff, two_mul_mul_mem_range_intCast_iff, volume_setOf_two_mul_mul_mem_range_intCast';
+
 /** The conclusions, in the order of the page, and their Lean declarations; `null` when measured. */
 export const CONCLUSION_LEAN = {
   fewest: 'forall_isMinOn_vecMulVec_staircase, two_mul_card_le_ncard_add_one_of_forall_isMinOn',
-  product: 'forall_isMinOn_taskKernel_mul_mulChar_iff_connected, forall_isMinOn_taskKernel_mul_mulChar_productCells, two_mul_sub_three_le_ncard_of_forall_isMinOn, exists_injective_mulChar, eq_of_taskKernel_eq',
+  product: `${DISCONTINUITY_LEAN}, forall_isMinOn_taskKernel_mul_mulChar_iff_connected, forall_isMinOn_taskKernel_mul_mulChar_productCells, two_mul_sub_three_le_ncard_of_forall_isMinOn, exists_injective_mulChar, eq_of_taskKernel_eq`,
   readout: 'singularValues_taskKernel_mul, not_isMinOn_taskKernel_mul',
   hidden: 'isMinOn_flat_fill_iff, isMinOn_decode_cubic_fill_iff, not_isMinOn_decode_cubic_fill, isMinOn_decode_add_fill_iff',
   data: null,
@@ -34,6 +37,7 @@ export type ConclusionId = keyof typeof CONCLUSION_LEAN;
 
 /** The Lean declarations behind the four boxed theorems of the full statement and its other Lean claims. */
 export const FULL_LEAN = {
+  discontinuity: DISCONTINUITY_LEAN,
   g: 'forall_isMinOn_vecMulVec_iff_support, rigid_support_iff_connected, exists_isTransportPlan_iff',
   a: 'isMinOn_nuclearNorm_iff',
   c: 'sum_norm_sq_sum_poly_add_mul_le_sub_one, sum_norm_sq_sum_affine_add_mul_eq, sum_norm_sq_sum_poly_add_mul_le, exists_sum_norm_sq_eq_iff_natDegree_le_one, norm_sq_sum_poly_add_mul_div_le',

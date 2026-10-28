@@ -48,14 +48,16 @@ const full = [
   ${m(`${sub('F', 'p')}(x, y) = f(a, b)/p`)} en ${m('x = a/p')} et ${m('y = b/p')}. Pour ${m('f = ab')}, c’est
   ${m(`${sub('F', 'p')}(x, y) = ${frac}(pxy)`)} ; sur tout le carré, ${m(`${frac}(pxy)`)} saute le long des
   ${m('p − 1')} hyperboles ${m('pxy = 1, …, p − 1')}. Quand ${m('p')} parcourt les nombres premiers, ${m(`${frac}(pxy)`)}
-  converge exactement là où ${m('2xy')} est entier. Pour ${m('xy')} irrationnel, ses valeurs sont équiréparties dans
-  ${m('[0, 1)')} (Vinogradov). Pour ${m('xy')} rationnel de dénominateur réduit ${m('q ≥ 3')}, elles prennent une infinité
-  de fois chacune des valeurs ${m('k/q')} avec ${m('0 < k < q')} et ${m('k')} premier avec ${m('q')}, qui sont au moins
-  deux (Dirichlet) ${hand('Dirichlet, Vinogradov', L)}. La limite n’existe donc que sur les axes et sur l’hyperbole
-  ${m('xy = ½')}, un ensemble de mesure nulle, et partout ailleurs ${m(`t ↦ ${frac}(xy/t)`)}, sur les points
-  ${m('t = 1/p')}, n’a pas de limite en ${m('t = 0')} : une discontinuité de seconde espèce. Pour ${m('f = a + b')}, au
-  contraire, ${m(`${sub('F', 'p')}(x, y) = ${frac}(x + y)`)} pour tout ${m('p')}, avec un seul saut, de première espèce,
-  le long de ${m('x + y = 1')}. Chaque table est finie ; l’expression décrit la famille quand ${m('p')} grandit.</li>
+  converge exactement là où ${m('2xy')} est entier. Si ${m('2xy')} est entier, ${m(`${frac}(pxy) = ${frac}(xy)`)} pour
+  tout ${m('p')} impair. Pour ${m('xy')} rationnel de dénominateur réduit ${m('q ≥ 3')}, ${m(`${frac}(pxy)`)} prend une
+  infinité de fois chacune des valeurs ${m('k/q')} avec ${m('0 < k < q')} et ${m('k')} premier avec ${m('q')}, qui sont
+  au moins deux, par le théorème de Dirichlet sur les nombres premiers en progression arithmétique
+  ${lean('Dirichlet')}. Pour ${m('xy')} irrationnel, ses valeurs sont équiréparties dans ${m('[0, 1)')} (Vinogradov)
+  ${hand('Vinogradov', L)}. La limite n’existe donc que sur les axes et sur l’hyperbole ${m('xy = ½')}, un ensemble de
+  mesure nulle ${lean('mesure nulle')}, et partout ailleurs ${m(`t ↦ ${frac}(xy/t)`)}, sur les points ${m('t = 1/p')},
+  n’a pas de limite en ${m('t = 0')} : une discontinuité de seconde espèce. Pour ${m('f = a + b')}, au contraire,
+  ${m(`${sub('F', 'p')}(x, y) = ${frac}(x + y)`)} pour tout ${m('p')}, avec un seul saut, de première espèce, le long de
+  ${m('x + y = 1')}. Chaque table est finie ; l’expression décrit la famille quand ${m('p')} grandit.${leanNames(FULL_LEAN.discontinuity)}</li>
   <li><strong>Observations.</strong> Un ensemble ${m('Ω ⊆ ℤ/p × ℤ/p')} de cases dont les valeurs sont montrées. À
   l’entraînement, ${m('Ω')} est une moitié aléatoire : les ${m('p²')} couples sont mélangés (SplitMix64, graines 7 et 11)
   et les ${m('⌊p²/2⌋')} premiers sont gardés, soit 4704 des 9409 cases pour ${m('p = 97')}. Les théorèmes admettent tout
@@ -249,7 +251,9 @@ export const fr: HomeText = {
       ${m('p')} premier et ${m('f(a, b) = ab <span class="op">mod</span> p')}. En ${m('x = a/p')} et ${m('y = b/p')}, pour
       ${m('a, b = 0, …, p − 1')}, ${m(`f/p = ${frac}(pxy)`)}, la partie fractionnaire de ${m('pxy')}. Quand
       ${m('p → ∞')} parmi les nombres premiers, ${m(`${frac}(pxy)`)} a une limite exactement aux points ${m('(x, y)')} de
-      ${m('[0, 1)²')} où ${m('2xy')} est entier, un ensemble d’aire 0 ${hand('Dirichlet, Vinogradov', L)}. En presque tout
+      ${m('[0, 1)²')} où ${m('2xy')} est entier, un ensemble d’aire 0 ${lean('aire')} : là où ${m('xy')} est rationnel,
+      par le théorème de Dirichlet ${lean('Dirichlet')}, ailleurs par celui de Vinogradov ${hand('Vinogradov', L)}. En
+      presque tout
       ${m('(x, y)')}, la fonction ${m(`t ↦ ${frac}(xy/t)`)}, sur les points ${m('t = 1/p')}, n’a donc pas de limite en
       ${m('t = 0')} : une discontinuité de seconde espèce. Pourtant, pour tout caractère multiplicatif ${m('χ')} de
       ${m('ℤ/p')}, prolongé par ${m('χ(0) = 0')}, la table ${m('[χ(ab)] = [χ(a) χ(b)]')} est de rang 1, à coefficients de

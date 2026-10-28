@@ -59,11 +59,14 @@ fast-forward and check `main`'s head before submitting.
       itself is recovered from no incomplete set). `679c008b`: `2p − 3` cells recover the
       table of `χ(ab)` for every `χ` (`forall_isMinOn_taskKernel_mul_mulChar_productCells`),
       and no fewer do (`two_mul_sub_three_le_ncard_of_forall_isMinOn`).
-- [ ] **The discontinuity.** `frac(pxy)` converges as `p → ∞` through primes iff `2xy ∈ ℤ`.
-      The home page marks it `hand('Dirichlet, Vinogradov')`. The rational case needs
-      Dirichlet's theorem (look it up with `dt`). The irrational case needs Vinogradov's
-      equidistribution of `pα` over primes, which Mathlib lacks: find a weaker argument, or
-      it stays `hand`.
+- [x] **The discontinuity.** `b1700f98`: if `2xy` is an integer, `frac(pxy) = frac(xy)` for
+      every odd `p`; for rational `xy` with denominator `q`, Dirichlet's theorem (Mathlib's
+      `Nat.forall_exists_prime_gt_and_eq_mod`) gives every `k/q` with `k` prime to `q`
+      infinitely often, so for rational `xy` the limit through the primes exists exactly when
+      `2xy` is an integer; the points where `2xy` is an integer have area 0. The irrational
+      case needs Vinogradov's equidistribution of `pα` over the primes, which Mathlib lacks,
+      and no weaker argument turned up: it stays `hand('Vinogradov')`. On the home page in
+      three languages.
 - [x] Two diagonals minus any one cell still recover `ψ(a + b)` (`63617153`).
 - [x] **The exact witness.** `4943eec7`, `a9e36f03`: `‖J − t 1_R 1_Cᵀ‖²_S1 =
       m n − 2t k l + t² k l + 2|t| g` for every real `t`, least `√(k (n − l)) + √(l (m − k))`

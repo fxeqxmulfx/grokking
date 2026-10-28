@@ -44,14 +44,16 @@ const full = [
   ${m(`${sub('F', 'p')}(x, y) = f(a, b)/p`)} at ${m('x = a/p')} and ${m('y = b/p')}. For ${m('f = ab')} this is
   ${m(`${sub('F', 'p')}(x, y) = ${frac}(pxy)`)}; on the whole square, ${m(`${frac}(pxy)`)} jumps along the
   ${m('p − 1')} hyperbolas ${m('pxy = 1, …, p − 1')}. As ${m('p')} runs through the primes, ${m(`${frac}(pxy)`)}
-  converges exactly where ${m('2xy')} is an integer. For irrational ${m('xy')} its values are equidistributed in
-  ${m('[0, 1)')} (Vinogradov). For rational ${m('xy')} whose denominator in lowest terms is ${m('q ≥ 3')}, they take each
-  of the values ${m('k/q')} with ${m('0 < k < q')} and ${m('k')} prime to ${m('q')}, at least two of them, infinitely often
-  (Dirichlet) ${hand('Dirichlet, Vinogradov', L)}. So the limit exists only on the axes and on the hyperbola
-  ${m('xy = ½')}, a null set, and everywhere else ${m(`t ↦ ${frac}(xy/t)`)}, on the points ${m('t = 1/p')}, has no limit
-  at ${m('t = 0')}: a discontinuity of the second kind. For ${m('f = a + b')}, by contrast,
-  ${m(`${sub('F', 'p')}(x, y) = ${frac}(x + y)`)} for every ${m('p')}, with one jump, of the first kind, along
-  ${m('x + y = 1')}. Each table is finite; the phrase describes the family as ${m('p')} grows.</li>
+  converges exactly where ${m('2xy')} is an integer. If ${m('2xy')} is an integer, ${m(`${frac}(pxy) = ${frac}(xy)`)}
+  for every odd ${m('p')}. For rational ${m('xy')} whose denominator in lowest terms is ${m('q ≥ 3')},
+  ${m(`${frac}(pxy)`)} takes each of the values ${m('k/q')} with ${m('0 < k < q')} and ${m('k')} prime to ${m('q')}, at
+  least two of them, infinitely often, by Dirichlet's theorem on primes in arithmetic progressions ${lean('Dirichlet')}.
+  For irrational ${m('xy')} its values are equidistributed in ${m('[0, 1)')} (Vinogradov) ${hand('Vinogradov', L)}. So
+  the limit exists only on the axes and on the hyperbola ${m('xy = ½')}, a null set ${lean('null set')}, and everywhere
+  else ${m(`t ↦ ${frac}(xy/t)`)}, on the points ${m('t = 1/p')}, has no limit at ${m('t = 0')}: a discontinuity of the
+  second kind. For ${m('f = a + b')}, by contrast, ${m(`${sub('F', 'p')}(x, y) = ${frac}(x + y)`)} for every ${m('p')},
+  with one jump, of the first kind, along ${m('x + y = 1')}. Each table is finite; the phrase describes the family as
+  ${m('p')} grows.${leanNames(FULL_LEAN.discontinuity)}</li>
   <li><strong>Observations.</strong> A set ${m('Ω ⊆ ℤ/p × ℤ/p')} of cells whose values are shown. In training ${m('Ω')}
   is a random half: the ${m('p²')} pairs are shuffled (SplitMix64, seeds 7 and 11) and the first ${m('⌊p²/2⌋')} are kept,
   4704 of the 9409 cells at ${m('p = 97')}. The theorems allow any ${m('Ω')}.</li>
@@ -230,7 +232,8 @@ export const en: HomeText = {
       ${m('p')} be prime and ${m('f(a, b) = ab <span class="op">mod</span> p')}. At ${m('x = a/p')} and ${m('y = b/p')},
       for ${m('a, b = 0, …, p − 1')}, ${m(`f/p = ${frac}(pxy)`)}, the fractional part of ${m('pxy')}. As ${m('p → ∞')}
       through the primes, ${m(`${frac}(pxy)`)} has a limit exactly at the points ${m('(x, y)')} of ${m('[0, 1)²')} where
-      ${m('2xy')} is an integer, a set of area 0 ${hand('Dirichlet, Vinogradov', L)}. So at almost every ${m('(x, y)')}
+      ${m('2xy')} is an integer, a set of area 0 ${lean('area')}: where ${m('xy')} is rational by Dirichlet's theorem
+      ${lean('Dirichlet')}, elsewhere by Vinogradov's ${hand('Vinogradov', L)}. So at almost every ${m('(x, y)')}
       the function ${m(`t ↦ ${frac}(xy/t)`)}, on the points ${m('t = 1/p')}, has no limit at ${m('t = 0')}: a
       discontinuity of the second kind. Yet for every multiplicative character ${m('χ')} of ${m('ℤ/p')}, extended by
       ${m('χ(0) = 0')}, the table ${m('[χ(ab)] = [χ(a) χ(b)]')} has rank 1, with entries of modulus 1 off the row
