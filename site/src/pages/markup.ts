@@ -34,6 +34,10 @@ export const eq = (html: string): string => `<div class="eq">${html}</div>`;
 /** A statement set apart: a theorem, a definition. */
 export const box = (html: string): string => `<div class="theorem">${html}</div>`;
 
+/** The Lean declarations behind a claim, as the transformer repository's `INDEX.md` names them. */
+export const leanNames = (names: string): string =>
+  `<div class="lean-names"><span class="label">Lean</span> <code>${names}</code></div>`;
+
 export const link = (lang: Lang, page: string, text: string, sectionId?: string): string =>
   `<a href="${hrefOf({lang, page, section: sectionId ?? null})}">${text}</a>`;
 

@@ -2,12 +2,16 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {existsSync, readFileSync} from 'node:fs';
+import {homedir} from 'node:os';
+import {join} from 'node:path';
 import {LANGS} from '../src/i18n.ts';
 import {en} from '../src/pages/home/en.ts';
 import {fr} from '../src/pages/home/fr.ts';
 import {homeHTML, missingHTML} from '../src/pages/home/index.ts';
 import {ru} from '../src/pages/home/ru.ts';
 import {OUTLINE, PAGES, PAGE_IDS, PLANNED} from '../src/pages/registry.ts';
+import {STATUS_BASE} from '../src/pages/recovery/spec.ts';
 import {LABS, SPRINGS, isLabId} from '../src/recovery/model.ts';
 import {RECOVERY_STRINGS} from '../src/recovery/strings.ts';
 
@@ -32,17 +36,44 @@ const marks = (html: string): string[] => [...html.matchAll(/class="icon \w+" ar
 const numbers = (html: string): string[] =>
   [...html.replace(/<[^>]+>/g, ' ').matchAll(/\d+(?:[.,]\d+)?/g)].map(m => m[0].replace(',', '.'));
 
+/** The Lean declarations a page names, list by list, in order. */
+const leanLists = (html: string): string[] =>
+  [...html.matchAll(/<div class="lean-names"><span class="label">Lean<\/span> <code>([^<]+)<\/code><\/div>/g)].map(m => m[1]);
+
 test('the home page makes the same claims, with the same numbers, in every language', () => {
   const text = {en, fr, ru};
   for (const lang of LANGS) {
     const t = text[lang], e = text.en;
     assert.deepEqual(sections(homeHTML(lang)), sections(homeHTML('en')), lang);
-    for (const key of ['lead', 'precise', 'full'] as const) {
-      assert.deepEqual(marks(t[key]), marks(e[key]), `${lang}/${key}: tags`);
-      assert.deepEqual(numbers(t[key]), numbers(e[key]), `${lang}/${key}: numbers`);
+    assert.deepEqual(leanLists(homeHTML(lang)), leanLists(homeHTML('en')), `${lang}: Lean names`);
+    const pieces: [string, string, string][] = [
+      ...(['statement', 'terms', 'full'] as const).map((key): [string, string, string] => [key, t[key], e[key]]),
+      ...Object.keys(e.theorems).flatMap(id => {
+        const a = t.theorems[id as keyof typeof e.theorems], b = e.theorems[id as keyof typeof e.theorems];
+        return [[`theorems/${id}/title`, a.title, b.title], [`theorems/${id}`, a.body, b.body]] as [string, string, string][];
+      }),
+      ...Object.keys(e.conclusions).flatMap(id => {
+        const a = t.conclusions[id as keyof typeof e.conclusions], b = e.conclusions[id as keyof typeof e.conclusions];
+        return [[`conclusions/${id}/title`, a.title, b.title], [`conclusions/${id}`, a.body, b.body]] as [string, string, string][];
+      }),
+    ];
+    for (const [where, mine, theirs] of pieces) {
+      assert.deepEqual(marks(mine), marks(theirs), `${lang}/${where}: tags`);
+      assert.deepEqual(numbers(mine), numbers(theirs), `${lang}/${where}: numbers`);
     }
-    t.ends.forEach((end, k) => assert.deepEqual(marks(end.body), marks(e.ends[k].body), `${lang}/ends/${k}`));
   }
+});
+
+/** The transformer repository's index of declarations, when it is checked out beside this one. */
+const INDEX = process.env.TRANSFORMER_INDEX ?? join(homedir(), 'lean_projects/transformer/INDEX.md');
+
+test('every Lean declaration a page names exists in the transformer repository', {skip: !existsSync(INDEX) && `no ${INDEX}`}, () => {
+  const declared = new Set([...readFileSync(INDEX, 'utf8').matchAll(/\[`([^`]+)`\]\(src\//g)].map(m => m[1]));
+  const lists = [
+    ...LANGS.flatMap(lang => leanLists(homeHTML(lang))),
+    ...Object.values(STATUS_BASE).flatMap(base => ('lean' in base && base.lean ? [base.lean] : [])),
+  ];
+  for (const name of new Set(lists.flatMap(list => list.split(', ')))) assert.ok(declared.has(name), name);
 });
 
 test('every page has the same sections and widgets in every language', () => {

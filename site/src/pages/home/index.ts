@@ -1,10 +1,10 @@
-/** The home page: the statement the course works toward, its two ends, and the outline. */
+/** The home page: the statement the course works toward, its two theorems, what follows, and the outline. */
 
 import type {Lang, Localized} from '../../i18n.ts';
 import {hrefOf} from '../../router.ts';
-import {box} from '../markup.ts';
+import {box, leanNames} from '../markup.ts';
 import {OUTLINE, PARTS, PART_NAMES, PLANNED, pageById} from '../registry.ts';
-import type {HomeText} from './spec.ts';
+import {CONCLUSION_LEAN, TERMS_LEAN, THEOREM_LEAN, type ConclusionId, type HomeText, type TheoremId} from './spec.ts';
 import {en} from './en.ts';
 import {fr} from './fr.ts';
 import {ru} from './ru.ts';
@@ -34,14 +34,21 @@ function outlineHTML(lang: Lang, writing: string): string {
 
 export function homeHTML(lang: Lang): string {
   const t = TEXT[lang];
-  const ends = t.ends.map(e => `<div class="end"><div class="panel-title">${e.title}</div><p>${e.body}</p></div>`).join('');
+  const theorems = (Object.keys(THEOREM_LEAN) as TheoremId[]).map(id => {
+    const {title, body} = t.theorems[id];
+    return box(`<p class="theorem-title">${title}</p>${body}${leanNames(THEOREM_LEAN[id])}`);
+  }).join('');
+  const conclusions = (Object.keys(CONCLUSION_LEAN) as ConclusionId[]).map(id => {
+    const {title, body} = t.conclusions[id], names = CONCLUSION_LEAN[id];
+    return `<li><strong>${title}.</strong> ${body}${names ? leanNames(names) : ''}</li>`;
+  }).join('');
   return `<article class="page home">
     <header class="page-head"><div class="kicker">${t.kicker}</div><h1>${t.title}</h1></header>
-    <p class="lead">${t.lead}</p>
     ${box(`<p class="statement">${t.statement}</p>`)}
-    ${t.precise}
+    <section id="terms">${t.terms}${leanNames(TERMS_LEAN)}</section>
+    <section id="theorems"><h2>${t.theoremsTitle}</h2>${theorems}</section>
+    <section id="conclusions"><h2>${t.conclusionsTitle}</h2><ol class="conclusions">${conclusions}</ol></section>
     <section id="full" class="full"><h2>${t.fullTitle}</h2>${t.full}</section>
-    <section id="ends"><h2>${t.endsTitle}</h2><div class="ends">${ends}</div></section>
     <section id="audience"><h2>${t.audienceTitle}</h2><p>${t.audience}</p><p class="sub">${t.legend}</p></section>
     <section id="pages"><h2>${t.pagesTitle}</h2><div class="outline">${outlineHTML(lang, t.writing)}</div></section>
   </article>`;
