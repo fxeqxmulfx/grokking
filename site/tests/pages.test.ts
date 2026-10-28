@@ -77,6 +77,27 @@ test('every Lean declaration a page names exists in the transformer repository',
   for (const name of new Set(lists.flatMap(list => list.split(', ')))) assert.ok(declared.has(name), name);
 });
 
+test('every written page makes the same claims, with the same numbers, in every language', () => {
+  const pieces = (html: string): string[] => html.split(/(?=<section id=")/);
+  for (const page of PAGES) {
+    const e = page.text.en, enCards = page.status?.en ?? [];
+    for (const lang of LANGS) {
+      const t = page.text[lang], cards = page.status?.[lang] ?? [];
+      const mine = pieces(t.body), theirs = pieces(e.body);
+      assert.equal(mine.length, theirs.length, `${page.id}/${lang}: sections`);
+      mine.forEach((piece, k) => {
+        assert.deepEqual(marks(piece), marks(theirs[k]), `${page.id}/${lang}, piece ${k}: tags`);
+        assert.deepEqual(numbers(piece), numbers(theirs[k]), `${page.id}/${lang}, piece ${k}: numbers`);
+      });
+      cards.forEach((card, k) => {
+        const other = enCards[k];
+        assert.deepEqual(numbers(card.title), numbers(other.title), `${page.id}/${lang}/${card.key}: title numbers`);
+        assert.deepEqual(numbers(card.detail), numbers(other.detail), `${page.id}/${lang}/${card.key}: numbers`);
+      });
+    }
+  }
+});
+
 test('every page has the same sections and widgets in every language', () => {
   for (const page of PAGES) {
     const en = page.text.en;

@@ -1,4 +1,4 @@
-/** The recovery page in French. Source: review/flat_spectrum.md, Theorems D, E and F. */
+/** The recovery page in French. Source: review/flat_spectrum.md, Theorems D, E, F and G. */
 
 import {box, eq, heuristic, lean, m, numbers, numerical, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
@@ -91,7 +91,14 @@ const body = [
   que sa ligne et sa colonne sont assez lourdes : exactement quand ${m('α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1')}
   ${lean('F.4')}.</p>
   ${widget('lab', 'weights')}
-  ${widget('quiz', 'q4')}`),
+  ${widget('quiz', 'q4')}
+  <p>Un poids peut aussi être nul. Une ligne ou une colonne de zéros n’a besoin d’aucune case, et les cases ne doivent tenir
+  ensemble que là où les poids ne sont pas nuls.</p>
+  ${box(`<strong>Théorème G</strong>. Soient ${m('a ≠ 0')} et ${m('b ≠ 0')}, entrées nulles permises. M retrouve
+  ${m(abT)} exactement quand les cases de ${m('Ω')} avec ${m(`${ai} ≠ 0`)} et ${m(`${bj} ≠ 0`)} relient ces lignes à ces
+  colonnes, et ${m('Σ<sub>i∈R</sub> α<sub>i</sub> ≤ Σ<sub>j∈N(R)</sub> β<sub>j</sub>')} pour tout ensemble de lignes
+  ${m('R')} ${lean('G')}.`)}
+  <p>Ainsi, à partir de sa seule entrée 1, M complète la ligne ${m('(1, ?)')} en ${m('(1, 0)')}, jamais en ${m('(1, 1)')}.</p>`),
 
   section('springs', 6, 'Pourquoi un plan force la réponse : des ressorts', `
   <p>Normalisez la table pour que ${m('‖a‖ = ‖b‖ = 1')} ; cela ne change rien à la reconstruction. Prenez la factorisation la
@@ -110,30 +117,57 @@ const body = [
   ${widget('springs')}`),
 
   section('numbers', 7, 'Les nombres', `
-  <p>Tous les motifs d’une table ${m('3 × 3')} sauf le motif plein, résolus par ADMM par lots dans torch
-  ${numerical('2026-10-28', L)}. L’écart est ${m(`‖X‖${S1} − ‖a‖ ‖b‖`)} ; l’erreur est la taille de ${m('X − K')} hors de
-  ${m('Ω')}.</p>
-  ${numbers(['Poids égaux (J)', 'motifs', 'écart', 'erreur', 'théorème'], [
-    ['rigide, permutation', '195', 'à 4·10<sup>−15</sup> près de 0', '≤ 4,7·10<sup>−14</sup>', 'E.2'],
+  <p>Tous les motifs d’une table ${m('3 × 3')} sauf le motif plein, et à poids aléatoires tous les motifs non vides, résolus
+  par ADMM par lots dans torch ${numerical('2026-10-28', L)}. L’écart est ${m(`‖X‖${S1} − ‖a‖ ‖b‖`)} ; l’erreur est
+  ${m('‖X − K‖ / ‖K‖')}, les deux normes prises hors de ${m('Ω')}. Les poids aléatoires ont ${m(`|${ai}|`)} et
+  ${m(`|${bj}|`)} uniformes dans ${m('[0,3 ; 2]')} et des phases aléatoires.</p>
+  ${numbers(['Poids égaux (J), 3 × 3', 'motifs', 'écart', 'erreur', 'théorème'], [
+    ['rigide, permutation', '195', 'à 5·10<sup>−15</sup> près de 0', '≤ 4,8·10<sup>−14</sup>', 'E.2'],
     ['rigide, sans permutation', '9', '−0,172', '0,5', 'E.3'],
     ['non rigide, permutation', '51', 'à 9·10<sup>−16</sup> près de 0', '0,89–1,00', 'E.1, D.7'],
-    ['non rigide, sans permutation', '256', '−3,00 à −0,172', '0,78–1,00', 'E.3'],
+    ['non rigide, sans permutation', '256', '−3,00 à −0,172', '0,77–1,00', 'E.3'],
   ])}
-  ${numbers(['Poids aléatoires, 3 tirages', 'motifs', 'écart', 'erreur', 'théorème'], [
+  ${numbers(['Poids aléatoires, 3 × 3, 3 tirages', 'motifs par tirage', 'écart', 'erreur', 'théorème'], [
     ['rigide, plan', '90', 'à 7·10<sup>−15</sup> près de 0', '≤ 1,8·10<sup>−15</sup>', 'F.2'],
     ['rigide, sans plan', '114', '−1,63 à −3·10<sup>−6</sup>', '1,7·10<sup>−3</sup> à 0,88', 'F.3'],
     ['non rigide, sans plan', '306', '−6,16 à −3·10<sup>−6</sup>', '0,44 à 1,00', 'F.3'],
   ])}
-  <p class="sub">Les neuf motifs rigides sans permutation sont les croix, et −0,172 = 2√2 − 3. Des poids aléatoires ne donnent
-  jamais de plan sans rigidité. Pour des poids où un ensemble de lignes tient sans aucune marge, les motifs rigides avec plan
-  convergent lentement (erreur 2,4·10<sup>−4</sup>, 5,0·10<sup>−5</sup>, 1,0·10<sup>−5</sup> après 6000, 30000 et 150000
-  pas), comme la croix à la limite de la section 5.</p>`),
+  <p class="sub">Les neuf motifs rigides sans permutation sont les croix, et −0,172 = 2√2 − 3. Dans les trois tirages, aucun
+  motif ne porte de plan sans être rigide. Avec les modules ${m('(√2, 1, 1)')} pour ${m('a')} comme pour ${m('b')}, de sorte
+  que ${m('α = β = (½, ¼, ¼)')} et qu’un ensemble propre de lignes peut remplir exactement les colonnes qu’il voit, les motifs
+  rigides avec plan convergent lentement : leur plus grande erreur vaut 2,4·10<sup>−4</sup>, 5,0·10<sup>−5</sup> et
+  1,0·10<sup>−5</sup> après 6000, 30 000 et 150 000 pas.</p>
+  <p>Tous les motifs d’une table ${m('4 × 4')} sauf le motif plein, à poids égaux, 20 000 pas
+  ${numerical('2026-10-28', L)}.</p>
+  ${numbers(['Poids égaux (J), 4 × 4', 'motifs', 'écart', 'erreur', 'théorème'], [
+    ['rigide, permutation', '33 852', 'à 7·10<sup>−7</sup> près de 0', '≤ 8,5·10<sup>−5</sup>', 'E.2'],
+    ['rigide, sans permutation', '2464', '−0,536 à −0,136', '0,345–0,667', 'E.3'],
+    ['non rigide, permutation', '3970', 'à 2·10<sup>−14</sup> près de 0', '0,775–1,00', 'E.1, D.7'],
+    ['non rigide, sans permutation', '25 249', '−4,00 à −0,136', '0,632–1,00', 'E.3'],
+  ])}
+  <p class="sub">Le théorème E prouve que M retrouve J à partir de tout motif rigide avec une permutation : l’erreur jusqu’à 8,5·10<sup>−5</sup> de la première ligne du tableau est donc la lenteur d’ADMM. Elle vient des 27 068 de ces motifs où un ensemble propre de lignes voit exactement autant de colonnes qu’il a de lignes ; sur les 6784 autres, l’erreur est sous 10<sup>−13</sup>, une erreur d’arrondi. Après 20 000 pas, 4464 des 27 068 ont encore une erreur au-dessus de 10<sup>−6</sup>. Prolongés, ils continuent de converger : leur erreur reste sous 3,5·10<sup>−5</sup>, 1,8·10<sup>−5</sup> et 8,9·10<sup>−6</sup> après 50 000, 100 000 et 200 000 pas, environ deux fois plus petite à chaque doublement du nombre de pas, et leur écart est positif et sous 2,3·10<sup>−8</sup> ${numerical('2026-10-29', L)}.</p>
+  <p>Tables à entrées nulles : tous les motifs sauf le motif plein de 13 tables de tailles ${m('2 × 3')}, ${m('3 × 2')},
+  ${m('3 × 3')}, ${m('2 × 4')} et ${m('3 × 4')}, toutes sauf une avec des zéros à des places fixées, phases aléatoires,
+  30 000 pas ${numerical('2026-10-28', L)}. Rigide veut dire ici que les cases avec ${m(`${ai} ≠ 0`)} et ${m(`${bj} ≠ 0`)}
+  relient ces lignes à ces colonnes ; la condition est celle du théorème G. Comme ${m('K')} peut s’annuler hors de
+  ${m('Ω')}, l’erreur est ici ${m('‖X − K‖')} hors de ${m('Ω')} divisée par ${m('‖K‖')}.</p>
+  ${numbers(['Entrées nulles', 'motifs', 'écart', 'erreur', 'théorème'], [
+    ['rigide, condition', '2010', 'à 4·10<sup>−15</sup> près de 0', '≤ 7,1·10<sup>−16</sup>', 'G'],
+    ['non rigide, condition', '224', 'à 2·10<sup>−15</sup> près de 0', '0,57–0,71', 'G'],
+    ['rigide, sans condition', '1582', '−2,86 à −3,5·10<sup>−4</sup>', '0,017–0,90', 'G'],
+    ['non rigide, sans condition', '8395', '−5,11 à −3,5·10<sup>−4</sup>', '0,15–1,00', 'G'],
+  ])}
+  <p class="sub">Neuf tables tirent les modules uniformément dans ${m('[0,3 ; 2]')} ; quatre les fixent :
+  ${m('|a| = (1, 1, 0)')} avec ${m('|b| = (1, 1, 0)')} ou ${m('(1, 1, 1)')}, ${m('|a| = (2, 1, 0)')} avec
+  ${m('|b| = (1, 1, √3, 0)')}, et ${m('|a| = (1, √2, 0)')} avec ${m('|b| = (1, 0, √2)')}. Seules ces quatre donnent des
+  motifs qui satisfont la condition sans rigidité ; sur eux, ADMM trouve une seconde matrice de norme nucléaire
+  ${m('‖a‖ ‖b‖')} qui coïncide avec ${m(abT)} sur ${m('Ω')}.</p>`),
 
   section('status', 8, 'Ce qui est démontré, ce qui reste', `
   <p>Chaque énoncé de cette page, rangé selon la façon dont il est connu. Cliquez sur une carte pour voir ses noms Lean.</p>
   ${widget('status')}
   <p class="sub">Source : <code>review/flat_spectrum.md</code> du dépôt transformer, section « Exact recovery of a rank-one
-  kernel », théorèmes D, E et F. Lean : <code>Transformer.Grokking.FlatSpectrum</code>. Les solveurs de cette page tournent
+  kernel », théorèmes D, E, F et G. Lean : <code>Transformer.Grokking.FlatSpectrum</code>. Les solveurs de cette page tournent
   dans votre navigateur : ADMM pour M, descente de gradient pour les ressorts.</p>`),
 ].join('\n');
 
@@ -169,7 +203,7 @@ export const fr: RecoveryText = {
     },
   },
   status: {
-    lemma1: {title: `Lemme 1 : ‖X‖${S1} = min ½(‖U‖² + ‖V‖²)`, detail: 'La norme nucléaire est le plus petit coût, en pénalité sur les poids, d’une factorisation X = UVᴴ, sur toutes les dimensions internes.'},
+    lemma1: {title: `Lemme 1 : ‖X‖${S1} = min ½(‖U‖² + ‖V‖²)`, detail: 'La norme nucléaire est le plus petit coût, en pénalité sur les poids, d’une factorisation X = UVᴴ, sur toutes les dimensions internes. Ainsi les produits des factorisations les moins chères qui coïncident avec Ω sont exactement les solutions de M, et la pénalité sur les poids à son optimum retrouve K exactement quand M le retrouve. Sur main depuis le commit 1aed20a5.'},
     d7: {title: 'D.7 : non rigide ⇒ un retournement', detail: 'Si les cases gardées se brisent en morceaux, retourner un morceau donne une seconde table d’entrées de module un qui coïncide sur Ω.'},
     d8: {title: 'D.8 : deux diagonales ⇔ s₂ − s₁ inversible', detail: 'M retrouve ψ(a + b) à partir exactement des diagonales de décalages s₁ et s₂ si et seulement si s₂ − s₁ est inversible dans ℤ/p.'},
     d9: {title: 'D.9 : la croix échoue pour N ≥ 3', detail: 'La croix est rigide et fixe toute complétion de rang un, mais sa plus petite norme nucléaire vaut 2√(N − 1) < N.'},
@@ -180,8 +214,10 @@ export const fr: RecoveryText = {
     cross: {title: 'F.4 : la croix : reconstruction ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'Dans un sens : un plan explicite sur la croix et F.2. Dans l’autre : le témoin de F.3 sur le bloc hors de la ligne i₀ et de la colonne j₀. Gale n’y est pas nécessaire. Sur main depuis le commit b6577f53.'},
     gale: {title: 'Gale : un plan ⇔ Σ<sub>R</sub> α ≤ Σ<sub>N(R)</sub> β', detail: 'Le théorème de l’offre et de la demande (Gale, 1957), pour toutes masses positives de même total. Récurrence sur les cases : pousser du sable le long d’une case jusqu’à vider sa ligne ou sa colonne, ou jusqu’à ce qu’un ensemble de lignes R soit serré, puis couper là. Sur main depuis le commit ab75b4fa.'},
     fiff: {title: 'Le théorème F comme équivalence', detail: 'M retrouve a bᵀ ⇔ Ω est rigide et porte un plan ⇔ Ω est rigide et ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² pour tout ensemble R. Exemple : le triangle {(0, 0), (0, 1), (1, 1)} retrouve (2, 1)(1, 2)ᵀ mais pas (1, 2)(2, 1)ᵀ. Sur main depuis le commit ab75b4fa.'},
-    n3: {title: 'Tous les motifs 3 × 3', detail: 'Les 511 motifs sauf le plein à poids égaux, et les 510 non vides à poids aléatoires, résolus par ADMM par lots : chaque classe se comporte comme le disent les théorèmes (section 7).'},
-    n4: {title: 'Tous les motifs 4 × 4', detail: 'En cours : 65 535 motifs. Fait jusqu’ici : les 3970 motifs non rigides qui contiennent une permutation atteignent l’écart 0 à 2·10<sup>−14</sup> près, avec une erreur d’au moins 0,77.'},
-    train: {title: 'L’entraînement se comporte comme M', detail: 'L’étape de modélisation du lemme 1 : la pénalité sur les poids à son optimum. Pas un théorème.'},
+    g: {title: 'Théorème G : entrées nulles permises', detail: 'Pour a ≠ 0 et b ≠ 0, zéros permis : M retrouve a bᵀ ⇔ les cases de Ω avec a_i ≠ 0 et b_j ≠ 0 relient ces lignes à ces colonnes, et Σ_R α_i ≤ Σ_N(R) β_j pour tout ensemble de lignes R. Une ligne ou une colonne de zéros n’a besoin d’aucune case. Exemple : dans une table 1 × 2, la case (0, 0) retrouve (1)(1, 0)ᵀ mais pas (1)(1, 1)ᵀ. Sur main depuis les commits 1c4bed77 et 6574a220.'},
+    n3: {title: 'Tous les motifs 3 × 3', detail: 'Les 511 motifs sauf le plein à poids égaux et, dans chacun des trois tirages de poids aléatoires, les 510 non vides, résolus par ADMM par lots : chaque classe se comporte comme le disent les théorèmes (section 7).'},
+    n4: {title: 'Tous les motifs 4 × 4', detail: 'Les 65 535 motifs sauf le plein, à poids égaux, résolus par ADMM par lots : chaque classe se comporte comme le dit le théorème E. Les 4464 motifs rigides avec une permutation dont l’erreur dépasse encore 10⁻⁶ après 20 000 pas continuent de converger quand on prolonge le calcul (section 7).'},
+    zeros: {title: 'Tables à entrées nulles', detail: 'Les 12 211 motifs, sauf les pleins, de 13 tables, toutes sauf une avec des zéros à des places fixées, résolus par ADMM par lots : chaque classe se comporte comme le dit le théorème G (section 7).'},
+    train: {title: 'L’entraînement atteint M', detail: 'La pénalité sur les poids à son optimum est M (lemme 1). Que l’entraînement atteigne cet optimum est une étape de modélisation, pas un théorème.'},
   },
 };

@@ -1,4 +1,4 @@
-/** The recovery page in English. Source: review/flat_spectrum.md, Theorems D, E and F. */
+/** The recovery page in English. Source: review/flat_spectrum.md, Theorems D, E, F and G. */
 
 import {box, eq, heuristic, lean, m, numbers, numerical, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
@@ -84,7 +84,13 @@ const body = [
   <p>Drag the gold and blue bars to change the weights. The cross, hopeless with equal weights, works once its row and its
   column are heavy enough: exactly when ${m('α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1')} ${lean('F.4')}.</p>
   ${widget('lab', 'weights')}
-  ${widget('quiz', 'q4')}`),
+  ${widget('quiz', 'q4')}
+  <p>A weight may also be zero. A row or a column of zeros needs no cell, and the cells must hold together only where the
+  weights are not zero.</p>
+  ${box(`<strong>Theorem G</strong>. Let ${m('a ≠ 0')} and ${m('b ≠ 0')}, zero entries allowed. M recovers ${m(abT)}
+  exactly when the cells of ${m('Ω')} with ${m(`${ai} ≠ 0`)} and ${m(`${bj} ≠ 0`)} connect these rows to these columns, and
+  ${m('Σ<sub>i∈R</sub> α<sub>i</sub> ≤ Σ<sub>j∈N(R)</sub> β<sub>j</sub>')} for every set of rows ${m('R')} ${lean('G')}.`)}
+  <p>So from its entry 1 alone, M completes the row ${m('(1, ?)')} to ${m('(1, 0)')}, never to ${m('(1, 1)')}.</p>`),
 
   section('springs', 6, 'Why a plan forces the answer: springs', `
   <p>Scale the table so that ${m('‖a‖ = ‖b‖ = 1')}; this changes nothing about recovery. Take the cheapest factorization
@@ -102,29 +108,55 @@ const body = [
   ${widget('springs')}`),
 
   section('numbers', 7, 'The numbers', `
-  <p>Every pattern of a ${m('3 × 3')} table but the full one, solved by batched ADMM in torch
-  ${numerical('2026-10-28', L)}. The gap is ${m(`‖X‖${S1} − ‖a‖ ‖b‖`)}; the error is the size of ${m('X − K')} off ${m('Ω')}.</p>
-  ${numbers(['Equal weights (J)', 'patterns', 'gap', 'error', 'theorem'], [
-    ['rigid, permutation', '195', 'within 4·10<sup>−15</sup> of 0', '≤ 4.7·10<sup>−14</sup>', 'E.2'],
+  <p>Every pattern of a ${m('3 × 3')} table but the full one, and with random weights every nonempty one, solved by batched
+  ADMM in torch ${numerical('2026-10-28', L)}. The gap is ${m(`‖X‖${S1} − ‖a‖ ‖b‖`)}; the error is ${m('‖X − K‖ / ‖K‖')},
+  both norms taken off ${m('Ω')}. Random weights have ${m(`|${ai}|`)} and ${m(`|${bj}|`)} uniform in ${m('[0.3, 2]')} and
+  random phases.</p>
+  ${numbers(['Equal weights (J), 3 × 3', 'patterns', 'gap', 'error', 'theorem'], [
+    ['rigid, permutation', '195', 'within 5·10<sup>−15</sup> of 0', '≤ 4.8·10<sup>−14</sup>', 'E.2'],
     ['rigid, no permutation', '9', '−0.172', '0.5', 'E.3'],
     ['not rigid, permutation', '51', 'within 9·10<sup>−16</sup> of 0', '0.89–1.00', 'E.1, D.7'],
-    ['not rigid, no permutation', '256', '−3.00 to −0.172', '0.78–1.00', 'E.3'],
+    ['not rigid, no permutation', '256', '−3.00 to −0.172', '0.77–1.00', 'E.3'],
   ])}
-  ${numbers(['Random weights, 3 draws', 'patterns', 'gap', 'error', 'theorem'], [
+  ${numbers(['Random weights, 3 × 3, 3 draws', 'patterns per draw', 'gap', 'error', 'theorem'], [
     ['rigid, plan', '90', 'within 7·10<sup>−15</sup> of 0', '≤ 1.8·10<sup>−15</sup>', 'F.2'],
     ['rigid, no plan', '114', '−1.63 to −3·10<sup>−6</sup>', '1.7·10<sup>−3</sup> to 0.88', 'F.3'],
     ['not rigid, no plan', '306', '−6.16 to −3·10<sup>−6</sup>', '0.44 to 1.00', 'F.3'],
   ])}
-  <p class="sub">The nine rigid patterns without a permutation are the crosses, and −0.172 = 2√2 − 3. Random weights never give
-  a plan without rigidity. At weights where some set of rows fits with no room to spare, rigid patterns with a plan converge
-  slowly (error 2.4·10<sup>−4</sup>, 5.0·10<sup>−5</sup>, 1.0·10<sup>−5</sup> after 6000, 30000 and 150000 steps), like the
-  cross on the edge in section 5.</p>`),
+  <p class="sub">The nine rigid patterns without a permutation are the crosses, and −0.172 = 2√2 − 3. In the three draws no
+  pattern carries a plan without being rigid. With moduli ${m('(√2, 1, 1)')} for both ${m('a')} and ${m('b')}, so that
+  ${m('α = β = (½, ¼, ¼)')} and a proper set of rows can fill the columns it sees exactly, the rigid patterns with a plan
+  converge slowly: their largest error is 2.4·10<sup>−4</sup>, 5.0·10<sup>−5</sup> and 1.0·10<sup>−5</sup> after 6000,
+  30 000 and 150 000 steps.</p>
+  <p>Every pattern of a ${m('4 × 4')} table but the full one, equal weights, 20 000 steps ${numerical('2026-10-28', L)}.</p>
+  ${numbers(['Equal weights (J), 4 × 4', 'patterns', 'gap', 'error', 'theorem'], [
+    ['rigid, permutation', '33 852', 'within 7·10<sup>−7</sup> of 0', '≤ 8.5·10<sup>−5</sup>', 'E.2'],
+    ['rigid, no permutation', '2464', '−0.536 to −0.136', '0.345–0.667', 'E.3'],
+    ['not rigid, permutation', '3970', 'within 2·10<sup>−14</sup> of 0', '0.775–1.00', 'E.1, D.7'],
+    ['not rigid, no permutation', '25 249', '−4.00 to −0.136', '0.632–1.00', 'E.3'],
+  ])}
+  <p class="sub">Theorem E proves that M recovers J from every rigid pattern with a permutation, so the error up to 8.5·10<sup>−5</sup> in the first row is ADMM’s slowness. It comes from the 27 068 of these patterns in which a proper set of rows sees exactly as many columns as it has rows; on the other 6784 the error is below 10<sup>−13</sup>, a rounding error. After 20 000 steps, 4464 of the 27 068 still have an error above 10<sup>−6</sup>. Run on, they keep converging: their error stays below 3.5·10<sup>−5</sup>, 1.8·10<sup>−5</sup> and 8.9·10<sup>−6</sup> after 50 000, 100 000 and 200 000 steps, about half as large each time the steps double, and their gap is positive and below 2.3·10<sup>−8</sup> ${numerical('2026-10-29', L)}.</p>
+  <p>Tables with zero entries: every pattern but the full one of 13 tables of sizes ${m('2 × 3')}, ${m('3 × 2')},
+  ${m('3 × 3')}, ${m('2 × 4')} and ${m('3 × 4')}, all but one with zeros at fixed places, random phases, 30 000 steps
+  ${numerical('2026-10-28', L)}. Rigid means here that the cells with ${m(`${ai} ≠ 0`)} and ${m(`${bj} ≠ 0`)} connect these
+  rows to these columns; the condition is that of Theorem G. Since ${m('K')} may vanish off ${m('Ω')}, the error here is
+  ${m('‖X − K‖')} off ${m('Ω')} over ${m('‖K‖')}.</p>
+  ${numbers(['Zero entries', 'patterns', 'gap', 'error', 'theorem'], [
+    ['rigid, condition', '2010', 'within 4·10<sup>−15</sup> of 0', '≤ 7.1·10<sup>−16</sup>', 'G'],
+    ['not rigid, condition', '224', 'within 2·10<sup>−15</sup> of 0', '0.57–0.71', 'G'],
+    ['rigid, no condition', '1582', '−2.86 to −3.5·10<sup>−4</sup>', '0.017–0.90', 'G'],
+    ['not rigid, no condition', '8395', '−5.11 to −3.5·10<sup>−4</sup>', '0.15–1.00', 'G'],
+  ])}
+  <p class="sub">Nine tables draw the moduli uniformly from ${m('[0.3, 2]')}; four fix them: ${m('|a| = (1, 1, 0)')} with
+  ${m('|b| = (1, 1, 0)')} or ${m('(1, 1, 1)')}, ${m('|a| = (2, 1, 0)')} with ${m('|b| = (1, 1, √3, 0)')}, and
+  ${m('|a| = (1, √2, 0)')} with ${m('|b| = (1, 0, √2)')}. Only these four give patterns that meet the condition without
+  rigidity; on them ADMM finds a second matrix of nuclear norm ${m('‖a‖ ‖b‖')} that agrees with ${m(abT)} on ${m('Ω')}.</p>`),
 
   section('status', 8, 'What is proved, what is left', `
   <p>Every claim of this page, sorted by how it is known. Click a card for its Lean names.</p>
   ${widget('status')}
   <p class="sub">Source: <code>review/flat_spectrum.md</code> in the transformer repository, the section “Exact recovery of a
-  rank-one kernel”, Theorems D, E and F. Lean: <code>Transformer.Grokking.FlatSpectrum</code>. The solvers on this page run in
+  rank-one kernel”, Theorems D, E, F and G. Lean: <code>Transformer.Grokking.FlatSpectrum</code>. The solvers on this page run in
   your browser: ADMM for M, gradient descent for the springs.</p>`),
 ].join('\n');
 
@@ -160,7 +192,7 @@ export const en: RecoveryText = {
     },
   },
   status: {
-    lemma1: {title: `Lemma 1: ‖X‖${S1} = least ½(‖U‖² + ‖V‖²)`, detail: 'The nuclear norm is the least weight-decay cost of a factorization X = UVᴴ, over every inner dimension.'},
+    lemma1: {title: `Lemma 1: ‖X‖${S1} = least ½(‖U‖² + ‖V‖²)`, detail: 'The nuclear norm is the least weight-decay cost of a factorization X = UVᴴ, over every inner dimension. So the products of the cheapest factorizations that agree with Ω are exactly the solutions of M, and weight decay at its optimum recovers K exactly when M does. On main since commit 1aed20a5.'},
     d7: {title: 'D.7: not rigid ⇒ a flip', detail: 'If the kept cells fall into pieces, flipping one piece gives a second table with entries of modulus one that agrees on Ω.'},
     d8: {title: 'D.8: two diagonals ⇔ s₂ − s₁ a unit', detail: 'M recovers ψ(a + b) from exactly the diagonals of offsets s₁ and s₂ if and only if s₂ − s₁ is a unit of ℤ/p.'},
     d9: {title: 'D.9: the cross fails for N ≥ 3', detail: 'The cross is rigid and fixes every rank-one completion, yet its least nuclear norm is 2√(N − 1) < N.'},
@@ -171,8 +203,10 @@ export const en: RecoveryText = {
     cross: {title: 'F.4: the cross: recovered ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'One way: an explicit plan on the cross and F.2. The other: the witness of F.3 on the block off row i₀ and column j₀. No Gale needed. On main since commit b6577f53.'},
     gale: {title: 'Gale: a plan ⇔ Σ<sub>R</sub> α ≤ Σ<sub>N(R)</sub> β', detail: 'The supply–demand theorem (Gale, 1957), for any nonnegative masses with equal totals. Induction on the cells: ship sand along one cell until its row or column is empty, or until a set of rows R becomes tight, then split there. On main since commit ab75b4fa.'},
     fiff: {title: 'Theorem F as an equivalence', detail: 'M recovers a bᵀ ⇔ Ω is rigid and carries a plan ⇔ Ω is rigid and ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² for every set R. Example: the triangle {(0, 0), (0, 1), (1, 1)} recovers (2, 1)(1, 2)ᵀ but not (1, 2)(2, 1)ᵀ. On main since commit ab75b4fa.'},
-    n3: {title: 'Every 3 × 3 pattern', detail: 'All 511 patterns but the full one with equal weights, and the 510 nonempty ones with random weights, solved by batched ADMM: each class behaves as the theorems say (section 7).'},
-    n4: {title: 'Every 4 × 4 pattern', detail: 'Running: 65 535 patterns. Done so far: the 3970 patterns that are not rigid but contain a permutation reach the gap 0 within 2·10<sup>−14</sup>, with error at least 0.77.'},
-    train: {title: 'Training behaves like M', detail: 'The modeling step of Lemma 1: weight decay at its optimum. Not a theorem.'},
+    g: {title: 'Theorem G: zero entries allowed', detail: 'For a ≠ 0 and b ≠ 0, zeros allowed: M recovers a bᵀ ⇔ the cells of Ω with a_i ≠ 0 and b_j ≠ 0 connect these rows to these columns, and Σ_R α_i ≤ Σ_N(R) β_j for every set of rows R. A row or a column of zeros needs no cell. Example: in a 1 × 2 table the cell (0, 0) recovers (1)(1, 0)ᵀ but not (1)(1, 1)ᵀ. On main since commits 1c4bed77 and 6574a220.'},
+    n3: {title: 'Every 3 × 3 pattern', detail: 'All 511 patterns but the full one with equal weights and, in each of three draws of random weights, the 510 nonempty ones, solved by batched ADMM: each class behaves as the theorems say (section 7).'},
+    n4: {title: 'Every 4 × 4 pattern', detail: 'All 65 535 patterns but the full one, with equal weights, solved by batched ADMM: each class behaves as Theorem E says. The 4464 rigid patterns with a permutation whose error is still above 10⁻⁶ after 20 000 steps keep converging when run on (section 7).'},
+    zeros: {title: 'Tables with zero entries', detail: 'All 12 211 patterns but the full ones of 13 tables, all but one with zeros at fixed places, solved by batched ADMM: each class behaves as Theorem G says (section 7).'},
+    train: {title: 'Training reaches M', detail: 'Weight decay at its optimum is M (Lemma 1). That training reaches this optimum is a modeling step, not a theorem.'},
   },
 };
