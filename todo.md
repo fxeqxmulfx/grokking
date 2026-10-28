@@ -7,20 +7,20 @@ try to generalize it. When a page needs a result that is not proved, prove it in
 
 Every task below can start now, unless it names the one thing it waits for.
 
-## In progress: the home page states the thesis in full
+## Done: the home page states the thesis in full
 
 `#/<lang>/home/full`, written for a professor who may read nothing past the first page.
-The English text is done, uncommitted: `site/src/pages/home/{en,spec,index}.ts` and
-`site/src/style.css`.
+When a theorem below lands, its tag on the home page changes in all three languages; the
+test `the home page makes the same claims, with the same numbers, in every language` keeps
+them in step.
 
-- [ ] `fr.ts`, `ru.ts`: `fullTitle` and `full`, with the same five sections as `en.ts`
+- [x] `fr.ts`, `ru.ts`: `fullTitle` and `full`, with the same five sections as `en.ts`
       (`terms`, `proved`, `refined`, `measured`, `unproved`), the same tags and numbers.
-- [ ] Their leads: `frac(pxy)` has a limit on a null set (the axes and `xy = ½`), not
+- [x] Their leads: `frac(pxy)` has a limit on a null set (the axes and `xy = ½`), not
       "at no point".
-- [ ] `site/tests/pages.test.ts`: `h3` in `assertBalanced`; a test that the home page has the
-      same sections in the three languages.
-- [ ] `npm run typecheck`, `npm test`, `npm run build`; look at `#/en|fr|ru/home` at 1280 px
-      and 390 px; commit.
+- [x] `site/tests/pages.test.ts`: `h3` in `assertBalanced`; the same sections, tags and
+      numbers in the three languages.
+- [x] Checked at 1280 px, 390 px and 360 px: no formula leaves its column.
 
 ## Lean, in the transformer repository
 
@@ -52,6 +52,10 @@ fast-forward and check `main`'s head before submitting.
       `forall_isMinOn_vecMulVec_iff_support`,
       `forall_isMinOn_vecMulVec_iff_exists_transport_support`,
       `rigid_support_iff_of_ne_zero`), with the zero-entry numbers.
+- [ ] Keep the phone-width probe:
+      `/tmp/claude-1000/-home-misha-lean-projects-transformer/7f8c1b5b-fb83-40a0-b148-1aad6935ee9c/scratchpad/overflow.mjs`
+      loads pages at a set width in headless Chrome (DevTools protocol, `Emulation.setDeviceMetricsOverride`) and
+      lists every formula or tag that leaves its column. Move it to `site/scripts/`.
 - [ ] Recovery page: the N = 4 card goes from `running` to `numerical`. Waits for the N = 4
       sweep (below).
 - [ ] Step 2: Rust compiled to `wasm32-unknown-unknown` in `crates/` for the heavy
@@ -69,12 +73,17 @@ fast-forward and check `main`'s head before submitting.
       of the site (`complete.py`, `patterns.py`, `small.py`, `chi_check.py`, `weighted.py`,
       `cross_weights.py`, `zeros_check.py` and others) exist only in a session scratchpad:
       `/tmp/claude-1000/-home-misha-lean-projects-transformer/7f8c1b5b-fb83-40a0-b148-1aad6935ee9c/scratchpad/rec/`.
-      Move them into `experiments/` here, as a uv project, before that directory goes.
+      The peak κ and the training predictions come from another scratchpad:
+      `/tmp/claude-1000/-home-misha-lean-projects-transformer/f59a2e8a-748c-4f77-9056-88503d0b17c1/scratchpad/train/`
+      (`kappa.py`, `tasks.py`, `drive.py`, `kappa.json`, `runs/`, `train.log`).
+      Move both into `experiments/` here, as a uv project, before those directories go.
 - [ ] **The optimizer.** The course's network trains with Schedule-Free AdamW, but the runs
       it quotes (the ten κ predictions, parity-cubic) used AdamW: `grok-simple.py` in
       `~/rust_projects/grokking_abmod/scripts`, lr 1e-3, betas 0.9/0.98, weight decay 1,
       batch 512, which has no Schedule-Free option. Rerun them with Schedule-Free AdamW on
-      the GPU, or keep saying AdamW.
+      the GPU, or keep saying AdamW. `ScheduleFreeAdamW` is in
+      `~/lean_projects/transformer/optimizers/src/lean_optim`; `compare-rotate90.py` in the
+      same `scripts/` directory shows how it is wired (`optimizer: schedule_free_adamw`).
 - [ ] **The N = 4 sweep** of every pattern runs in the background, into `small4_out.txt` in
       the scratchpad above; three of its four classes are printed (56 287 patterns). When it
       ends: the table in `review/flat_spectrum.md` (*Exhaustive check*) and the site's card.

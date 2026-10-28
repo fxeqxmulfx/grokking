@@ -3,7 +3,10 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {LANGS} from '../src/i18n.ts';
+import {en} from '../src/pages/home/en.ts';
+import {fr} from '../src/pages/home/fr.ts';
 import {homeHTML, missingHTML} from '../src/pages/home/index.ts';
+import {ru} from '../src/pages/home/ru.ts';
 import {OUTLINE, PAGES, PAGE_IDS, PLANNED} from '../src/pages/registry.ts';
 import {LABS, SPRINGS, isLabId} from '../src/recovery/model.ts';
 import {RECOVERY_STRINGS} from '../src/recovery/strings.ts';
@@ -15,12 +18,32 @@ const sections = (html: string): string[] => [...html.matchAll(/<section id="([^
 /** Every opened tag of these kinds is closed, in order. */
 function assertBalanced(html: string, where: string): void {
   const stack: string[] = [];
-  for (const m of html.matchAll(/<(\/?)(section|article|header|div|p|span|strong|em|sub|sup|ul|ol|li|table|thead|tbody|tr|th|td|a|code|h1|h2)\b[^>]*>/g)) {
+  for (const m of html.matchAll(/<(\/?)(section|article|header|div|p|span|strong|em|sub|sup|ul|ol|li|table|thead|tbody|tr|th|td|a|code|h1|h2|h3)\b[^>]*>/g)) {
     if (!m[1]) stack.push(m[2]);
     else assert.equal(stack.pop(), m[2], `${where}: </${m[2]}> closes the wrong tag`);
   }
   assert.deepEqual(stack, [], `${where}: unclosed tags`);
 }
+
+/** The marks of the claim tags, in order: ✓ Lean, ~ by hand, ≈ numerical, ○ open, · heuristic. */
+const marks = (html: string): string[] => [...html.matchAll(/class="icon \w+" aria-hidden="true">([^<]+)</g)].map(m => m[1]);
+
+/** The numbers of a text, in order, a decimal comma read as a point. */
+const numbers = (html: string): string[] =>
+  [...html.replace(/<[^>]+>/g, ' ').matchAll(/\d+(?:[.,]\d+)?/g)].map(m => m[0].replace(',', '.'));
+
+test('the home page makes the same claims, with the same numbers, in every language', () => {
+  const text = {en, fr, ru};
+  for (const lang of LANGS) {
+    const t = text[lang], e = text.en;
+    assert.deepEqual(sections(homeHTML(lang)), sections(homeHTML('en')), lang);
+    for (const key of ['lead', 'precise', 'full'] as const) {
+      assert.deepEqual(marks(t[key]), marks(e[key]), `${lang}/${key}: tags`);
+      assert.deepEqual(numbers(t[key]), numbers(e[key]), `${lang}/${key}: numbers`);
+    }
+    t.ends.forEach((end, k) => assert.deepEqual(marks(end.body), marks(e.ends[k].body), `${lang}/ends/${k}`));
+  }
+});
 
 test('every page has the same sections and widgets in every language', () => {
   for (const page of PAGES) {

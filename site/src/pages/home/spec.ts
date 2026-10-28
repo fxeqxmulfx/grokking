@@ -7,6 +7,10 @@ export interface HomeText {
   readonly lead: string;
   readonly statement: string;
   readonly precise: string;
+  /** The heading of the detailed statement. */
+  readonly fullTitle: string;
+  /** HTML: the detailed statement, as `<section id>`s with `<h3>` headings. */
+  readonly full: string;
   readonly endsTitle: string;
   readonly ends: readonly {readonly title: string; readonly body: string}[];
   readonly audienceTitle: string;
@@ -15,6 +19,18 @@ export interface HomeText {
   readonly pagesTitle: string;
   readonly writing: string;
 }
+
+/** `x` with the subscript `i`. */
+export const sub = (x: string, i: string): string => `${x}<sub>${i}</sub>`;
+
+/** The fractional part, set as an operator. */
+export const frac = '<span class="op">frac</span>';
+
+/** The letters of Theorem G and Theorem C, the same in every language. */
+export const ri = sub('r', 'i'), sj = sub('s', 'j'), ui = sub('u', 'i'), vj = sub('v', 'j'), Kr = sub('K', 'ρ');
+
+/** The square root in Theorem C's bound, for `m = deg P`. */
+export const root = '√((m − 1)(2p − 1))';
 
 /** The marks of the tags, in the order of every legend. */
 const MARKS = [['good', '✓'], ['tight', '~'], ['run', '≈'], ['open', '○'], ['open', '·']] as const;

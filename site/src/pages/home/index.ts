@@ -40,6 +40,7 @@ export function homeHTML(lang: Lang): string {
     <p class="lead">${t.lead}</p>
     ${box(`<p class="statement">${t.statement}</p>`)}
     ${t.precise}
+    <section id="full" class="full"><h2>${t.fullTitle}</h2>${t.full}</section>
     <section id="ends"><h2>${t.endsTitle}</h2><div class="ends">${ends}</div></section>
     <section id="audience"><h2>${t.audienceTitle}</h2><p>${t.audience}</p><p class="sub">${t.legend}</p></section>
     <section id="pages"><h2>${t.pagesTitle}</h2><div class="outline">${outlineHTML(lang, t.writing)}</div></section>
