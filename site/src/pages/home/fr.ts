@@ -117,6 +117,13 @@ const full = [
   contiennent une permutation des résidus non nuls ; pour ${m('[χ(a + ab)] = [χ(a) χ(1 + b)]')}, il en va de même avec
   les colonnes ${m('b ≠ −1')} au lieu de ${m('b ≠ 0')}, et une bijection des lignes ${m('a ≠ 0')} sur elles au lieu de la
   permutation ${lean('G et Hall')}.${leanNames(FULL_LEAN.characters)}</li></ul>
+  <p>L’échec a une marge. Soit ${m('K')} une table ${m('N × N')} de rang 1 à coefficients de module 1, de sorte que
+  ${m(`‖K‖${S1} = N`)}. Si ${m('Ω')} ne contient aucune permutation, une matrice égale à ${m('K')} sur ${m('Ω')} a une
+  norme nucléaire d’au plus ${m('√(N² − 1) < N − 1/(2N)')}. Soit ${m('k + l = N + 1')} avec ${m('k ≤ l ≤ k + 1')}.
+  Pour chaque ${m('Ω')} sans permutation, une matrice égale à ${m('K')} sur ${m('Ω')} a une norme nucléaire d’au plus
+  ${m('√(k (k − 1)) + √(l (l − 1))')}, et pour l’un d’eux c’est la plus petite norme nucléaire des matrices égales à
+  ${m('K')} sur ${m('Ω')} : ${m('√(N² − 1)')} pour ${m('N')} impair, ${m('√2 + √6')} pour ${m('N = 4')}
+  ${lean('marge d’échec')}.</p>${leanNames(FULL_LEAN.margin)}
   <p>Puis les tables plates.</p>
   ${box(`<p><strong>Théorème A</strong> ${lean('A')}. Soit ${m('K')} inversible, de facteur polaire
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Alors ${m('K')} a la plus petite norme nucléaire parmi les matrices égales

@@ -41,6 +41,7 @@ export const FULL_LEAN = {
   diagonals: 'isMinOn_addKernel_iff_of_ne, exists_ne_isMinOn_addKernel_of_diagonal',
   cross: 'rigid_cross, vecMulVec_eq_of_cross, isLeast_nuclearNorm_addKernel_cross',
   characters: 'forall_isMinOn_taskKernel_mul_mulChar_iff_connected, forall_isMinOn_taskKernel_add_mul_mulChar_iff_connected',
+  margin: 'exists_norm_eq_one_of_vecMulVec, nuclearNorm_vecMulVec_of_norm_eq_one, sqrt_sq_sub_one_lt, exists_nuclearNorm_le_sqrt_vecMulVec_of_not_perm, failureMargin_vecMulVec, failureMargin_odd_vecMulVec, failureMargin_four_vecMulVec',
   weil: 'norm_sum_addChar_eval_le, norm_le_sqrt_of_mem_roots',
   oneHot: 'eq_zero_of_isMinOn_classKernel_cube_add_mul',
   real: 'det_cosKernel, det_sinKernel',

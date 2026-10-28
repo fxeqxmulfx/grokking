@@ -107,6 +107,13 @@ const full = [
   the nonzero residues; for ${m('[χ(a + ab)] = [χ(a) χ(1 + b)]')} the same holds with the columns ${m('b ≠ −1')} in
   place of ${m('b ≠ 0')} and a bijection from the rows ${m('a ≠ 0')} onto them in place of the permutation
   ${lean('G and Hall')}.${leanNames(FULL_LEAN.characters)}</li></ul>
+  <p>The failure has a margin. Let ${m('K')} be an ${m('N × N')} table of rank 1 whose entries have modulus 1, so that
+  ${m(`‖K‖${S1} = N`)}. If ${m('Ω')} contains no permutation, some matrix equal to ${m('K')} on ${m('Ω')} has nuclear
+  norm at most ${m('√(N² − 1) < N − 1/(2N)')}. Let ${m('k + l = N + 1')} with ${m('k ≤ l ≤ k + 1')}. For every
+  ${m('Ω')} without a permutation, some matrix equal to ${m('K')} on ${m('Ω')} has nuclear norm at most
+  ${m('√(k (k − 1)) + √(l (l − 1))')}, and for one of them this is the least nuclear norm of the matrices equal to
+  ${m('K')} on ${m('Ω')}: ${m('√(N² − 1)')} for odd ${m('N')}, ${m('√2 + √6')} for ${m('N = 4')}
+  ${lean('failure margin')}.</p>${leanNames(FULL_LEAN.margin)}
   <p>Then flat tables.</p>
   ${box(`<p><strong>Theorem A</strong> ${lean('A')}. Let ${m('K')} be invertible, with polar factor
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Then ${m('K')} has the least nuclear norm among the matrices equal to
