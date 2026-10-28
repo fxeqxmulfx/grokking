@@ -95,7 +95,8 @@ const full = [
   pour ${m('p ≥ 3')}, M rend une table de norme nucléaire ${m('2√(p − 1) < p')} ${lean('D.9')} ;</li>
   <li>pour ${m('χ(ab)')}, la ligne nulle et la colonne nulle n’ont besoin d’aucune case observée : M la retrouve exactement
   quand les cases de ${m('Ω')} où ${m('a, b ≠ 0')} relient les lignes et colonnes non nulles et contiennent une
-  permutation de celles-ci ${hand('G et Hall', L)}.</li></ul>
+  permutation de celles-ci, et de même pour ${m('χ(a + ab) = χ(a) χ(1 + b)')}, avec la colonne ${m('−1')} à la place de
+  la colonne ${m('0')} ${lean('G et Hall')}.</li></ul>
   <p>Puis la moitié négative.</p>
   ${box(`<p><strong>Théorème A</strong> ${lean('A')}. Soit ${m('K')} inversible, de facteur polaire
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Alors ${m('K')} a la plus petite norme nucléaire parmi les matrices égales

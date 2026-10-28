@@ -27,14 +27,12 @@ them in step.
 Work in the worktree `.claude/worktrees/rank-one-recovery`; land each commit on `main` by
 fast-forward and check `main`'s head before submitting.
 
-- [ ] **χ(ab) from Theorem G.** For a multiplicative character χ of `ZMod p` (Mathlib's
-      `MulChar` sends non-units to 0), M recovers `χ(a)χ(b)` from Ω exactly when the cells
-      of Ω with `a, b ≠ 0` are rigid on the units and contain a permutation of them. The
-      zero row and column need no cell. A faithful χ matters only to read `ab` back. Route:
-      Theorem G for vectors of modulus one on their support, then Hall
-      (`Finset.all_card_le_biUnion_card_iff_exists_injective`, as in Theorem E.3).
-      Then the home page's `hand('G and Hall')` becomes `lean`, in three languages, and the
-      χ check (12 training splits, all recovered) goes into `review/flat_spectrum.md`.
+- [x] **χ(ab) from Theorem G.** On `main` as `542ba3ea`:
+      `forall_isMinOn_vecMulVec_iff_equiv_support` (moduli one on supports of the same size:
+      rigid there, and a bijection between them inside Ω, by Hall),
+      `forall_isMinOn_taskKernel_mul_mulChar_iff`, and for `χ(a + ab) = χ(a) χ(1 + b)`
+      `forall_isMinOn_taskKernel_add_mul_mulChar_iff`. The home page says `lean('G and Hall')`
+      in three languages; the χ check (12 splits) is in `review/flat_spectrum.md`.
 - [ ] **Rigidity is connectivity.** Rigid on the supports ⇔ the bipartite graph of Ω on the
       nonzero rows and columns is connected; so a rigid pattern has at least `2N − 1` cells.
       The home page marks it `hand('graphs')`.

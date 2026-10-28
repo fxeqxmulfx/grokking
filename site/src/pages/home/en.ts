@@ -88,8 +88,8 @@ const full = [
   <li>the cross, row 0 with column 0, is rigid and determines ${m('ψ(a + b)')} among the tables of rank one, yet for
   ${m('p ≥ 3')} M returns a table of nuclear norm ${m('2√(p − 1) < p')} ${lean('D.9')};</li>
   <li>for ${m('χ(ab)')} the zero row and the zero column need no observed cell: M recovers it exactly when the cells of
-  ${m('Ω')} with ${m('a, b ≠ 0')} connect the nonzero rows and columns and contain a permutation of them
-  ${hand('G and Hall', L)}.</li></ul>
+  ${m('Ω')} with ${m('a, b ≠ 0')} connect the nonzero rows and columns and contain a permutation of them, and likewise
+  for ${m('χ(a + ab) = χ(a) χ(1 + b)')} with column ${m('−1')} in place of column ${m('0')} ${lean('G and Hall')}.</li></ul>
   <p>Then the negative half.</p>
   ${box(`<p><strong>Theorem A</strong> ${lean('A')}. Let ${m('K')} be invertible, with polar factor
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Then ${m('K')} has the least nuclear norm among the matrices equal to
