@@ -68,19 +68,20 @@ fast-forward and check `main`'s head before submitting.
 - [x] **The exact witness.** `4943eec7`, `a9e36f03`: `‖J − t 1_R 1_Cᵀ‖²_S1 =
       m n − 2t k l + t² k l + 2|t| g` for every real `t`, least `√(k (n − l)) + √(l (m − k))`
       at `t = 1 − g/(k l)`; some `t` beats `J` iff `k + l > N`. On the site: `eef763e`.
-- [ ] **The failure margin.** Cauchy–Schwarz on the exact witness: a missed block with
-      `k + l > N` gives `√(k (N − l)) + √(l (N − k)) ≤ √((k + l)(2N − k − l)) ≤ √(N² − 1)`, so
-      every pattern without a permutation lets M miss `J` by more than `1/(2N)`. The 4 × 4 sweep
-      fits: its largest gap without a permutation, −0.136, is `√2 + √6 − 4`. Sharp for odd `N`
-      if the complement of a `(N + 1)/2` square block has least norm exactly `√(N² − 1)`:
-      averaging over the permutations of `R` and of `C` makes the best fill constant on the
-      block.
+- [x] **The failure margin.** `f192a4aa`: a contraction certifies the least norm
+      `√(k (N − l)) + √(l (N − k))` off a `k × l` block; every pattern without a permutation
+      has a completion of `J` of norm at most `√(N² − 1) < N − 1/(2N)`; the worst case is
+      `√(N² − 1)` for odd `N` and `√2 + √6` for `N = 4`. `da5f79ce`: for every `N`, the
+      largest least norm without a permutation is `√(a (a − 1)) + √(b (b − 1))` with
+      `a + b = N + 1`, `a ≤ b ≤ a + 1`. `58f6f140`, `5f4dee08`: all of it for every rank-one
+      table with entries of modulus one. Numerically on 3 × 3 to 7 × 7 (`30dcce5`); on the
+      site: `c867838`, `e677cdd`.
 - [ ] `‖Y − Q‖_op = cos(π/p)`, the last item of *Not formalized* in `review/flat_spectrum.md`.
 
 ## Site
 
 - [x] Recovery page: Theorem G with the zero-entry numbers, and the N = 4 card (`177fa3b`).
-- [ ] Recovery page: the slow check's 400 000-step point, when `slow 4` ends.
+- [x] Recovery page: the slow check's 400 000-step point (`c867838`).
 - [ ] Step 2: Rust compiled to `wasm32-unknown-unknown` in `crates/` for the heavy
       computations (nuclear-norm completion, singular values, κ), then the planned pages of
       `site/src/pages/registry.ts`: `start`, `fourier`, `spectrum`, `model`, `flat`,
@@ -106,7 +107,8 @@ fast-forward and check `main`'s head before submitting.
       `~/lean_projects/transformer/optimizers/src/lean_optim`; `compare-rotate90.py` in the
       same `scripts/` directory shows how it is wired (`optimizer: schedule_free_adamw`).
 - [x] **The N = 4 sweep** of every pattern: all four classes, on the site (`177fa3b`).
-- [ ] The N = 4 table and the slow check in `review/flat_spectrum.md` (*Exhaustive check*).
+- [x] The N = 4 table and the slow check in `review/flat_spectrum.md` (*Exhaustive check*):
+      transformer `757c0418`, `15ff9684`.
 
 ## Open, for the next cycles
 
