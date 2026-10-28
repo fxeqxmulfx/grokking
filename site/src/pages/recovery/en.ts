@@ -1,6 +1,6 @@
 /** The recovery page in English. Source: review/flat_spectrum.md, Theorems D, E and F. */
 
-import {box, eq, hand, heuristic, lean, m, numbers, numerical, open, section, widget, S1} from '../markup.ts';
+import {box, eq, heuristic, lean, m, numbers, numerical, open, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
 
 const L = 'en';
@@ -45,7 +45,7 @@ const body = [
   cannot tell it from the truth.</p>
   ${widget('lab', 'rigid')}
   <p>Call ${m('Ω')} <strong>rigid</strong> when the drawing is connected. Rigidity is necessary ${lean('D.7')} for entries of
-  modulus one, and the same flip works for entries of any size ${hand('F.3', L)}. M recovers ${m('ψ(a + b)')} from the two
+  modulus one, and the same flip works for entries of any size ${lean('F.3')}. M recovers ${m('ψ(a + b)')} from the two
   diagonals of offsets ${m('s₁, s₂')} exactly when ${m('s₂ − s₁')} is a unit mod ${m('p')}, which is when they are rigid
   ${lean('D.8')}.</p>
   ${widget('quiz', 'q2')}`),
@@ -73,14 +73,15 @@ const body = [
   ${m(`α<sub>i</sub> = |${ai}|²/‖a‖²`)} and column ${m('j')} a hole ${m(`β<sub>j</sub> = |${bj}|²/‖b‖²`)}. Sand moves only through
   kept cells. A <strong>transport plan</strong> moves all the sand and fills every hole exactly.</p>
   ${box(`<strong>Theorem F</strong>. Let ${m(`K = ${abT}`)} have no zero entry. If ${m('Ω')} is rigid and carries a plan, M
-  recovers ${m('K')} ${lean('F.1–F.2')}. Without rigidity, or without a plan, it does not ${hand('F.3', L)}.`)}
+  recovers ${m('K')} ${lean('F.1–F.2')}. If ${m('Ω')} is not rigid, or some rows ${m('R')} hold more sand than the
+  columns ${m('N(R)')} they see can take, it does not ${lean('F.3')}.`)}
   <p>The obstacles are the ones you met: the flip of a piece, and the cheaper
   ${m(`${abT} − s² a<sub>R</sub> b<sub>C</sub><sup>T</sup>`)}. A plan exists exactly when every set of rows fits into the
   columns it sees, ${m('Σ<sub>i∈R</sub> α<sub>i</sub> ≤ Σ<sub>j∈N(R)</sub> β<sub>j</sub>')} ${open('Gale 1957', L)}. With
   equal weights, a permutation inside ${m('Ω')} divided by ${m('N')} is a plan, Gale's condition becomes Hall's
   ${m('|R| ≤ |N(R)|')}, and Theorem F becomes Theorem E.</p>
   <p>Drag the gold and blue bars to change the weights. The cross, hopeless with equal weights, works once its row and its
-  column are heavy enough: exactly when ${m('α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1')} ${open('the cross', L)}.</p>
+  column are heavy enough: exactly when ${m('α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1')} ${lean('F.4')}.</p>
   ${widget('lab', 'weights')}
   ${widget('quiz', 'q4')}`),
 
@@ -164,11 +165,11 @@ export const en: RecoveryText = {
     d9: {title: 'D.9: the cross fails for N ≥ 3', detail: 'The cross is rigid and fixes every rank-one completion, yet its least nuclear norm is 2√(N − 1) < N.'},
     e: {title: 'Theorem E: rigid and a permutation', detail: `For entries of modulus one: a permutation in Ω gives ‖X‖${S1} ≥ N (E.1); with rigidity M recovers the table (E.2); without a permutation a cheaper witness exists (E.3); together, an equivalence (E.4).`},
     f12: {title: 'F.1–F.2: a plan ⇒ recovered', detail: `A transport plan from α to β on Ω gives ‖X‖${S1} ≥ ‖a‖ ‖b‖; with rigidity M recovers a bᵀ. On main since commit 7f7423c9.`},
-    f3a: {title: 'F.3: not rigid ⇒ a flip, any sizes', detail: 'Next in Lean: generalize D.7 with phases u_i v_j = 1 on Ω; the flip keeps the norm.'},
-    f3b: {title: 'F.3: no plan ⇒ a cheaper witness', detail: 'Next in Lean: U = diag(a) U₀ and V = diag(b̄) V₀ from E.3 cost ‖a‖² − ½ s² (δ − s² Σ_R α) < ‖a‖² for small s.'},
-    cross: {title: 'The cross: recovered ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'From F.2 with an explicit plan and from the witness of F.3; it needs no Gale.'},
+    f3a: {title: 'F.3: not rigid ⇒ a flip, any sizes', detail: `The phases u_i v_j = 1 on Ω, with u_i₀ v_j₀ = −1, give a second table with the same moduli. Since ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, it costs the same. On main since commit b6577f53.`},
+    f3b: {title: 'F.3: overfull rows ⇒ a cheaper witness', detail: 'If rows R hold more sand than their columns N(R) take, Ω misses R × N(R)ᶜ, and U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ from E.3, with p² = ‖b‖/‖a‖, cost less than ‖a‖ ‖b‖. On main since commit b6577f53.'},
+    cross: {title: 'F.4: the cross: recovered ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'One way: an explicit plan on the cross and F.2. The other: the witness of F.3 on the block off row i₀ and column j₀. No Gale needed. On main since commit b6577f53.'},
     gale: {title: 'Gale: a plan ⇔ Σ<sub>R</sub> α ≤ Σ<sub>N(R)</sub> β', detail: 'The supply–demand theorem (Gale, 1957). Mathlib has only the unweighted Hall theorem; the proof pushes sand along a cell or splits at a tight set R.'},
-    fiff: {title: 'Theorem F as an equivalence', detail: 'After F.3 and Gale: M recovers a bᵀ ⇔ Ω is rigid and ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² for every set R.'},
+    fiff: {title: 'Theorem F as an equivalence', detail: 'Only Gale is missing: M recovers a bᵀ ⇔ Ω is rigid and ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² for every set R. F.3 already proves ⇒.'},
     n3: {title: 'Every 3 × 3 pattern', detail: 'All 511 patterns but the full one with equal weights, and the 510 nonempty ones with random weights, solved by batched ADMM: each class behaves as the theorems say (section 7).'},
     n4: {title: 'Every 4 × 4 pattern', detail: 'Running: 65 535 patterns. Done so far: the 3970 patterns that are not rigid but contain a permutation reach the gap 0 within 2·10<sup>−14</sup>, with error at least 0.77.'},
     train: {title: 'Training behaves like M', detail: 'The modeling step of Lemma 1: weight decay at its optimum. Not a theorem.'},

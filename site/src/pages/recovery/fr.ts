@@ -1,6 +1,6 @@
 /** The recovery page in French. Source: review/flat_spectrum.md, Theorems D, E and F. */
 
-import {box, eq, hand, heuristic, lean, m, numbers, numerical, open, section, widget, S1} from '../markup.ts';
+import {box, eq, heuristic, lean, m, numbers, numerical, open, section, widget, S1} from '../markup.ts';
 import type {RecoveryText} from './spec.ts';
 
 const L = 'fr';
@@ -49,7 +49,7 @@ const body = [
   La table retournée coïncide avec ${m('Ω')} et coûte autant : M ne peut pas la distinguer de la vraie.</p>
   ${widget('lab', 'rigid')}
   <p>Disons que ${m('Ω')} est <strong>rigide</strong> quand le dessin est connexe. La rigidité est nécessaire ${lean('D.7')}
-  pour des entrées de module un, et le même retournement marche pour des entrées de toutes tailles ${hand('F.3', L)}.
+  pour des entrées de module un, et le même retournement marche pour des entrées de toutes tailles ${lean('F.3')}.
   M retrouve ${m('ψ(a + b)')} à partir des deux diagonales de décalages ${m('s₁, s₂')} exactement quand ${m('s₂ − s₁')} est
   inversible modulo ${m('p')}, c’est-à-dire quand elles forment un motif rigide ${lean('D.8')}.</p>
   ${widget('quiz', 'q2')}`),
@@ -79,7 +79,8 @@ const body = [
   ne passe que par les cases gardées. Un <strong>plan de transport</strong> déplace tout le sable et remplit exactement chaque
   trou.</p>
   ${box(`<strong>Théorème F</strong>. Soit ${m(`K = ${abT}`)} sans entrée nulle. Si ${m('Ω')} est rigide et porte un plan,
-  M retrouve ${m('K')} ${lean('F.1–F.2')}. Sans rigidité, ou sans plan, M échoue ${hand('F.3', L)}.`)}
+  M retrouve ${m('K')} ${lean('F.1–F.2')}. Si ${m('Ω')} n’est pas rigide, ou si des lignes ${m('R')} portent plus de sable
+  que les colonnes ${m('N(R)')} qu’elles voient ne peuvent en prendre, M échoue ${lean('F.3')}.`)}
   <p>Les obstacles sont ceux que vous avez rencontrés : le retournement d’un morceau, et la matrice moins chère
   ${m(`${abT} − s² a<sub>R</sub> b<sub>C</sub><sup>T</sup>`)}. Un plan existe exactement quand chaque ensemble de lignes tient
   dans les colonnes qu’il voit, ${m('Σ<sub>i∈R</sub> α<sub>i</sub> ≤ Σ<sub>j∈N(R)</sub> β<sub>j</sub>')}
@@ -87,7 +88,7 @@ const body = [
   condition de Gale devient celle de Hall, ${m('|R| ≤ |N(R)|')}, et le théorème F devient le théorème E.</p>
   <p>Faites glisser les barres dorées et bleues pour changer les poids. La croix, sans espoir à poids égaux, fonctionne dès
   que sa ligne et sa colonne sont assez lourdes : exactement quand ${m('α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1')}
-  ${open('la croix', L)}.</p>
+  ${lean('F.4')}.</p>
   ${widget('lab', 'weights')}
   ${widget('quiz', 'q4')}`),
 
@@ -173,11 +174,11 @@ export const fr: RecoveryText = {
     d9: {title: 'D.9 : la croix échoue pour N ≥ 3', detail: 'La croix est rigide et fixe toute complétion de rang un, mais sa plus petite norme nucléaire vaut 2√(N − 1) < N.'},
     e: {title: 'Théorème E : rigide et une permutation', detail: `Pour des entrées de module un : une permutation dans Ω donne ‖X‖${S1} ≥ N (E.1) ; avec la rigidité, M retrouve la table (E.2) ; sans permutation, un témoin moins cher existe (E.3) ; ensemble, une équivalence (E.4).`},
     f12: {title: 'F.1–F.2 : un plan ⇒ reconstruction', detail: `Un plan de transport de α vers β sur Ω donne ‖X‖${S1} ≥ ‖a‖ ‖b‖ ; avec la rigidité, M retrouve a bᵀ. Sur main depuis le commit 7f7423c9.`},
-    f3a: {title: 'F.3 : non rigide ⇒ un retournement, toutes tailles', detail: 'Prochaine étape en Lean : généraliser D.7 avec des phases u_i v_j = 1 sur Ω ; le retournement garde la norme.'},
-    f3b: {title: 'F.3 : sans plan ⇒ un témoin moins cher', detail: 'Prochaine étape en Lean : U = diag(a) U₀ et V = diag(b̄) V₀ tirés de E.3 coûtent ‖a‖² − ½ s² (δ − s² Σ_R α) < ‖a‖² pour s petit.'},
-    cross: {title: 'La croix : reconstruction ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'Par F.2 avec un plan explicite et par le témoin de F.3 ; Gale n’y est pas nécessaire.'},
+    f3a: {title: 'F.3 : non rigide ⇒ un retournement, toutes tailles', detail: `Les phases u_i v_j = 1 sur Ω, avec u_i₀ v_j₀ = −1, donnent une seconde table de mêmes modules. Comme ‖a bᵀ‖${S1} = ‖a‖ ‖b‖, elle coûte autant. Sur main depuis le commit b6577f53.`},
+    f3b: {title: 'F.3 : des lignes trop chargées ⇒ un témoin moins cher', detail: 'Si des lignes R portent plus de sable que leurs colonnes N(R) n’en prennent, Ω évite R × N(R)ᶜ, et U = p diag(a) U₀, V = p⁻¹ diag(b̄) V₀ tirés de E.3, avec p² = ‖b‖/‖a‖, coûtent moins que ‖a‖ ‖b‖. Sur main depuis le commit b6577f53.'},
+    cross: {title: 'F.4 : la croix : reconstruction ⇔ α<sub>i₀</sub> + β<sub>j₀</sub> ≥ 1', detail: 'Dans un sens : un plan explicite sur la croix et F.2. Dans l’autre : le témoin de F.3 sur le bloc hors de la ligne i₀ et de la colonne j₀. Gale n’y est pas nécessaire. Sur main depuis le commit b6577f53.'},
     gale: {title: 'Gale : un plan ⇔ Σ<sub>R</sub> α ≤ Σ<sub>N(R)</sub> β', detail: 'Le théorème de l’offre et de la demande (Gale, 1957). Mathlib n’a que le théorème de Hall sans poids ; la preuve pousse du sable le long d’une case ou coupe selon un ensemble R serré.'},
-    fiff: {title: 'Le théorème F comme équivalence', detail: 'Après F.3 et Gale : M retrouve a bᵀ ⇔ Ω est rigide et ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² pour tout ensemble R.'},
+    fiff: {title: 'Le théorème F comme équivalence', detail: 'Il ne manque que Gale : M retrouve a bᵀ ⇔ Ω est rigide et ‖b‖² Σ_R |a_i|² ≤ ‖a‖² Σ_N(R) |b_j|² pour tout ensemble R. F.3 prouve déjà ⇒.'},
     n3: {title: 'Tous les motifs 3 × 3', detail: 'Les 511 motifs sauf le plein à poids égaux, et les 510 non vides à poids aléatoires, résolus par ADMM par lots : chaque classe se comporte comme le disent les théorèmes (section 7).'},
     n4: {title: 'Tous les motifs 4 × 4', detail: 'En cours : 65 535 motifs. Fait jusqu’ici : les 3970 motifs non rigides qui contiennent une permutation atteignent l’écart 0 à 2·10<sup>−14</sup> près, avec une erreur d’au moins 0,77.'},
     train: {title: 'L’entraînement se comporte comme M', detail: 'L’étape de modélisation du lemme 1 : la pénalité sur les poids à son optimum. Pas un théorème.'},
