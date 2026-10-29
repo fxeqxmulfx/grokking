@@ -42,7 +42,7 @@ the rate when they are not 128, 1 and 10 000.
 | --- | --- | --- | --- | --- | --- |
 | `adamw-lr0.001` | AdamW with a linear warmup of 10 steps, as grok-simple.py | 1e-3 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.001` | Schedule-Free AdamW | 1e-3 | the 15 below | 7, 11 | 10 000 |
-| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below and the 7 of the last section | 7, 11 | 10 000 |
+| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below and the seven sets `[a + b ∈ A]` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.03` | Schedule-Free AdamW | 0.03 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
@@ -77,7 +77,7 @@ and 11; `—` means never in 10 000 steps:
   still rising when training stops at 10 000 steps. The five with `κ` from 0.0672 to 0.1059 never
   do: they end at 0.68% to 2.17% validation accuracy, near chance (1/97 ≈ 1.03%), and their
   parity accuracy is 45.75% to 51.48%. Nor do the two powers of `a + b`, with `κ = 0.0427` and
-  0.0125, which the last section treats.
+  0.0125, which the next section treats.
 - Under Schedule-Free AdamW, no run that reached 99% falls below it at a later check. Under
   AdamW, three do: `sum-square` with seed 7 (down to 97.94% at step 5500) and seed 11 (98.32%
   at step 8000), and `sum-cube` with seed 7 (95.52% at step 4500), which ends on such a dip, at
@@ -93,9 +93,10 @@ and 11; `—` means never in 10 000 steps:
   AdamW. At 0.01 and 0.03 it reaches 99% at the first or second check (500 or 1000 steps), and
   `sum-cube` at 1000 to 2000.
 - `κ` depends on `p`: `sum-cube` has `κ = 1.0000` at `p = 47`, where `3 ∤ 46` makes `x ↦ x³` a
-  bijection, and 0.2756 at `p = 97`, 0.2755 at `p = 199`. `runs/kappa.json` holds the other 25
-  tasks at `p` = 47, 97 and 199, and the two powers at 47 and 97; the seven sets of the last
-  section have only the exact `κ` given there.
+  bijection, and 0.2756 at `p = 97`, 0.2755 at `p = 199`. `runs/kappa.json` holds `κ` at
+  `p` = 47, 97 and 199 for the 23 tasks of `domain/tasks.py` other than the two powers and the
+  seven sets `[a + b ∈ A]`, and for `abs-diff` and `parity-cubic` with the answer's lowest bit
+  dropped; at 47 and 97 for the two powers; at 97 for the seven sets.
 
 ## Two powers of `a + b`
 
@@ -112,8 +113,9 @@ recorded before these tasks ran (`DISAGREE` in `application/runs.py`), disagree 
 - `a + b` has rank one under `ψ`, so the hypothesis that `g(h)` is learned for every `g` when `h`
   has rank one under an injective readout predicts success.
 
-Validation accuracy at the end of each run, for seeds 7 and 11. On the held-out half, a guess with
-the answers' frequencies scores 16.36% for `(a + b)¹⁶` and 49.03% to 49.06% for `(a + b)⁴⁸`:
+Validation accuracy at the end of each run, for seeds 7 and 11. On the held-out half, a random
+guess with the answers' frequencies there scores on average 16.36% for `(a + b)¹⁶` and 49.03% to
+49.06% for `(a + b)⁴⁸`:
 
 | network | optimizer, learning rate | steps | `(a + b)¹⁶` | `(a + b)⁴⁸` |
 | --- | --- | --- | --- | --- |
@@ -164,17 +166,22 @@ the answers' frequencies scores 16.36% for `(a + b)¹⁶` and 49.03% to 49.06% f
 ## One size of set, different spectra
 
 The seven tasks `[a + b ∈ A]` (`SPECTRUM` in `application/runs.py`, with the predictions recorded
-before they ran) have sets `A` of `(p − 1)/2 = 48` residues, so every table has the answers 0 and
-1 with the same frequencies, and only the spectrum of `A` differs. `I` is the interval
-`{0, …, 47}`, `I_j` the interval with `j` of its points exchanged for `j` points outside it (`I₄`
-keeps the swaps of `I₂`, and so on), `R` a fixed random set and `Q` the nonzero squares. For an
-indicator the formula of the last section gives `κ = 4 max_{k ≠ 0} |Σ_{c ∈ A} ω^{kc}|² / p²`
-(hand). One wave classifies `I` exactly: `cos(2π(c − 23.5)/97) > 0` if and only if
-`c ∈ {0, …, 47}`.
+before they ran) have sets `A` of `(p − 1)/2 = 48` residues. All seven tables thus have the answer
+1 on 48 of the 97 sums and 0 on the other 49, and differ only in which sums give 1. `I` is the
+interval `{0, …, 47}`, `I_j` the interval with `j` of its points exchanged for `j` points outside
+it (`I₄` keeps the swaps of `I₂`, and so on), `R` a fixed random set and `Q` the nonzero squares,
+the set where `(a + b)⁴⁸ = 1`. For an indicator the formula of the previous section gives
+`κ = 4 max_{k ≠ 0} |Σ_{c ∈ A} ω^{kc}|² / p²`, and the solver finds the same seven values, with
+363 to 384 of its 456 starts within `10⁻³` of the best. This `κ` is `2|A|(p − |A|)/p² = 0.49995`
+times the share of the variance of the indicator of `A` that its strongest real wave
+`cos(2πkc/p + θ)` carries (hand, by Parseval's identity): 81.07% for `I`, 7.73% for `R`, 2.50%
+for `Q`. One wave classifies `I` exactly: `cos(2π(c − 23.5)/97) > 0` if and only if
+`c ∈ {0, …, 47}` (hand).
 
 Schedule-Free AdamW at 0.01, width 128, 10 000 steps, seeds 7 and 11. On the held-out half, a
-guess with the answers' frequencies scores 50.00% to 50.03%. The vote counts the sums `c` whose
-held-out cells have the right answer as their unique most common prediction:
+random guess with the answers' frequencies there scores on average 50.00% to 50.03%, the most
+common answer there 50.27% to 51.31%. Every prediction is 0 or 1. The vote counts the sums `c`
+whose held-out cells have the right answer as their unique most common prediction:
 
 | task | `A` | `κ`, p = 97 | validation accuracy | vote right, of 97 sums |
 | --- | --- | --- | --- | --- |
@@ -187,18 +194,27 @@ held-out cells have the right answer as their unique most common prediction:
 | sum-squares | `Q` | 0.0125 | 44.21%, 46.16% | 25, 29 |
 
 - The first prediction held (numerical): for each seed, the accuracy falls strictly with `κ`,
-  although the answers and their frequencies are the same in all seven tasks. No run reaches 99%,
-  and every run ends with 99.72% to 100% training accuracy. With the number of values and their
-  frequencies fixed, the spectrum of `g` decides here; why it does is heuristic.
-- The second held for few swaps. On every swapped sum of `I₂` and `I₄`, 4 of 4 and 8 of 8 in both
-  seeds, the vote gives the answer of the interval, not the task's; with `I₈` on 13 and 15 of 16
-  swapped sums, with `I₁₂` on only 13 and 11 of 24. The network learns the interval and treats
-  the swapped points as noise, until 12 swaps of 48 hide the interval. The accuracy stays below
-  `(97 − 2j)/97` (95.9%, 91.8%, 80.4% and 75.3%), because the other cells are also worse: 94.38%
-  to 94.75% of them are right with `I₂`, 89.52% to 90.20% with `I₄`.
-- The third held in part: the interval is learned except at its ends. The 3 sums its vote gets
-  wrong, `{47, 48, 96}` and `{0, 48, 96}`, lie among its four ends 47, 48, 96 and 0, where 33% to
-  65% of the held-out cells are right; these are the sums where the wave above is closest to 0
-  (`|cos| ≤ 0.049`).
-- `R` and `Q` are not learned: 53.33% to 53.56% and 44.21% to 46.16%, about and below the
-  frequency guess, as with the Legendre symbol above.
+  though the answers have the same frequencies in all seven tasks. From `I₈` to `I₁₂` it falls
+  by only 2.09 and 0.32 points, while the two seeds of `I₈` differ by 1.87, and the vote is right
+  on more sums with `I₁₂` (77, 77) than with `I₈` (74, 71). No run reaches 99%, and every run
+  ends with 99.72% to 100% training accuracy. A heuristic reading: weight decay favors fits by
+  few waves, and the less of `A` its strongest wave carries, the more waves a fit of `A` needs.
+- The second held for few swaps. With `I₂` and `I₄`, in both seeds, the vote gives the
+  interval's answer, not the task's, on every swapped sum (4 of 4 and 8 of 8), and the task's
+  answer on 93 and 92 of the 93 other sums and on 87 of the 89. With `I₈` it follows the
+  interval on 13 and 15 of the 16 swapped sums and is right on 71 and 70 of the 81 others; with
+  `I₁₂` it follows the interval on only 13 and 11 of the 24, and is right on 66 and 65 of the 73.
+  The wrong unswapped sums lie near the boundaries of `I`, in 38 to 49 and 88 to 96, except 12
+  with `I₁₂`. The accuracy stays below the predicted `(97 − 2j)/97` (95.88%, 91.75%, 83.51% and
+  75.26%): with `I₂`, 94.38% to 94.75% of the held-out cells of the unswapped sums are right and
+  13.54% to 15.38% of those of the swapped sums; with `I₄`, 89.52% to 90.20% and 20.05% to
+  23.47%.
+- The third held in part: the interval is learned except at its boundaries, and not to 99%. In
+  both seeds the vote is right on 94 of the 97 sums. Its 3 wrong sums, `{47, 48, 96}` and
+  `{0, 48, 96}`, lie at the two boundaries of `I`, between 47 and 48 and between 96 and 0. On
+  these four sums 33% to 65% of the held-out cells are right, against 79% to 96% on their
+  neighbors 1, 46, 49 and 95. They are the four sums where the wave above is closest to 0:
+  `|cos| ≤ 0.049` there, at least 0.080 elsewhere (hand).
+- `R` and `Q` are not learned. `R` ends at 53.33% and 53.56%, 3.30 and 3.56 points above the
+  frequency guess, with the vote right on 59 and 53 sums; `Q` at 44.21% and 46.16%, below it, as
+  `(a + b)⁴⁸` above, which is 1 on the same set.
