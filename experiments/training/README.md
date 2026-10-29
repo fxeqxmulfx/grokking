@@ -2,7 +2,7 @@
 
 Does the course's network learn `f(a, b) mod 97` from half of its table, and does the peak `κ`
 of the table say beforehand which tasks it learns? Does it learn every function `g(a + b)`, as
-it learns `π(a + b)` for a permutation `π`?
+it learns `π(a + b)` for a permutation `π`, and if not, does the spectrum of `g` decide which?
 
 The network is the Rotate90 model of grok-simple.py (`~/rust_projects/grokking_abmod/scripts`),
 ported unchanged (`infrastructure/model.py`): one table `E` embeds `a` and `b` and reads out
@@ -25,7 +25,9 @@ uv run --locked training train --optimizer schedule-free-adamw --lr 1e-3   # als
 uv run --locked training report --optimizer schedule-free-adamw --lr 1e-3  # one column below
 uv run --locked training train --tasks sum-pow16 sum-pow48 --optimizer schedule-free-adamw \
   --lr 0.01 --depth 2                       # also --depth 4, 8; --width 512; --steps 100000
-uv run --locked training kappa runs/kappa.json 47 97 199         # κ of 27 tasks
+uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-interval \
+  sum-interval-2 sum-interval-4 sum-interval-8 sum-interval-12 sum-random-half sum-squares
+uv run --locked training kappa runs/kappa.json 47 97 199         # κ of every task
 uv run --locked python -m unittest discover -s tests
 ```
 
@@ -40,7 +42,7 @@ the rate when they are not 128, 1 and 10 000.
 | --- | --- | --- | --- | --- | --- |
 | `adamw-lr0.001` | AdamW with a linear warmup of 10 steps, as grok-simple.py | 1e-3 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.001` | Schedule-Free AdamW | 1e-3 | the 15 below | 7, 11 | 10 000 |
-| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below | 7, 11 | 10 000 |
+| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below and the 7 of the last section | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.03` | Schedule-Free AdamW | 0.03 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
@@ -92,7 +94,8 @@ and 11; `—` means never in 10 000 steps:
   `sum-cube` at 1000 to 2000.
 - `κ` depends on `p`: `sum-cube` has `κ = 1.0000` at `p = 47`, where `3 ∤ 46` makes `x ↦ x³` a
   bijection, and 0.2756 at `p = 97`, 0.2755 at `p = 199`. `runs/kappa.json` holds the other 25
-  tasks at `p` = 47, 97 and 199, and the two powers at 47 and 97.
+  tasks at `p` = 47, 97 and 199, and the two powers at 47 and 97; the seven sets of the last
+  section have only the exact `κ` given there.
 
 ## Two powers of `a + b`
 
@@ -157,3 +160,45 @@ the answers' frequencies scores 16.36% for `(a + b)¹⁶` and 49.03% to 49.06% f
   predict it. The accuracies below the frequency guess fit a leave-one-out effect: each row has
   48 squares and 48 non-squares among its sums, so hiding a cell whose sum is a square leaves
   more non-squares among the training cells of its row and of its column.
+
+## One size of set, different spectra
+
+The seven tasks `[a + b ∈ A]` (`SPECTRUM` in `application/runs.py`, with the predictions recorded
+before they ran) have sets `A` of `(p − 1)/2 = 48` residues, so every table has the answers 0 and
+1 with the same frequencies, and only the spectrum of `A` differs. `I` is the interval
+`{0, …, 47}`, `I_j` the interval with `j` of its points exchanged for `j` points outside it (`I₄`
+keeps the swaps of `I₂`, and so on), `R` a fixed random set and `Q` the nonzero squares. For an
+indicator the formula of the last section gives `κ = 4 max_{k ≠ 0} |Σ_{c ∈ A} ω^{kc}|² / p²`
+(hand). One wave classifies `I` exactly: `cos(2π(c − 23.5)/97) > 0` if and only if
+`c ∈ {0, …, 47}`.
+
+Schedule-Free AdamW at 0.01, width 128, 10 000 steps, seeds 7 and 11. On the held-out half, a
+guess with the answers' frequencies scores 50.00% to 50.03%. The vote counts the sums `c` whose
+held-out cells have the right answer as their unique most common prediction:
+
+| task | `A` | `κ`, p = 97 | validation accuracy | vote right, of 97 sums |
+| --- | --- | --- | --- | --- |
+| sum-interval | `I` | 0.4053 | 96.98%, 97.47% | 94, 94 |
+| sum-interval-2 | `I₂` | 0.3374 | 91.33%, 91.43% | 93, 92 |
+| sum-interval-4 | `I₄` | 0.2667 | 84.25%, 84.55% | 87, 87 |
+| sum-interval-8 | `I₈` | 0.1997 | 70.46%, 68.59% | 74, 71 |
+| sum-interval-12 | `I₁₂` | 0.1187 | 68.37%, 68.27% | 77, 77 |
+| sum-random-half | `R` | 0.0386 | 53.33%, 53.56% | 59, 53 |
+| sum-squares | `Q` | 0.0125 | 44.21%, 46.16% | 25, 29 |
+
+- The first prediction held (numerical): for each seed, the accuracy falls strictly with `κ`,
+  although the answers and their frequencies are the same in all seven tasks. No run reaches 99%,
+  and every run ends with 99.72% to 100% training accuracy. With the number of values and their
+  frequencies fixed, the spectrum of `g` decides here; why it does is heuristic.
+- The second held for few swaps. On every swapped sum of `I₂` and `I₄`, 4 of 4 and 8 of 8 in both
+  seeds, the vote gives the answer of the interval, not the task's; with `I₈` on 13 and 15 of 16
+  swapped sums, with `I₁₂` on only 13 and 11 of 24. The network learns the interval and treats
+  the swapped points as noise, until 12 swaps of 48 hide the interval. The accuracy stays below
+  `(97 − 2j)/97` (95.9%, 91.8%, 80.4% and 75.3%), because the other cells are also worse: 94.38%
+  to 94.75% of them are right with `I₂`, 89.52% to 90.20% with `I₄`.
+- The third held in part: the interval is learned except at its ends. The 3 sums its vote gets
+  wrong, `{47, 48, 96}` and `{0, 48, 96}`, lie among its four ends 47, 48, 96 and 0, where 33% to
+  65% of the held-out cells are right; these are the sums where the wave above is closest to 0
+  (`|cos| ≤ 0.049`).
+- `R` and `Q` are not learned: 53.33% to 53.56% and 44.21% to 46.16%, about and below the
+  frequency guess, as with the Legendre symbol above.
