@@ -46,6 +46,7 @@ export const FULL_LEAN = {
   cross: 'rigid_cross, vecMulVec_eq_of_cross, isLeast_nuclearNorm_addKernel_cross',
   characters: 'forall_isMinOn_taskKernel_mul_mulChar_iff_connected, forall_isMinOn_taskKernel_add_mul_mulChar_iff_connected',
   rank: 'svd_hypotheses, isMinOn_iff_of_certificate, reachable_of_forall_isMinOn',
+  minimum: 'isMinOn_iff_exists_isContraction, isContraction_trace_eq_iff, isMinOn_iff_exists_certificate, isMinOn_iff_of_full_rank',
   threeCells: 'forall_isMinOn_threeCells_iff, forall_isMinOn_threeCells_iff_of_det_ne_zero, forall_isMinOn_threeCells_iff_det_eq_zero, exists_ne_zero_threeCells_of_det_ne_zero',
   margin: 'exists_norm_eq_one_of_vecMulVec, nuclearNorm_vecMulVec_of_norm_eq_one, sqrt_sq_sub_one_lt, exists_nuclearNorm_le_sqrt_vecMulVec_of_not_perm, failureMargin_vecMulVec, failureMargin_odd_vecMulVec, failureMargin_four_vecMulVec',
   weil: 'norm_sum_addChar_eval_le, norm_le_sqrt_of_mem_roots',

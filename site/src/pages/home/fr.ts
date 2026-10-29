@@ -135,6 +135,16 @@ const full = [
   ${m('Ω')}, alors les cases de ${m('Ω')} où ${m(`${sub('K', 'ab')} ≠ 0`)}, vues comme des arêtes entre lignes et
   colonnes, relient la ligne et la colonne de chaque coefficient non nul ; au rang 1, c’est la première condition du
   théorème G ${lean('rang r')}.</p>${leanNames(FULL_LEAN.rank)}
+  <p>Savoir si ${m('K')} est un minimum, peut-être parmi d’autres, est tranché à tout rang : exactement quand une
+  matrice ${m('Y')} nulle hors de ${m('Ω')}, de plus grande valeur singulière au plus 1, vérifie
+  ${m(`tr(Y<sup>ᴴ</sup>K) = ‖K‖${S1}`)}. Quand la diagonale de ${m('S')} est positive, les matrices ${m('Y')} de plus
+  grande valeur singulière au plus 1 avec ${m(`tr(Y<sup>ᴴ</sup>K) = ‖K‖${S1}`)} sont exactement les
+  ${m('U V<sup>ᴴ</sup> + W')} avec ${m('U<sup>ᴴ</sup>W = 0')}, ${m('WV = 0')} et une plus grande valeur singulière
+  de ${m('W')} au plus 1. Donc ${m('K')} est un minimum exactement quand la première condition ci-dessus vaut avec « au
+  plus 1 » au lieu de « inférieure à 1 » ; la seconde n’est pas nécessaire. Quand ${m('V')} est carrée, seule
+  ${m('W = 0')} convient : ${m('K')} est un minimum exactement quand ${m('U V<sup>ᴴ</sup>')} est nulle hors de
+  ${m('Ω')} ${lean('minimum')}. Pour ${m('K')} inversible, ${m('U V<sup>ᴴ</sup>')} est le facteur polaire, et c’est le
+  théorème A ci-dessous ${hand('facteur polaire', L)}.</p>${leanNames(FULL_LEAN.minimum)}
   <p>Le plus petit cas au-delà du rang 1 : soit ${m('K')} une table ${m('2 × 2')}, ${m('Ω')} ses trois cases autres que
   ${m('(0, 1)')}, ${m(`β = ${k10}`)} et ${m(`γ = ${k00} ${k11}`)}. M retrouve ${m('K')} à partir de ${m('Ω')}
   exactement quand</p>
@@ -228,8 +238,9 @@ const full = [
   réponse ; sans ce mode il vaut 0,094. Le réseau prédit la parité sur 79 à 80 % de la moitié non vue et la réponse
   elle-même sur 2,3 à 2,7 %, à peu près les ${m('2/p')} du hasard sur le reste : il apprend ce que porte le pic et rien du
   reste ${numerical('entraînement', L)}.</li>
-  <li><strong>Le rang au-dessus de 1.</strong> Pour les tables de rang ${m('r ≥ 2')}, aucun critère comme le théorème G
-  n’est démontré : les conditions suffisante et nécessaire ci-dessus laissent un écart, comblé seulement pour les trois
+  <li><strong>Le rang au-dessus de 1.</strong> Pour les tables de rang ${m('r ≥ 2')}, savoir si ${m('K')} est un
+  minimum est tranché ci-dessus, mais savoir s’il est le seul, c’est-à-dire s’il est retrouvé, n’a pas de critère comme
+  le théorème G : les conditions suffisante et nécessaire ci-dessus laissent un écart, comblé seulement pour les trois
   cases d’une table ${m('2 × 2')} et, par le théorème 1, pour les tables plates sans coefficient nul
   ${open('rang r', L)}.</li>
   <li><strong>Les tâches hors de la famille.</strong> Pour ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et

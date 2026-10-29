@@ -124,6 +124,15 @@ const full = [
   on ${m('Ω')}. If M recovers ${m('K')} from ${m('Ω')}, then the cells of ${m('Ω')} with ${m(`${sub('K', 'ab')} ≠ 0`)},
   as edges between rows and columns, connect the row and the column of every nonzero entry; at rank 1 this is the first
   condition of Theorem G ${lean('rank r')}.</p>${leanNames(FULL_LEAN.rank)}
+  <p>Whether ${m('K')} is a minimum at all, perhaps one of several, is decided at every rank: exactly when some matrix
+  ${m('Y')} vanishing off ${m('Ω')}, whose largest singular value is at most 1, has
+  ${m(`tr(Y<sup>ᴴ</sup>K) = ‖K‖${S1}`)}. When the diagonal of ${m('S')} is positive, the matrices ${m('Y')} of largest
+  singular value at most 1 with ${m(`tr(Y<sup>ᴴ</sup>K) = ‖K‖${S1}`)} are exactly the ${m('U V<sup>ᴴ</sup> + W')} with ${m('U<sup>ᴴ</sup>W = 0')}, ${m('WV = 0')} and the largest singular value of
+  ${m('W')} at most 1. So ${m('K')} is a minimum exactly when the first condition above holds with “at most 1” in place
+  of “less than 1”; the second is not needed. When ${m('V')} is square, only ${m('W = 0')} qualifies: ${m('K')} is a
+  minimum exactly when ${m('U V<sup>ᴴ</sup>')} vanishes off ${m('Ω')} ${lean('minimum')}. For an invertible ${m('K')},
+  ${m('U V<sup>ᴴ</sup>')} is the polar factor, and this is Theorem A below
+  ${hand('polar factor', L)}.</p>${leanNames(FULL_LEAN.minimum)}
   <p>The smallest case past rank 1: let ${m('K')} be a ${m('2 × 2')} table, ${m('Ω')} its three cells other than
   ${m('(0, 1)')}, ${m(`β = ${k10}`)} and ${m(`γ = ${k00} ${k11}`)}. M recovers ${m('K')} from ${m('Ω')} exactly
   when</p>
@@ -210,9 +219,10 @@ const full = [
   answer alone; without that mode it is 0.094. The network predicts the parity on 79 to 80% of the unseen half and the
   answer itself on 2.3 to 2.7%, about the ${m('2/p')} of guessing the rest: it learns what the peak carries and nothing of
   the remainder ${numerical('training', L)}.</li>
-  <li><strong>Rank above 1.</strong> For tables of rank ${m('r ≥ 2')}, no criterion like Theorem G is proved: the
-  sufficient and the necessary conditions above leave a gap, closed only for the three cells of a ${m('2 × 2')} table
-  and, by Theorem 1, for flat tables without zero entries ${open('rank r', L)}.</li>
+  <li><strong>Rank above 1.</strong> For tables of rank ${m('r ≥ 2')}, whether ${m('K')} is a minimum is decided
+  above, but whether it is the only one, which is recovery, has no criterion like Theorem G: the sufficient and the
+  necessary conditions above leave a gap, closed only for the three cells of a ${m('2 × 2')} table and, by Theorem 1,
+  for flat tables without zero entries ${open('rank r', L)}.</li>
   <li><strong>Tasks outside the family.</strong> For ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} and
   ${m('a³ + ab² + b')} the peak is small only numerically; no ceiling like Theorem C's is proved
   ${open('ceiling on κ', L)}. The effective rank ${m(`(‖K‖${S1}/‖K‖<sub>S2</sub>)²`)}, with ${m('‖K‖<sub>S2</sub>')}
