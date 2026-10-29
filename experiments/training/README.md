@@ -29,7 +29,7 @@ uv run --locked training train --tasks sum-pow16 sum-pow48 --optimizer schedule-
 uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-interval \
   sum-interval-2 sum-interval-4 sum-interval-8 sum-interval-12 sum-random-half sum-squares
 uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-pow4 \
-  sum-pow6 sum-pow8 sum-pow12 sum-pow24 sum-pow32
+  sum-pow6 sum-pow8 sum-pow12 sum-pow24 sum-pow32       # then --steps 100000 for the last three
 uv run --locked training kappa runs/kappa.json 47 97 199         # κ of every task
 uv run --locked python -m unittest discover -s tests
 ```
@@ -47,7 +47,7 @@ the rate when they are not 128, 1 and 10 000.
 | `schedule-free-adamw-lr0.001` | Schedule-Free AdamW | 1e-3 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below, the seven sets `[a + b ∈ A]` and six more powers of `a + b` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.03` | Schedule-Free AdamW | 0.03 | the 15 below | 7, 11 | 10 000 |
-| `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 100 000 |
+| `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48`, `sum-pow12`, `sum-pow24`, `sum-pow32` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.0025-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.0025 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01-d2`, `-d4`, `-d8` | Schedule-Free AdamW, 2, 4 and 8 blocks | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
@@ -276,7 +276,15 @@ its completion is right; the frequency guess is that of the held-out half, as ab
   the vote along each sum is right on all 97 sums. With `d = 24` it is right on 49 and 54 sums, and
   the accuracy, 32.43% and 32.07%, is 7.90 and 7.54 points above the frequency guess; with `d = 32`
   on 17 and 20, and 31.07% and 30.31% lie below it, as for `(a + b)⁴⁸`.
-- On these ten powers the network thus reaches 99% in 10 000 steps exactly when `d ≤ 8`, and M
-  recovers the table exactly when `d ≤ 12` (numerical). A heuristic reading: the least rank of a
-  readout counts the waves a fit needs, weight decay makes each wave cost, and M marks the rank
-  above which half of the table no longer pins the fit down.
+- Ten times longer does not give 99% either (`LONGER` in `application/runs.py`, predictions
+  recorded before). The 100 000-step runs repeat the 10 000-step runs exactly up to step 10 000.
+  From step 30 000 to 100 000, `(a + b)¹²` stays between 97.02% and 98.02% (seed 7) and between
+  97.13% and 98.55% (seed 11), with the vote right on all 97 sums; `(a + b)²⁴` stays between
+  35.35% and 38.45%, and `(a + b)³²` between 31.03% and 32.45%, below its frequency guess. The
+  prediction that the network learns what M recovers, given time, failed for `d = 12`; the
+  prediction that it learns neither `d = 24` nor `d = 32` held.
+- On these ten powers the network reaches 99% exactly when `d ≤ 8`, in 10 000 steps, and not for
+  `d = 12` in 100 000; M recovers the table exactly when `d ≤ 12` (numerical). Here M's recovery
+  is needed, but not enough. A heuristic reading: the least rank of a readout counts the waves a
+  fit needs, weight decay makes each wave cost, and M marks the rank above which half of the table
+  no longer pins the fit down; the network stops below that rank.
