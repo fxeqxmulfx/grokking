@@ -60,12 +60,18 @@ and 11; `—` means never in 10 000 steps:
 | parity-cubic | `2⌊(a³ + ab)/2⌋ + parity(a + b)` | 0.9823 | —, — | —, — | —, — | —, — |
 
 - All four runs split the tasks alike (numerical). The seven tasks with `κ ≥ 0.2756` reach 99%,
-  except `sum-cube` with seed 11 under Schedule-Free AdamW at 1e-3, which ends at 97.70%. Under
-  AdamW, `sum-cube` reached 99% and ended at 97.68% and 99.79%. The five with `κ ≤ 0.1059`
-  never do: they end at 0.68% to 2.17% validation accuracy, near chance (1/97 ≈ 1.03%), and
-  their parity accuracy is 45.75% to 51.48%.
+  except `sum-cube` with seed 11 under Schedule-Free AdamW at 1e-3, which is at 97.70% and
+  still rising when training stops at 10 000 steps. The five with `κ ≤ 0.1059` never do: they
+  end at 0.68% to 2.17% validation accuracy, near chance (1/97 ≈ 1.03%), and their parity
+  accuracy is 45.75% to 51.48%.
+- Under Schedule-Free AdamW, no run that reached 99% falls below it at a later check. Under
+  AdamW, three do: `sum-square` with seed 7 (down to 97.94% at step 5500) and seed 11 (98.32%
+  at step 8000), and `sum-cube` with seed 7 (95.52% at step 4500), which ends on such a dip, at
+  97.68%. Under Schedule-Free AdamW the same `sum-cube` run ends at 99.53%, 99.94% and 99.55%
+  at 1e-3, 0.01 and 0.03. In these runs, the dips occur only under AdamW.
 - The ten predictions made from `κ` before these tasks ran (`PREDICTED_LEARN` and
-  `PREDICTED_FAIL` in `application/runs.py`) all held, but for that one `sum-cube` run.
+  `PREDICTED_FAIL` in `application/runs.py`) all held, except `sum-cube` with seed 11 under
+  Schedule-Free AdamW at 1e-3.
 - A large `κ` is not enough (a heuristic criterion whose converse fails): `parity-cubic` has
   `κ = 0.9823` and ends at 2.01% to 6.78% validation accuracy with 78.68% to 91.82% parity
   accuracy. The network learns the parity bit, not the rest.
