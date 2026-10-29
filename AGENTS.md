@@ -8,7 +8,9 @@ Its mathematics is proved in Lean in `~/lean_projects/transformer`.
 
 - English in code, comments, filenames and commits; the pages in all three languages.
 - One commit per logical change, as soon as its checks pass.
-- Preview locally (`npm start` in `site/`). Never publish a page as an artifact or on the web.
+- Preview locally (`npm start` in `site/`). A push to `main` that changes `site/` publishes it
+  on GitHub Pages (`.github/workflows/pages.yml`): https://fxeqxmulfx.github.io/grokking/.
+  Never publish a page as an artifact.
 - A claim on a page carries its status: `lean` (name declarations that exist in the
   transformer repository's `INDEX.md`), `hand`, `numerical`, `heuristic` or `open`. Only a
   Lean proof makes a claim proved.
