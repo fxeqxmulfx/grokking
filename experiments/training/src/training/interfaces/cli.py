@@ -14,6 +14,7 @@ from pathlib import Path  # noqa: E402
 from training.application.peaks import ALL, peaks  # noqa: E402
 from training.application.ports import OPTIMIZERS, Peak, RunSpec  # noqa: E402
 from training.application.runs import COURSE, Summary, stored, train_all  # noqa: E402
+from training.application.sums import SumErrors, stored_sums  # noqa: E402
 from training.domain.tasks import FORMULA  # noqa: E402
 
 HERE = Path(__file__).resolve().parents[3]
@@ -34,13 +35,25 @@ def row(s: Summary) -> str:
             f"  {s.seconds:6.1f}s")
 
 
+def sums_row(s: SumErrors) -> str:
+    total = sum(s.wrong.values())
+    worst = sorted(s.wrong.items(), key=lambda kv: (-kv[1], kv[0]))[:4]
+    share = sum(n for _, n in worst) / max(total, 1)
+    return (f"{s.spec.task:16s} seed {s.spec.seed:3d}  val {100 * s.low:6.2f}% to {100 * s.high:6.2f}%"
+            f"  best {100 * s.best:6.2f}% at {s.best_step}  wrong {total} of {s.held} on {len(s.wrong)} sums,"
+            f" the worst {', '.join(f'{c}: {n}' for c, n in worst)} ({100 * share:.0f}%)"
+            f"  vote wrong on {list(s.vote_wrong)}  frequency guess {100 * s.frequency_guess:.2f}%")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="training", description=__doc__)
     parser.add_argument("--device", default="cuda", help="cuda (the default) or cpu")
     commands = parser.add_subparsers(dest="command", required=True)
+    parsers = {}
     for name, text in (("train", "train the course's network, resuming finished runs"),
-                       ("report", "summarize the finished runs")):
-        command = commands.add_parser(name, help=text)
+                       ("report", "summarize the finished runs"),
+                       ("sums", "where the finished runs of tasks of a + b go wrong, sum by sum")):
+        command = parsers[name] = commands.add_parser(name, help=text)
         command.add_argument("--tasks", nargs="+", default=list(COURSE), choices=sorted(FORMULA))
         command.add_argument("--seeds", type=int, nargs="+", default=[7, 11])
         command.add_argument("--optimizer", choices=OPTIMIZERS, default="adamw")
@@ -50,6 +63,7 @@ def main() -> None:
         command.add_argument("--steps", type=int, default=10_000)
         command.add_argument("--report-every", type=int, default=500)
         command.add_argument("--runs", type=Path, default=HERE / "runs")
+    parsers["sums"].add_argument("--since", type=int, default=0, help="the first step of the accuracy range")
     kappa = commands.add_parser("kappa", help="the peak κ of every task, resuming a results file")
     kappa.add_argument("out", type=Path, help="JSON file of results, read first if it exists")
     kappa.add_argument("primes", type=int, nargs="+")
@@ -68,6 +82,10 @@ def main() -> None:
 
     from training.infrastructure.trainer import TorchTrainer
     trainer = TorchTrainer(args.runs, args.device)
+    if args.command == "sums":
+        for e in stored_sums(trainer, specs(args), args.since):
+            print(sums_row(e))
+        return
     summaries = train_all(trainer, specs(args)) if args.command == "train" else stored(trainer, specs(args))
     for s in summaries:
         print(row(s))

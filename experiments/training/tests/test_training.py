@@ -8,8 +8,9 @@ from pathlib import Path
 import torch
 
 from training.application.peaks import peaks
-from training.application.ports import RunSpec
+from training.application.ports import Report, RunResult, RunSpec
 from training.application.runs import COURSE, summarize
+from training.application.sums import sum_errors
 from training.domain.splits import Sampler, split
 from training.domain.tasks import FORMULA, TASKS, interval_with_swaps, permutation, random_half, squares, table, task
 from training.infrastructure.kappa import TorchPeaks, primitive_root
@@ -128,6 +129,20 @@ class Training(unittest.TestCase):
             b = TorchTrainer(Path(two), "cpu", echo=False).run(spec)
             self.assertEqual(a.reports, b.reports)
             self.assertEqual(a.validation, b.validation)
+
+    def test_sum_errors(self) -> None:
+        reports = tuple(Report(step, 0.0, 0.0, 1.0, accuracy) for step, accuracy in ((0, 0.2), (10, 0.9), (20, 0.8)))
+        # (a + b)² mod 5: sum 1, answer 1, is wrong once in three; sum 2, answer 4, is wrong twice.
+        validation = ((0, 1, 1, 1), (2, 4, 1, 1), (3, 3, 1, 0), (0, 2, 4, 3), (1, 1, 4, 3))
+        s = sum_errors(RunResult(RunSpec("sum-square", 7, modulus=5), reports, validation, 0.0), since=10)
+        self.assertEqual((s.low, s.high, s.best, s.best_step), (0.8, 0.9, 0.9, 10))
+        self.assertEqual((s.held, s.wrong, s.vote_wrong), (5, {1: 1, 2: 2}, (2,)))
+        self.assertAlmostEqual(s.frequency_guess, (3 / 5) ** 2 + (2 / 5) ** 2)
+        # A tie between the answer and a wrong prediction is a wrong vote.
+        tied = sum_errors(RunResult(RunSpec("sum-square", 7, modulus=5), reports, validation[:2] + ((4, 2, 1, 0), (1, 0, 1, 0)), 0.0), 0)
+        self.assertEqual((tied.vote_wrong, tied.low, tied.best_step), ((1,), 0.2, 10))
+        with self.assertRaises(ValueError):
+            sum_errors(RunResult(RunSpec("mul", 7, modulus=5), reports, ((0, 1, 0, 0), (2, 4, 3, 3)), 0.0), 0)
 
 
 class Peaks(unittest.TestCase):

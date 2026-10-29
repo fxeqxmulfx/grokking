@@ -30,6 +30,8 @@ uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks
   sum-interval-2 sum-interval-4 sum-interval-8 sum-interval-12 sum-random-half sum-squares
 uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-pow4 \
   sum-pow6 sum-pow8 sum-pow12 sum-pow24 sum-pow32       # then --steps 100000 for the last three
+uv run --locked training sums --optimizer schedule-free-adamw --lr 0.01 --steps 100000 \
+  --since 30000 --tasks sum-interval sum-pow12     # accuracy from step 30 000, errors by sum
 uv run --locked training kappa runs/kappa.json 47 97 199         # κ of every task
 uv run --locked python -m unittest discover -s tests
 ```
