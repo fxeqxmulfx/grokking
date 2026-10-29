@@ -1,5 +1,5 @@
 """What the experiments need from outside: a solver of model M, the certificates of
-Theorem D, and random numbers."""
+Theorem D and of *Rank above one*, and random numbers."""
 
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
@@ -49,6 +49,10 @@ class Run(Protocol):
         """Drops every pattern but these, which keep their state, in this order."""
         ...
 
+    def matrices(self) -> list[list[list[complex]]]:
+        """The completion Z of every pattern, which agrees with its table on the kept cells."""
+        ...
+
 
 class Solver(Protocol):
     def start(self, patterns: Sequence[Pattern], a: Sequence[complex], b: Sequence[complex]) -> Run:
@@ -57,6 +61,11 @@ class Solver(Protocol):
 
     def start_tables(self, pattern: Pattern, tables: Sequence[tuple[Sequence[complex], Sequence[complex]]]) -> Run:
         """Model M on one pattern of each table a bᵀ, all of the same shape, in this order."""
+        ...
+
+    def start_matrices(self, patterns: Sequence[Pattern], tables: Sequence[Sequence[Sequence[complex]]]) -> Run:
+        """Model M on each pattern of its own table, of any rank, all of the same shape, in this
+        order."""
         ...
 
     def fill(self, table: Sequence[Sequence[complex]], pattern: Pattern, checkpoints: Sequence[int],
@@ -86,6 +95,32 @@ class Certificates(Protocol):
         ...
 
     def operator_norm(self, matrix: Sequence[Sequence[complex]]) -> float:
+        ...
+
+
+@dataclass(frozen=True)
+class RankCertificate:
+    """The certificate of *Rank above one*, item 1, for a table K of rank r and a pattern Ω:
+    U, V from a singular value decomposition, and W with Uᴴ W = 0, W V = 0 and U Vᴴ + W
+    vanishing off Ω. A ‖W‖_op below 1 gives item 1.2 with c = 1/‖W‖_op, when no nonzero
+    U Aᴴ + B Vᴴ vanishes on Ω."""
+
+    #: The least singular value of h ↦ h on Ω over the matrices h = U Aᴴ + B Vᴴ, taken with an
+    #: orthonormal basis; 0 exactly when a nonzero one vanishes on Ω.
+    injectivity: float
+    #: ‖W‖_op for the W of least Frobenius norm, or None when no W exists.
+    least_squares: float | None
+    #: The least ‖W‖_op that projected subgradient descent finds from it, or None.
+    best: float | None
+    #: The largest violation of the equations for W at the end: above 1e-9, no W exists.
+    violation: float
+
+
+class RankCertificates(Protocol):
+    def certificate(self, table: Sequence[Sequence[complex]], pattern: Pattern, rank: int,
+                    steps: int) -> RankCertificate:
+        """The certificate for `table`, of rank `rank`, from `pattern`; the descent takes `steps`
+        steps, and runs only when no W of norm below 1 is known yet and h ↦ h on Ω is injective."""
         ...
 
 

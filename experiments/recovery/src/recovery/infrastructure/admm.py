@@ -62,6 +62,9 @@ class TorchRun:
         self.masks, self.table = self.masks[index], self.table[index]
         self.z, self.u = self.z[index], self.u[index]
 
+    def matrices(self) -> list[list[list[complex]]]:
+        return self.z.cpu().tolist()
+
 
 class TorchADMM:
     """The solver of model M, on the CPU unless told otherwise: for these tiny complex matrices
@@ -81,6 +84,10 @@ class TorchADMM:
         a = torch.tensor([list(a) for a, _ in tables], dtype=torch.complex128)
         b = torch.tensor([list(b) for _, b in tables], dtype=torch.complex128)
         return TorchRun(masks, (a.unsqueeze(-1) * b.unsqueeze(-2)).to(self.device))
+
+    def start_matrices(self, patterns: Sequence[Pattern], tables: Sequence[Sequence[Sequence[complex]]]) -> TorchRun:
+        masks = torch.tensor(patterns, dtype=torch.bool, device=self.device)
+        return TorchRun(masks, torch.tensor(tables, dtype=torch.complex128, device=self.device))
 
     def fill(self, table: Sequence[Sequence[complex]], pattern: Pattern, checkpoints: Sequence[int],
              tol: float) -> Iterator[Fill]:

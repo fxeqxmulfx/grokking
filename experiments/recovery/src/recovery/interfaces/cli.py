@@ -9,10 +9,12 @@ from recovery.application.weights import cross_check, slow_tight_weights, tight_
 from recovery.application.additive import Filled, cubic_splits, diagonal_certificate, long_diagonals, long_runs, survey, theorem_d
 from recovery.application.characters import character_check
 from recovery.application.margins import off_blocks, random_margins
+from recovery.application.ranks import RANK_CLASSES, RankCase, rank_check, three_cells
 from recovery.infrastructure.admm import TorchADMM
 from recovery.infrastructure.certificates import TorchCertificates
 from recovery.domain.margins import block_value, worst_block
 from recovery.infrastructure.draws import TorchDraws
+from recovery.infrastructure.rank_certificates import TorchRankCertificates
 
 
 def line(s: ClassSummary) -> str:
@@ -29,6 +31,23 @@ def weighted_sweep(solver: TorchADMM, tables: list[Table], steps: int) -> None:
         print(f"{table.name}: |a| = {[round(abs(x), 3) for x in table.a]}, |b| = {[round(abs(x), 3) for x in table.b]}")
         for s in sweep(solver, table.groups, table.a, table.b, steps, lambda c: c.error_of_hidden):
             print(line(s), flush=True)
+
+
+def span(values: list[float]) -> str:
+    return f"[{min(values):.2e}, {max(values):.2e}]" if values else "-"
+
+
+def rank_lines(cases: list[RankCase]) -> None:
+    for name in RANK_CLASSES:
+        part = [c for c in cases if c.kind == name]
+        if not part:
+            continue
+        best = [c.certificate.best for c in part if c.certificate.best is not None]
+        print(f"  {name:24s} patterns={len(part):4d} recovered={sum(c.error < 1e-6 for c in part):4d}"
+              f" cells in [{min(c.cells for c in part)}, {max(c.cells for c in part)}]"
+              f" gap in {span([c.gap for c in part])} error in {span([c.error for c in part])}"
+              f" injectivity in {span([c.certificate.injectivity for c in part])}"
+              f" certificate in {span(best)} ({len(part) - len(best)} without)", flush=True)
 
 
 def main() -> None:
@@ -85,6 +104,17 @@ def main() -> None:
     margin.add_argument("--sizes", type=int, nargs="+", default=[3, 4, 5, 6])
     margin.add_argument("--count", type=int, default=1000, help="random patterns of each size")
     margin.add_argument("--seed", type=int, default=0)
+    three = checks.add_parser("three-cells", help="Rank above one, item 3: 2 x 2 tables from the cells off (0, 1)")
+    three.add_argument("steps", type=int)
+    three.add_argument("--count", type=int, default=1000, help="tables of each kind")
+    three.add_argument("--seed", type=int, default=0)
+    ranked = checks.add_parser("rank", help="Rank above one, items 1 and 2: random tables of rank r, random cells")
+    ranked.add_argument("steps", type=int)
+    ranked.add_argument("--sizes", type=int, nargs="+", default=[4, 6, 8])
+    ranked.add_argument("--ranks", type=int, nargs="+", default=[2, 3])
+    ranked.add_argument("--count", type=int, default=300, help="tables of each size, rank and kind")
+    ranked.add_argument("--best-steps", type=int, default=2000)
+    ranked.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
     solver = TorchADMM(args.device)
     print(f"device {solver.device}", flush=True)
@@ -175,6 +205,28 @@ def main() -> None:
                     print(f"  random, {r.name:9s}: {r.count:5d} patterns without a permutation, largest gap {r.gap:+.6f},"
                           f" largest least block value - N {r.value:+.6f}, largest ||Z||_S1 - its value {r.over_value:+.2e}",
                           flush=True)
+        case "three-cells":
+            print(f"2 x 2 tables from the cells other than (0, 1), {args.steps} steps")
+            for t in three_cells(solver, TorchDraws(args.seed), args.count, args.steps):
+                print(f"  {t.name:22s} tables={t.count:5d} k01 = x*: {t.predicted:5d} recovered={t.recovered:5d}"
+                      f" disagree={t.disagree} max |Z01 - x*|/||K|| = {t.off_fill:.2e}"
+                      f" |det K|/||K||^2 in [{t.det[0]:.2e}, {t.det[1]:.2e}]", flush=True)
+        case "rank":
+            draws, certificates = TorchDraws(args.seed), TorchRankCertificates()
+            everything: list[RankCase] = []
+            for size in args.sizes:
+                for rank in args.ranks:
+                    if rank >= size:
+                        continue
+                    for kind in ("dense", "blocks"):
+                        print(f"{size} x {size}, rank {rank}, {kind}, {args.count} tables, {args.steps} steps,"
+                              f" dim T = {rank * (2 * size - rank)} of {size * size} cells")
+                        cases = list(rank_check(solver, certificates, draws, size, rank, kind, args.count, args.steps,
+                                                args.best_steps))
+                        everything += cases
+                        rank_lines(cases)
+            print("all")
+            rank_lines(everything)
         case "slow":
             for stop, s in slow_tight_hall(solver, args.size, args.checkpoints):
                 print(f"after {stop:7d} steps:", line(s).strip(), flush=True)

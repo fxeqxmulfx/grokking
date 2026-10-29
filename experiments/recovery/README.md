@@ -38,6 +38,23 @@ On `p × p` tables at a prime `p`, with `ψ(x) = e^{2πix/p}`:
 - `χ(ab)` and `χ(a + ab)`, for a faithful multiplicative character `χ` with `χ(0) = 0`, are
   rank one with a zero row and a zero column: Theorem G with moduli one on the supports.
 
+Above rank one (*Rank above one*, added to the review):
+
+- **The certificate** (`isMinOn_iff_of_certificate`): write `K = U S Vᴴ` with orthonormal
+  columns in `U` and in `V` and `S` diagonal with entries `≥ 0` (`svd_hypotheses`). M recovers
+  `K` if some `W` with `Uᴴ W = 0`, `W V = 0` and `‖W‖_op < 1` makes `U Vᴴ + W` vanish off `Ω`,
+  and no nonzero `U Aᴴ + B Vᴴ` vanishes on `Ω`.
+- **The necessary condition** (`reachable_of_forall_isMinOn`): if M recovers `K`, the cells of
+  `Ω` where `K ≠ 0`, as edges between rows and columns, join the row and the column of every
+  nonzero entry.
+- **Three cells** (`isMinOn_threeCells_iff`, `forall_isMinOn_threeCells_iff`): from the cells
+  of a `2 × 2` table other than `(0, 1)`, M's only minimum puts
+  `x* = conj(k₁₀) k₀₀ k₁₁ / max(|k₁₀|², |k₀₀ k₁₁|)` at `(0, 1)`, and `0` when
+  `k₁₀ = k₀₀ k₁₁ = 0`, so M recovers `K` exactly when `k₀₁ = x*`. With `det K ≠ 0` this reads
+  `k₀₁ = conj(k₁₀) det K / |det K|`, and a nonzero `U Aᴴ + B Vᴴ` vanishes on the three cells
+  (`exists_ne_zero_threeCells_of_det_ne_zero`); yet `[[2, 1], [1, 1]]` is recovered, so the
+  certificate's second condition is not necessary.
+
 These checks solve M by ADMM and compare. The small tables run every pattern at once, sorted
 into the classes a theorem names; the prime tables run diagonals, the cross, random cells and
 the training halves of `grok-simple.py` (`~/rust_projects/grokking_abmod/scripts`).
@@ -59,6 +76,8 @@ uv run --locked recovery survey 31 61 97             # ψ(a + b) from random and
 uv run --locked recovery long 31 20000 100000 300000
 uv run --locked recovery cubic 31 61 97              # ψ(a³ + ab) from the training halves
 uv run --locked recovery characters 31 61 97         # χ(ab) and χ(a + ab) from them
+uv run --locked recovery three-cells 20000           # rank above one: 2 × 2 from three cells
+uv run --locked recovery rank 20000                  # rank 2 and 3, 4 × 4 to 8 × 8, random cells
 uv run --locked python -m unittest discover -s tests
 ```
 
@@ -86,6 +105,8 @@ a `4 × 4` table took 30 s on the CPU and 555 s on an RTX 3050.
 | `long` | `31 × 31` | the survey's rigid patterns with a permutation that are not elementary | `ψ(a + b)` | up to 300 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `cubic` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `ψ(a³ + ab)` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `characters` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `χ(ab)`, `χ(a + ab)`, `χ(g^k) = e^{2πik/(p − 1)}` for the least primitive root `g` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
+| `three-cells` | 5000 of 2 × 2, 1000 of each kind, and the five tables of Lean's examples | the three cells other than `(0, 1)` | random; rank one, `u vᵀ`; rank two with `k₀₁ = x*`; moduli one; moduli one and rank one. Moduli uniform in [0.3, 2], random phases, seed 0 | 20 000 | `\|Z₀₁ − x*\|/‖K‖` |
+| `rank` | 300 of each `N × N`, `N` = 4, 6, 8, of each rank `r` = 2, 3 and each kind | each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept | dense: `A Bᵀ` with `N × r` factors; blocks: `r` diagonal blocks of nearly equal sizes, each `a bᵀ`, and 0 off them. Factor entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 
 `TIGHT_WEIGHTS` (`application/weights.py`) give the shares `|a_i|²/‖a‖²` and `|b_j|²/‖b‖²` of
 `(½, ¼, ¼)` for both (A), `(½, ¼, ¼)` and `(¼, ¼, ½)` (B), and `(⅗, ⅕, ⅕)` and `(⅕, ⅖, ⅖)` (C).
@@ -104,6 +125,22 @@ SplitMix64 seeded with `seed ^ 0x73706C6974730002`. A certificate is the least-F
 that vanishes off `Ω` with unit row and column sums, measured by `‖Y − J/p‖_op`, or none when
 no such `Y` exists; for a rigid `Ω` where it is not below 1, projected subgradient descent
 over all such `Y` looks for a better one.
+
+The two checks above rank one batch every table into one ADMM run. In `three-cells`, the rank
+two kind has `k₁₀ = b`, `k₀₀ k₁₁ = c` with `|c| = |b|² + 0.1 + 2t`, `t` uniform in [0, 1], and
+`k₀₁ = conj(b) c / |c|`, so that `x* = k₀₁` and `det K = c (1 − |b|²/|c|) ≠ 0`; `k₀₁ = x*`
+is tested to within `10⁻¹² ‖K‖`, and recovered means `|Z₀₁ − k₀₁| < 10⁻⁶ ‖K‖`. In `rank`, each
+pattern falls into one class, tested in this order: *not joined*, when the kept cells where
+`K ≠ 0` do not join the row and the column of some nonzero entry (union–find); *not
+injective*, when the least singular value, on `Ω`, of the orthonormal basis `u_a v_bᴴ` with
+`a < r` or `b < r` of the matrices `U Aᴴ + B Vᴴ` (`U`, `V` from an SVD of `K`) is at most
+`10⁻⁹`, or `Ω` has fewer cells than this basis; *certificate*, when some `W` with
+`‖W‖_op < 1` was found; *none found* otherwise. Every `W` with `Uᴴ W = 0` and `W V = 0` is
+`U⊥ G V⊥ᴴ`; the least-Frobenius `G` that makes `U Vᴴ + W` vanish off `Ω` comes from a
+pseudoinverse, the system counting as solvable when its residual is at most `10⁻⁹`, and when
+its `‖G‖_op` is not below 1 and the pattern is injective, 2000 steps of projected subgradient
+descent on `‖G‖_op` look for a better one. The certificate is the least `‖W‖_op` found, and
+the gap is `‖Z‖_S1 − ‖K‖_S1`.
 
 ## What they found
 
@@ -291,3 +328,35 @@ and `‖Z‖_S1` from 0.5503 to 0.5565 times `p^{3/2} = ‖K‖_S1`.
 and come back with errors 1.52e-11 to 7.53e-11, `‖Z‖_S1 = p − 1 = ‖K‖_S1` to three decimals and
 every hidden cell decoded. On the zero row and column `Z` is 0 for `χ(ab)` and below
 `5·10⁻¹⁵` for `χ(a + ab)`, rounding errors that change with the number of threads.
+
+Rank above one, three cells (`three-cells 20000`). On every table the solver's `Z₀₁` is Lean's
+`x*` to within `2.67·10⁻¹⁵ ‖K‖`, and the solver recovers `K` exactly when `k₀₁ = x*`:
+
+| kind | tables | `k₀₁ = x*` | recovered | `\|det K\|/‖K‖²` |
+| --- | --- | --- | --- | --- |
+| random | 1000 | 0 | 0 | 9.85e-3 to 0.498 |
+| rank one | 1000 | 521 | 521 | 0 to 9.95e-17 |
+| rank two, `k₀₁ = x*` | 1000 | 1000 | 1000 | 1.61e-3 to 0.450 |
+| moduli one | 1000 | 0 | 0 | 8.51e-4 to 0.500 |
+| moduli one, rank one | 1000 | 1000 | 1000 | 0 to 1.00e-16 |
+
+The tables of Lean's examples come out as Lean says: `[[2, 1], [1, 1]]` and `[[2, 1], [2, 1]]`
+are recovered, `[[2, 1], [1, −1]]`, `[[1, 2], [1, 2]]` and `[[1, 1], [1, −1]]` are not.
+
+Rank above one, random cells (`rank 20000`, ten minutes on the CPU), all 3600 patterns:
+
+| class | patterns | recovered | gap | error | certificate |
+| --- | --- | --- | --- | --- | --- |
+| not joined | 1446 | 0 | −18.5 to −2.71e-5 | 0.0546 to 1.03 | no `W` |
+| joined, not injective | 1037 | 117 | −15.4 to 8.88e-15 | 0 to 1.05 | no `W` for 749; 0 to 29.6 |
+| injective, certificate | 468 | 468 | −1.42e-14 to 3.55e-14 | 0 to 7.17e-16 | 0 to 0.998 |
+| injective, none found | 649 | 0 | −4.18 to −5.50e-6 | 6.16e-4 to 0.678 | 1.00 to 152 |
+
+Each of the twelve runs shows the same. No pattern whose cells do not join is recovered, as
+item 2 says, and every injective one with a certificate is, as item 1.2 says. On the 649
+injective patterns where the search found no `W` below 1, the gap is negative: `K` is not even
+a minimum. The 117 recovered patterns that are not injective are all block tables: 17, 59, 12,
+18, 3 and 8 of the 38, 83, 34, 42, 32 and 59 block tables of this class at `4 × 4` of rank 2
+and 3, `6 × 6` of rank 2 and 3, and `8 × 8` of rank 2 and 3. For the 749 dense tables of the
+class the system for `W` has no solution. As item 4 proves for three cells, recovery does not
+need the injectivity.
