@@ -41,7 +41,7 @@ const WIDGETS: Readonly<Record<string, Mount>> = {
 
 const WORDS: Localized<{readonly site: string; readonly nav: string; readonly langs: string; readonly foot: string}> = {
   en: {site: 'Grokking', nav: 'Pages', langs: 'Language', foot: 'Every claim carries its status. The Lean proofs are in the transformer repository, <code>Transformer.Grokking.FlatSpectrum</code> and <code>Transformer.Weil</code>; every interactive figure on these pages runs in your browser.'},
-  fr: {site: 'Grokking', nav: 'Pages', langs: 'Langue', foot: 'Chaque énoncé porte son statut. Les preuves Lean sont dans le dépôt transformer, <code>Transformer.Grokking.FlatSpectrum</code> et <code>Transformer.Weil</code> ; chaque figure interactive de ces pages tourne dans votre navigateur.'},
+  fr: {site: 'Grokking', nav: 'Pages', langs: 'Langue', foot: 'Chaque énoncé porte son statut. Les preuves Lean sont dans le dépôt transformer, <code>Transformer.Grokking.FlatSpectrum</code> et <code>Transformer.Weil</code> ; chaque figure interactive de ces pages tourne dans votre navigateur.'},
   ru: {site: 'Grokking', nav: 'Страницы', langs: 'Язык', foot: 'У каждого утверждения указан его статус. Доказательства на Lean лежат в репозитории transformer, <code>Transformer.Grokking.FlatSpectrum</code> и <code>Transformer.Weil</code>; все интерактивные рисунки на этих страницах работают в вашем браузере.'},
 };
 

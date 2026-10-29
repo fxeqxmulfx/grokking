@@ -37,12 +37,12 @@ export const PLANNED: readonly PlannedPage[] = [
   }},
   {id: 'fourier', part: 'foundations', text: {
     en: {title: 'Characters: Fourier series on ℤ/p', summary: `From ${m('e<sup>inθ</sup>')} on the circle to ${m('ψ(x) = e<sup>2πix/p</sup>')} and the multiplicative characters; Gauss sums, of modulus ${m('√p')} for nontrivial characters.`},
-    fr: {title: 'Les caractères : séries de Fourier sur ℤ/p', summary: `De ${m('e<sup>inθ</sup>')} sur le cercle à ${m('ψ(x) = e<sup>2πix/p</sup>')} et aux caractères multiplicatifs ; les sommes de Gauss, de module ${m('√p')} pour des caractères non triviaux.`},
+    fr: {title: 'Les caractères : séries de Fourier sur ℤ/p', summary: `De ${m('e<sup>inθ</sup>')} sur le cercle à ${m('ψ(x) = e<sup>2πix/p</sup>')} et aux caractères multiplicatifs ; les sommes de Gauss, de module ${m('√p')} pour des caractères non triviaux.`},
     ru: {title: 'Характеры: ряды Фурье на ℤ/p', summary: `От ${m('e<sup>inθ</sup>')} на окружности к ${m('ψ(x) = e<sup>2πix/p</sup>')} и мультипликативным характерам; суммы Гаусса, при нетривиальных характерах с модулем ${m('√p')}.`},
   }},
   {id: 'spectrum', part: 'foundations', text: {
     en: {title: 'The spectrum of a table', summary: `Singular values, the nuclear norm and the effective rank; ${m('ψ(a + b)')} has rank one, ${m('ψ(a³ + ab)')} is flat (Proposition 2).`},
-    fr: {title: 'Le spectre d’une table', summary: `Valeurs singulières, norme nucléaire et rang effectif ; la table ${m('ψ(a + b)')} est de rang un, la table ${m('ψ(a³ + ab)')} est plate (proposition 2).`},
+    fr: {title: 'Le spectre d’une table', summary: `Valeurs singulières, norme nucléaire et rang effectif ; la table ${m('ψ(a + b)')} est de rang un, la table ${m('ψ(a³ + ab)')} est plate (proposition 2).`},
     ru: {title: 'Спектр таблицы', summary: `Сингулярные числа, ядерная норма и эффективный ранг; у таблицы ${m('ψ(a + b)')} ранг один, таблица ${m('ψ(a³ + ab)')} плоская (предложение 2).`},
   }},
   {id: 'model', part: 'model', text: {
@@ -52,12 +52,12 @@ export const PLANNED: readonly PlannedPage[] = [
   }},
   {id: 'flat', part: 'obstacles', text: {
     en: {title: 'M does not recover a flat table without zeros', summary: `Theorem A: an invertible table has the least nuclear norm among the matrices equal to it on ${m('Ω')} exactly when its polar factor vanishes off ${m('Ω')}; when one cell of ${m('ψ(a³ + ab)')} is hidden, M fills it with the opposite phase; Theorem B: for ${m('r ≠ 0')}, the mean of ${m('ψ<sub>r</sub>(ab)')} given the label ${m('a³ + ab')} has squared norm ${m('O(1/p)')}.`},
-    fr: {title: 'M ne retrouve pas une table plate sans zéros', summary: `Théorème A : une table inversible a la plus petite norme nucléaire parmi les matrices qui lui sont égales sur ${m('Ω')} exactement quand son facteur polaire s’annule hors de ${m('Ω')} ; quand une seule case de ${m('ψ(a³ + ab)')} est cachée, M la remplit par la phase opposée ; théorème B : pour ${m('r ≠ 0')}, la moyenne de ${m('ψ<sub>r</sub>(ab)')} sachant l’étiquette ${m('a³ + ab')} a une norme au carré en ${m('O(1/p)')}.`},
+    fr: {title: 'M ne retrouve pas une table plate sans zéros', summary: `Théorème A : une table inversible a la plus petite norme nucléaire parmi les matrices qui lui sont égales sur ${m('Ω')} exactement quand son facteur polaire s’annule hors de ${m('Ω')} ; quand une seule case de ${m('ψ(a³ + ab)')} est cachée, M la remplit par la phase opposée ; théorème B : pour ${m('r ≠ 0')}, la moyenne de ${m('ψ<sub>r</sub>(ab)')} sachant l’étiquette ${m('a³ + ab')} a une norme au carré en ${m('O(1/p)')}.`},
     ru: {title: 'M не восстанавливает плоскую таблицу без нулей', summary: `Теорема A: обратимая таблица имеет наименьшую ядерную норму среди матриц, совпадающих с ней на ${m('Ω')}, тогда и только тогда, когда её полярный множитель обращается в нуль вне ${m('Ω')}; когда скрыта одна клетка ${m('ψ(a³ + ab)')}, M заполняет её противоположной фазой; теорема B: при ${m('r ≠ 0')} условное среднее ${m('ψ<sub>r</sub>(ab)')} при данной метке ${m('a³ + ab')} имеет квадрат нормы ${m('O(1/p)')}.`},
   }},
   {id: 'readout', part: 'obstacles', text: {
     en: {title: 'Every readout has a low peak', summary: `Theorem C: for ${m('P(a) + ab')}, some readout of the answer has normalized peak 1 when ${m('deg P ≤ 1')}, and every readout at most ${m('λ/(p − 1)')}, of order ${m('√(2(deg P − 1)/p)')}, when ${m('deg P ≥ 2')}; the peak ${m('κ')}.`},
-    fr: {title: 'Toute lecture a un pic bas', summary: `Théorème C : pour ${m('P(a) + ab')}, une certaine lecture de la réponse a un pic normalisé égal à 1 quand ${m('deg P ≤ 1')}, et toute lecture un pic normalisé d’au plus ${m('λ/(p − 1)')}, de l’ordre de ${m('√(2(deg P − 1)/p)')}, quand ${m('deg P ≥ 2')} ; le pic ${m('κ')}.`},
+    fr: {title: 'Toute lecture a un pic bas', summary: `Théorème C : pour ${m('P(a) + ab')}, une certaine lecture de la réponse a un pic normalisé égal à 1 quand ${m('deg P ≤ 1')}, et toute lecture un pic normalisé d’au plus ${m('λ/(p − 1)')}, de l’ordre de ${m('√(2(deg P − 1)/p)')}, quand ${m('deg P ≥ 2')} ; le pic ${m('κ')}.`},
     ru: {title: 'У любого считывания низкий пик', summary: `Теорема C: для ${m('P(a) + ab')} нормированный пик некоторого считывания ответа равен 1 при ${m('deg P ≤ 1')}, а любого считывания — не больше ${m('λ/(p − 1)')}, порядка ${m('√(2(deg P − 1)/p)')}, при ${m('deg P ≥ 2')}; пик ${m('κ')}.`},
   }},
   {id: 'weil', part: 'obstacles', text: {
@@ -67,7 +67,7 @@ export const PLANNED: readonly PlannedPage[] = [
   }},
   {id: 'train', part: 'frontier', text: {
     en: {title: 'Train it yourself', summary: `The network of this course trains in your browser on any table; compare the outcome with the heuristic prediction of the peak ${m('κ')}.`},
-    fr: {title: 'Entraînez-le vous-même', summary: `Le réseau de ce cours s’entraîne dans votre navigateur sur n’importe quelle table ; comparez le résultat à la prédiction heuristique du pic ${m('κ')}.`},
+    fr: {title: 'Entraînez-le vous-même', summary: `Le réseau de ce cours s’entraîne dans votre navigateur sur n’importe quelle table ; comparez le résultat à la prédiction heuristique du pic ${m('κ')}.`},
     ru: {title: 'Обучите сами', summary: `Сеть этого курса обучается в вашем браузере на любой таблице; сравните результат с эвристическим предсказанием по пику ${m('κ')}.`},
   }},
   {id: 'frontier', part: 'frontier', text: {
@@ -77,7 +77,7 @@ export const PLANNED: readonly PlannedPage[] = [
   }},
   {id: 'status', part: 'frontier', text: {
     en: {title: 'What is proved', summary: 'Every claim in the course on one board: proved in Lean or by hand, measured, heuristic or open.'},
-    fr: {title: 'Ce qui est démontré', summary: 'Chaque énoncé du cours sur un même tableau : démontré en Lean ou à la main, mesuré, heuristique ou ouvert.'},
+    fr: {title: 'Ce qui est démontré', summary: 'Chaque énoncé du cours sur un même tableau : démontré en Lean ou à la main, mesuré, heuristique ou ouvert.'},
     ru: {title: 'Что доказано', summary: 'Все утверждения курса на одной доске: доказанные в Lean или вручную, измеренные, эвристические или открытые.'},
   }},
 ];
