@@ -117,9 +117,9 @@ Work in a fresh worktree (`.claude/worktrees/<name>`, made from `main`); land ea
       `/tmp/claude-1000/-home-misha-lean-projects-transformer/f59a2e8a-748c-4f77-9056-88503d0b17c1/scratchpad/train/`
       (`kappa.py`, `tasks.py`, `drive.py`, `kappa.json`, `runs/`, `train.log`).
       Move them into `experiments/` here, as a uv project, before that directory goes.
-- [ ] **The optimizer.** Rerun done (`3cc0aef`): Schedule-Free AdamW at 1e-3, 0.01 and 0.03
-      splits the 13 tasks as AdamW does, 2.5 to 5 times slower at 1e-3. Left: say so on the
-      site, in three languages, with the κ values of `experiments/training/README.md`. Was:
+- [x] **The optimizer.** Rerun done (`3cc0aef`): Schedule-Free AdamW at 1e-3, 0.01 and 0.03
+      splits the 13 tasks as AdamW does, 2.5 to 5 times slower at 1e-3. On the home page, in
+      three languages, with the κ values of `experiments/training/README.md`: `f6138d9`. Was:
       The course's network trains with Schedule-Free AdamW, but the runs
       it quotes (the ten κ predictions, parity-cubic) used AdamW: `grok-simple.py` in
       `~/rust_projects/grokking_abmod/scripts`, lr 1e-3, betas 0.9/0.98, weight decay 1,
@@ -136,14 +136,10 @@ Work in a fresh worktree (`.claude/worktrees/<name>`, made from `main`); land ea
 - [x] Done, transformer `49776341` (items 5.1–5.4), numerics in grokking `93cecb9`; then
   **linear growth** (item 6): `733ec189` (exactly item 1.2's hypotheses), `4848e3d6` (full
   rank and `[[2, 1], [1, 1]]` recover without it, `‖K + h E₀₁‖_S1 = √(9 + h²)`), `9c4b4e68`
-  (it needs `r (m + n − r)` cells). Next: the review's *Rank check* in the transformer repo
-  still lacks the item 5 numbers of `rank` and `polar` (cite `93cecb9`); the home page lacks
-  item 6 (FULL_LEAN names in `exists_pos_le_nuclearNorm_add_iff`,
-  `isMinOn_iff_of_exists_pos_le_nuclearNorm_add`,
-  `not_exists_pos_le_nuclearNorm_add_of_full_column_rank`, `…_of_full_row_rank`,
-  `nuclearNorm_add_smul_single_threeCells`, `not_exists_pos_le_nuclearNorm_add_threeCells`,
-  `card_mul_add_le_ncard_of_tangent`, `card_mul_add_le_ncard_of_exists_pos_le_nuclearNorm_add`);
-  a numerical check of linear against quadratic growth is open.
+  (it needs `r (m + n − r)` cells); on the home page, with the item 5 numbers: `f6138d9`.
+  Next: the review's *Rank check* in the transformer repo still lacks the item 5 numbers of
+  `rank` and `polar` (cite `93cecb9`); a numerical check of linear against quadratic growth
+  is open.
   Was: **Theorem A at every rank.** `K = U S Vᴴ` with `S > 0` is
   a minimum of M exactly when some `W` with `Uᴴ W = 0`, `W V = 0` and `‖W‖_op ≤ 1` makes
   `U Vᴴ + W` vanish off Ω (for invertible `K`, `W = 0` and this is Theorem A). Route: the
