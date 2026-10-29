@@ -84,6 +84,16 @@ fast-forward and check `main`'s head before submitting.
       cycle; `c (Y − Q)` is a contraction exactly when `|c| cos(π/N) ≤ 1`, so Theorem D's
       item 1 holds with `c = 1/cos(π/N)` for `N ≥ 3`, and no larger `c` works for this `Y`
       (review item D.11). No page quotes Theorem D's constant, so the site is unchanged.
+- [x] **Rank above one.** `57e74719`, `51365133`: Theorem D's certificate at every rank
+      (`isMinOn_iff_of_certificate`: `K = U S Vᴴ`, a `W` with `Uᴴ W = 0`, `W V = 0`,
+      `‖W‖_op < 1` making `U Vᴴ + W` vanish off Ω, and no nonzero `U Aᴴ + B Vᴴ` vanishing on
+      Ω); the necessary condition (`reachable_of_forall_isMinOn`: the cells of Ω where `K ≠ 0`
+      join the row and the column of every nonzero entry); the `2 × 2` table from three cells
+      (`forall_isMinOn_threeCells_iff`: recovered exactly when `k₀₁ = conj(k₁₀) k₀₀ k₁₁ /
+      max(|k₁₀|², |k₀₀ k₁₁|)`), so `[[2, 1], [1, 1]]` is recovered and `[[2, 1], [1, −1]]`, of
+      the same moduli, is not; and the certificate's second condition is not necessary
+      (`exists_ne_zero_threeCells_of_det_ne_zero`). Numerically: grokking `e5cfbe6`, review
+      `e6c15b9b`; on the home page: `c59f26c`.
 
 ## Site
 
@@ -119,14 +129,15 @@ fast-forward and check `main`'s head before submitting.
 
 ## Open, for the next cycles
 
-- Rank above one: when does M recover a table of rank `r`? Theorem G is `r = 1`. Plan
-  (2026-10-29): no criterion in Ω, supports and moduli alone exists for `r ≥ 2` — already
-  `2 × 2` from the three cells off `(0, 1)`: `[[2, 1], [1, 1]]` is recovered, `[[2, 1],
-  [1, −1]]`, with the same moduli, is not. Prove in Lean: the sufficient condition for every
-  rank (Theorem D's certificate with `U Vᴴ` in place of `J/N`, and no nonzero `U Aᴴ + B Vᴴ`
-  vanishing on Ω); the necessary one (the cells of Ω inside the support of `K` connect the
-  row and the column of every nonzero entry); the exact `2 × 2` criterion
-  `k₀₁ = conj(k₁₀) det K / |det K|`. Then rank-2 tables numerically.
+- Rank above one, the next cycle: **Theorem A at every rank.** `K = U S Vᴴ` with `S > 0` is
+  a minimum of M exactly when some `W` with `Uᴴ W = 0`, `W V = 0` and `‖W‖_op ≤ 1` makes
+  `U Vᴴ + W` vanish off Ω (for invertible `K`, `W = 0` and this is Theorem A). Route: the
+  analytic Hahn–Banach theorem (`exists_extension_of_le_sublinear`) extends `t K + H ↦
+  t ‖K‖_S1` from `ℝ K + L` to a functional `Re tr(Yᴴ ·) ≤ ‖·‖_S1`; then `‖Y‖_op ≤ 1`,
+  `Y = 0` off Ω, `Re tr(Yᴴ K) = ‖K‖_S1`, which forces `Y V = U` and `Yᴴ U = V`. The rank
+  check agrees: on the 649 injective patterns without a certificate below 1, `K` was not even
+  a minimum. Uniqueness has no such criterion: injectivity is not necessary (item 4), as the
+  nuclear-norm ball is not polyhedral.
 - **Not unique, but correct?** (user, 2026-10-29: "ok, result not unique, but maybe also
   correct?"). Three cases: `K` the only minimum; `K` one of several (one diagonal: every
   `X ⪰ 0` with unit diagonal after the transfer to `J`, so `K`, `Z` and the segment between
