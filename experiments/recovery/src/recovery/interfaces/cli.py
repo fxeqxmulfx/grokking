@@ -9,6 +9,7 @@ from recovery.application.weights import cross_check, slow_tight_weights, tight_
 from recovery.application.additive import Filled, cubic_splits, diagonal_certificate, long_diagonals, long_runs, survey, theorem_d
 from recovery.application.characters import character_check
 from recovery.application.periods import period_check
+from recovery.application.intervals import interval_check
 from recovery.application.margins import off_blocks, random_margins
 from recovery.application.ranks import RANK_CLASSES, STANDINGS, RankCase, polar_check, rank_check, three_cells
 from recovery.infrastructure.admm import TorchADMM
@@ -151,6 +152,9 @@ def main() -> None:
     periods.add_argument("prime", type=int)
     periods.add_argument("powers", type=int, nargs="+")
     periods.add_argument("--cap", type=int, default=20000)
+    interval = checks.add_parser("interval", help="[a + b < (p - 1)/2] as 0 and 1 from the training splits, wrong cells by sum")
+    interval.add_argument("prime", type=int)
+    interval.add_argument("--cap", type=int, default=20000)
     margin = checks.add_parser("margin", help="the failure margin: J off a block, and random patterns without a permutation")
     margin.add_argument("steps", type=int)
     margin.add_argument("--sizes", type=int, nargs="+", default=[3, 4, 5, 6])
@@ -244,6 +248,14 @@ def main() -> None:
             for f in period_check(solver, args.prime, args.powers, args.cap):
                 print(f"p = {args.prime} (a + b)^{f.m:<2d} rank {f.rank:2d} seed {f.seed:2d}: error={f.error:.2e}"
                       f" decoded={100 * f.decoded:6.2f}% ||Z||_S1 - ||K||_S1={f.gap:+.3e} steps={f.steps}", flush=True)
+        case "interval":
+            for f in interval_check(solver, args.prime, args.cap):
+                total = sum(f.wrong.values())
+                worst = sorted(f.wrong.items(), key=lambda kv: (-kv[1], kv[0]))[:4]
+                print(f"p = {args.prime} [a + b < {(args.prime - 1) // 2}] seed {f.seed:2d}: wrong={total} of {f.hidden}"
+                      f" on {len(f.wrong)} sums, the worst {', '.join(f'{c}: {n}' for c, n in worst)}"
+                      f" ({100 * sum(n for _, n in worst) / max(total, 1):.0f}%)"
+                      f" ||Z||_S1 - ||K||_S1={f.gap:+.3e} steps={f.steps}", flush=True)
         case "zeros":
             totals: dict[str, list[ClassSummary]] = {name: [] for name in G_CLASSES}
             for table in zero_tables(TorchDraws(args.seed), args.tight):

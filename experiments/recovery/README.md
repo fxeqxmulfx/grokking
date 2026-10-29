@@ -41,6 +41,12 @@ On `p × p` tables at a prime `p`, with `ψ(x) = e^{2πix/p}`:
   `d = gcd(m, p − 1)`, the least rank of an injective readout of `(a + b)^m` (hand,
   `period_readout` in `domain/residues.py`). For `d > 1` no theorem here says from which `Ω` M
   recovers it.
+- `[a + b < (p − 1)/2]` read as 0 and 1, the training experiment's `sum-interval`, has rank `p`:
+  its Fourier coefficients are all nonzero (hand, `interval_table` in `domain/residues.py`). So
+  by *Rank above one*, item 6.3, item 1.2 certifies it from no incomplete `Ω`. Item 5.4 shows
+  more (hand): the polar factor `U Vᴴ` of a table `f(a + b)` of rank `p` is again a function
+  `g(a + b)`, not identically zero, so M does not recover the table from an `Ω` that misses a cell
+  on every sum, as each training half does.
 
 Above rank one (*Rank above one*, added to the review):
 
@@ -92,6 +98,7 @@ uv run --locked recovery long 31 20000 100000 300000
 uv run --locked recovery cubic 31 61 97              # ψ(a³ + ab) from the training halves
 uv run --locked recovery characters 31 61 97         # χ(ab) and χ(a + ab) from them
 uv run --locked recovery periods 97 2 3 4 6 8 12 16 24 32 48   # (a + b)^m from them
+uv run --locked recovery interval 97                 # [a + b < 48] from them, by sum
 uv run --locked recovery three-cells 20000           # rank above one: 2 × 2 from three cells
 uv run --locked recovery rank 20000                  # rank 2 and 3, 4 × 4 to 8 × 8, random cells
 uv run --locked recovery polar 20000                 # full column rank, random cells: item 5.4
@@ -123,6 +130,7 @@ a `4 × 4` table took 30 s on the CPU and 555 s on an RTX 3050.
 | `cubic` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `ψ(a³ + ab)` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `characters` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `χ(ab)`, `χ(a + ab)`, `χ(g^k) = e^{2πik/(p − 1)}` for the least primitive root `g` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `periods` | `97 × 97` | the training halves of seeds 7 and 11 | `ρ((a + b)^m)`, `ρ` the Gaussian periods, `m` = 2, 3, 4, 6, 8, 12, 16, 24, 32, 48 | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
+| `interval` | `97 × 97` | the training halves of seeds 7 and 11 | `[a + b < 48]`, read as 0 and 1 | at most 20 000 | the wrong hidden cells on each sum |
 | `three-cells` | 5000 of 2 × 2, 1000 of each kind, and the five tables of Lean's examples | the three cells other than `(0, 1)` | random; rank one, `u vᵀ`; rank two with `k₀₁ = x*`; moduli one; moduli one and rank one. Moduli uniform in [0.3, 2], random phases, seed 0 | 20 000 | `\|Z₀₁ − x*\|/‖K‖` |
 | `rank` | 300 of each `N × N`, `N` = 4, 6, 8, of each rank `r` = 2, 3 and each kind | each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept | dense: `A Bᵀ` with `N × r` factors; blocks: `r` diagonal blocks of nearly equal sizes, each `a bᵀ`, and 0 off them. Factor entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `polar` | 300 of each `m × n` = 4 × 4, 8 × 8, 6 × 3, 8 × 4, 8 × 2 and each kind of pattern | random: each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept; blocks: the same, with the cells of the blocks of `Q` added | `K = Q P`: `n` blocks of consecutive rows of nearly equal sizes (on a square table, the diagonal), column `j` of `Q` a unit vector of random entries on block `j` and 0 elsewhere, `P = Gᴴ G` with `G` an `n × n` matrix of random entries. Entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
@@ -372,6 +380,11 @@ decoded. From `d = 16` on, both fail. `‖Z‖_S1 − ‖K‖_S1` is −0.449 an
 −110 to −1052 above; the errors are 3.94e-2 and 5.11e-2 for `d = 16` and 0.517 to 1.05 above.
 The value of `ρ` nearest `Z` is the right one on 93.33% and 90.65% of the hidden cells for
 `d = 16`, and on 49.42% to 54.58% above.
+
+`interval 97`, 14 s: neither training half gives the table back, with `‖Z‖_S1 − ‖K‖_S1` = −44.9
+and −42.4 after 3127 and 2660 steps. The value of {0, 1} nearest `Z` is wrong on 163 and 150 of
+the 4705 hidden cells. For each seed these wrong cells lie on 15 sums, and 62% and 68% of them on
+the four sums 47, 48, 96 and 0 at the two ends of `{0, …, 47}`.
 
 Rank above one, three cells (`three-cells 20000`). On every table the solver's `Z₀₁` is Lean's
 `x*` to within `2.67·10⁻¹⁵ ‖K‖`, and the solver recovers `K` exactly when `k₀₁ = x*`:

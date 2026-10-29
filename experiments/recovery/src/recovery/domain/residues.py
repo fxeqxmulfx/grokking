@@ -1,6 +1,6 @@
 """The tables of residues mod a prime p that the checks fill: a task f(a, b) mod p read through
-ψ(x) = e^{2πi x/p}, a faithful multiplicative character χ, extended by χ(0) = 0, and the powers
-(a + b)^m read through Gaussian periods."""
+ψ(x) = e^{2πi x/p}, a faithful multiplicative character χ, extended by χ(0) = 0, the powers
+(a + b)^m read through Gaussian periods, and the interval [a + b < (p − 1)/2] read as 0 and 1."""
 
 import cmath
 import math
@@ -63,3 +63,10 @@ def period_table(p: int, m: int) -> list[list[complex]]:
     """ρ((a + b)^m) for every cell (a, b) of the p x p table, ρ the Gaussian periods."""
     readout = period_readout(p, m)
     return [[readout[pow(a + b, m, p)] for b in range(p)] for a in range(p)]
+
+
+def interval_table(p: int) -> list[list[complex]]:
+    """[a + b mod p < (p − 1)/2], 1 or 0, for every cell (a, b): the training experiment's
+    `sum-interval`. Its Fourier coefficients Σ_{c < (p − 1)/2} e^{−2πi kc/p} are all nonzero, so it
+    has rank p (hand)."""
+    return [[complex((a + b) % p < (p - 1) // 2) for b in range(p)] for a in range(p)]

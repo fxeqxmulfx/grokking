@@ -8,7 +8,8 @@ import torch
 from recovery.application.additive import random_density, survey_patterns
 from recovery.domain.matchings import block_bound, elementary, leaves, max_matching
 from recovery.domain.patterns import cross, diagonals, rigid, without
-from recovery.domain.residues import discrete_log, period_readout, period_table, primitive_root, roots_of_unity
+from recovery.domain.residues import (discrete_log, interval_table, period_readout, period_table, primitive_root,
+                                     roots_of_unity)
 from recovery.domain.splits import training_pattern
 from recovery.infrastructure.draws import TorchDraws
 
@@ -60,6 +61,16 @@ class Large(unittest.TestCase):
             self.assertGreater(min(abs(x - y) for i, x in enumerate(codes) for y in codes[i + 1:]), 1e-3)
             table = torch.tensor(period_table(p, m), dtype=torch.complex128)
             self.assertEqual(torch.linalg.matrix_rank(table).item(), d)
+
+    def test_interval(self) -> None:
+        for p in (31, 97):
+            table = interval_table(p)
+            # Each row and column holds (p − 1)/2 ones, and the table depends on a + b only.
+            self.assertEqual({sum(row).real for row in table}, {(p - 1) // 2})
+            self.assertEqual({sum(col).real for col in zip(*table)}, {(p - 1) // 2})
+            self.assertTrue(all(table[a][b] == table[(a + 1) % p][(b - 1) % p] for a in range(p) for b in range(p)))
+            self.assertEqual([table[0][c].real for c in ((p - 3) // 2, (p - 1) // 2, p - 1)], [1, 0, 0])
+            self.assertEqual(torch.linalg.matrix_rank(torch.tensor(table, dtype=torch.complex128)).item(), p)
 
 
 if __name__ == "__main__":
