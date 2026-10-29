@@ -63,11 +63,11 @@ and 11; `—` means never in 10 000 steps:
   except `sum-cube` with seed 11 under Schedule-Free AdamW at 1e-3, which ends at 97.70%. Under
   AdamW, `sum-cube` reached 99% and ended at 97.68% and 99.79%. The five with `κ ≤ 0.1059`
   never do: they end at 0.68% to 2.17% validation accuracy, near chance (1/97 ≈ 1.03%), and
-  their parity accuracy is 45.76% to 51.48%.
+  their parity accuracy is 45.75% to 51.48%.
 - The ten predictions made from `κ` before these tasks ran (`PREDICTED_LEARN` and
   `PREDICTED_FAIL` in `application/runs.py`) all held, but for that one `sum-cube` run.
 - A large `κ` is not enough (a heuristic criterion whose converse fails): `parity-cubic` has
-  `κ = 0.9823` and ends at 2.02% to 6.78% validation accuracy with 78.68% to 91.82% parity
+  `κ = 0.9823` and ends at 2.01% to 6.78% validation accuracy with 78.68% to 91.82% parity
   accuracy. The network learns the parity bit, not the rest.
 - At the same learning rate 1e-3, Schedule-Free AdamW reaches 99% 2.5 to 5 times later than
   AdamW. At 0.01 and 0.03 it reaches 99% at the first or second check (500 or 1000 steps), and
