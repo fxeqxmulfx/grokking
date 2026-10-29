@@ -30,6 +30,11 @@ SPECTRUM = ("sum-interval", "sum-interval-2", "sum-interval-4", "sum-interval-8"
 #: d ≤ 12 and not for d = 24, 32, so "M recovers ρ(F) for an injective ρ" predicts 99% for the
 #: first four.
 RECOVERY = ("sum-pow4", "sum-pow6", "sum-pow8", "sum-pow12", "sum-pow24", "sum-pow32")
+#: Three of them rerun for 100 000 steps, with predictions recorded before (2026-10-29). In 10 000
+#: steps the first three reached 99%, at 1000 to 8500 steps, and sum-pow12 ended at 96.66% and
+#: 97.58%, still rising. If what M recovers the network learns, given time, sum-pow12 reaches 99%;
+#: sum-pow24 and sum-pow32, which M does not recover, do not, as sum-pow16 did not.
+LONGER = ("sum-pow12", "sum-pow24", "sum-pow32")
 COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE + DISAGREE
 
 
