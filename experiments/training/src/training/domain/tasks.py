@@ -3,10 +3,12 @@
 Ported from the scratch `tasks.py` of 2026-10-28 (the session that measured the peak κ and the
 ten training predictions): the ten operations of grokking_abmod's `scripts/grok-simple.py`
 (`OPERATIONS`), thirteen more, and the two "blind" variants that drop the answer's lowest bit;
-then (2026-10-29) two powers of a + b on which κ and the composition hypothesis disagree.
+then (2026-10-29) two powers of a + b on which κ and the composition hypothesis disagree, and seven
+indicators [a + b ∈ A] of sets A of one size that differ only in their spectrum.
 """
 
 from collections.abc import Callable
+from functools import cache
 
 MASK64 = (1 << 64) - 1
 
@@ -57,6 +59,37 @@ def random_table(p: int) -> list[list[int]]:
     return [[random.index(p) for _ in range(p)] for _ in range(p)]
 
 
+def half(p: int) -> int:
+    """(p − 1)/2, the size of every set A of the tasks [a + b ∈ A]."""
+    return (p - 1) // 2
+
+
+@cache
+def interval_with_swaps(p: int, swaps: int) -> frozenset[int]:
+    """The interval {0, …, (p − 3)/2} with `swaps` of its points exchanged for as many points
+    outside it, the first ones of two fixed shuffles, so a set with more swaps contains the swaps
+    of a set with fewer."""
+    inside, outside = list(range(half(p))), list(range(half(p), p))
+    random = SplitMix64(0x696E74657276616C)
+    random.shuffle(inside)
+    random.shuffle(outside)
+    return frozenset(inside[swaps:] + outside[:swaps])
+
+
+@cache
+def random_half(p: int) -> frozenset[int]:
+    """A fixed random set of (p − 1)/2 residues."""
+    values = list(range(p))
+    SplitMix64(0x68616C6673657421).shuffle(values)
+    return frozenset(values[:half(p)])
+
+
+@cache
+def squares(p: int) -> frozenset[int]:
+    """The (p − 1)/2 nonzero squares mod p."""
+    return frozenset(c * c % p for c in range(1, p))
+
+
 def parity_cubic(a: int, b: int, p: int) -> int:
     """2 ⌊c/2⌋ + parity(a + b), c = a³ + ab mod p; the one overflow, p, wraps to 0."""
     c = (a**3 + a * b) % p
@@ -92,6 +125,13 @@ EXTRA: dict[str, Task] = {
     "parity-cubic": parity_cubic,
     "sum-pow16": lambda a, b, p: pow(a + b, 16, p),
     "sum-pow48": lambda a, b, p: pow(a + b, 48, p),
+    "sum-interval": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 0)),
+    "sum-interval-2": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 2)),
+    "sum-interval-4": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 4)),
+    "sum-interval-8": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 8)),
+    "sum-interval-12": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 12)),
+    "sum-random-half": lambda a, b, p: int((a + b) % p in random_half(p)),
+    "sum-squares": lambda a, b, p: int((a + b) % p in squares(p)),
 }
 
 TASKS: dict[str, Task] = {**LAB, **EXTRA}
@@ -110,6 +150,10 @@ FORMULA = {
     "sum-cube": "(a + b)³", "square-product": "a² + ab", "random": "random table",
     "parity-cubic": "2⌊(a³+ab)/2⌋ + parity(a+b)",
     "sum-pow16": "(a + b)¹⁶", "sum-pow48": "(a + b)⁴⁸",
+    "sum-interval": "[a + b < (p − 1)/2]", "sum-interval-2": "[a + b ∈ I₂]",
+    "sum-interval-4": "[a + b ∈ I₄]", "sum-interval-8": "[a + b ∈ I₈]",
+    "sum-interval-12": "[a + b ∈ I₁₂]", "sum-random-half": "[a + b ∈ R]",
+    "sum-squares": "[a + b a nonzero square]",
 }
 
 

@@ -14,6 +14,14 @@ CONVERSE = ("parity-cubic",)
 #: κ, 0.0427 and 0.0125 at p = 97, lies below that of every task that failed, so κ predicts failure;
 #: a + b has rank one under ψ, so the hypothesis "g of a rank-one h is learned" predicts success.
 DISAGREE = ("sum-pow16", "sum-pow48")
+#: Seven tasks [a + b ∈ A] with |A| = (p − 1)/2: the same two answers with the same frequencies,
+#: sets A that differ only in their spectrum (2026-10-29). Predictions recorded before they ran:
+#: accuracy falls with κ; if the network learns what the peak carries and not the flat rest, then
+#: with j points of the interval swapped the vote of each sum is right on the p − 2j sums outside
+#: the swaps and wrong on the 2j swapped ones, an accuracy near (p − 2j)/p; if the interval itself is
+#: not learned, the hypothesis that a peaked spectrum decides fails.
+SPECTRUM = ("sum-interval", "sum-interval-2", "sum-interval-4", "sum-interval-8", "sum-interval-12",
+            "sum-random-half", "sum-squares")
 COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE + DISAGREE
 
 

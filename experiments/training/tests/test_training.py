@@ -11,7 +11,7 @@ from training.application.peaks import peaks
 from training.application.ports import RunSpec
 from training.application.runs import COURSE, summarize
 from training.domain.splits import Sampler, split
-from training.domain.tasks import FORMULA, TASKS, permutation, table, task
+from training.domain.tasks import FORMULA, TASKS, interval_with_swaps, permutation, random_half, squares, table, task
 from training.infrastructure.kappa import TorchPeaks, primitive_root
 from training.infrastructure.optimizers import ScheduleFreeAdamW
 from training.infrastructure.trainer import TorchTrainer
@@ -32,6 +32,16 @@ class Tasks(unittest.TestCase):
         self.assertEqual([legendre.count(v) for v in (0, 1, 96)], [97, 48 * 97, 48 * 97])
         # x¹⁶ maps (Z/97)^× onto the six sixth roots of unity.
         self.assertEqual(len({x for r in table("sum-pow16", 97) for x in r}), 7)
+        # The sets A of [a + b ∈ A]: one size, nested swaps, the squares.
+        interval = interval_with_swaps(97, 0)
+        self.assertEqual(interval, frozenset(range(48)))
+        for j in (2, 4, 8, 12):
+            self.assertEqual(len(interval_with_swaps(97, j)), 48)
+            self.assertEqual(len(interval - interval_with_swaps(97, j)), j)
+        self.assertTrue(interval - interval_with_swaps(97, 2) <= interval - interval_with_swaps(97, 4))
+        self.assertEqual(len(random_half(97)), 48)
+        self.assertEqual(squares(97), frozenset(c for c in range(1, 97) if pow(c, 48, 97) == 1))
+        self.assertEqual(TASKS["sum-squares"](3, 1, 97), 1)  # 4 = 2²
         self.assertEqual(set(FORMULA), set(TASKS))
         self.assertTrue(set(COURSE) <= set(TASKS))
 
