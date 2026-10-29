@@ -63,8 +63,8 @@ const full = [
   l’entraînement, ${m('Ω')} est une moitié aléatoire : les ${m('p²')} couples sont mélangés (SplitMix64, graines 7 et 11)
   et les ${m('⌊p²/2⌋')} premiers sont gardés, soit 4704 des 9409 cases pour ${m('p = 97')}. Les théorèmes admettent tout
   ${m('Ω')}.</li>
-  <li><strong>Apprendre.</strong> Atteindre au moins 99 % de réponses justes sur les cases hors de ${m('Ω')}, la moitié non
-  vue. Le hasard donne ${m('1/p')}, environ 1 % pour ${m('p = 97')}.</li>
+  <li><strong>Apprendre.</strong> Atteindre au moins 99 % de réponses justes sur les cases hors de ${m('Ω')}, la moitié non
+  vue. Le hasard donne ${m('1/p')}, environ 1 % pour ${m('p = 97')}.</li>
   <li><strong>Le réseau.</strong> Une seule table ${m('E ∈ ℝ<sup>p×128</sup>')} plonge les deux opérandes et sert aussi à
   lire la réponse : le plongement est partagé. ${m('J')} tourne de 90° chaque paire de canaux de ${m(sub('E', 'b'))},
   ${m('(x₁, x₂) ↦ (−x₂, x₁)')}, pour que l’entrée distingue ${m('(a, b)')} de ${m('(b, a)')}. ${m('n')} est RMSNorm sans
@@ -254,12 +254,12 @@ const full = [
   été prédite à partir de ${m('κ')} avant leur premier entraînement, et les dix ont donné ce qui était prédit avec
   AdamW au taux d’apprentissage ${m('10<sup>−3</sup>')} et les graines 7 et 11 ; la précision sur la moitié non vue
   est mesurée tous les 500 pas. ${m('a² + ab')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')} finissent sous
-  2 %, comme les témoins ${m('a³ + ab')} et ${m('a² + ab + b²')}, et aucune ne dépasse 2,3 % ; ${m('ab')},
+  2 %, comme les témoins ${m('a³ + ab')} et ${m('a² + ab + b²')}, et aucune ne dépasse 2,3 % ; ${m('ab')},
   ${m('a²b')}, ${m('a + ab')}, ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')} atteignent
-  99 % en 1000 à 3000 pas, bien que ${m('(a + b)³')} finisse à 97,68 % avec la graine 7. Schedule-Free AdamW,
+  99 % en 1000 à 3000 pas, bien que ${m('(a + b)³')} finisse à 97,68 % avec la graine 7. Schedule-Free AdamW,
   l’optimiseur du cours, sépare les douze de même aux taux ${m('10<sup>−3</sup>')}, 0,01 et 0,03 : les cinq
-  finissent sous 2,2 % et aucune ne dépasse 2,3 %, et les sept atteignent 99 % en 500 à 9500 pas, sauf
-  ${m('(a + b)³')} avec la graine 11 à ${m('10<sup>−3</sup>')}, qui finit à 97,70 %
+  finissent sous 2,2 % et aucune ne dépasse 2,3 %, et les sept atteignent 99 % en 500 à 9500 pas, sauf
+  ${m('(a + b)³')} avec la graine 11 à ${m('10<sup>−3</sup>')}, qui finit à 97,70 %
   ${numerical('entraînement', L)}.</li></ul></section>`,
 
   `<section id="unproved"><h3>Ce qui n’est pas démontré</h3><ul>
@@ -268,10 +268,10 @@ const full = [
   <li><strong>Qu’un mode fort suffise au réseau.</strong> Ce n’est pas le cas, sous cette forme. Pour
   ${m('2⌊(a³ + ab)/2⌋ + (a + b <span class="op">mod</span> 2)')}, le pic ${m('κ = 0,98')} vient de la seule parité de la
   réponse ; sans le bit le plus bas de la réponse, le meilleur pic trouvé vaut 0,087. À la fin, avec AdamW, le réseau
-  prédit la parité sur 78,68 à 79,60 % de la moitié non vue et la réponse elle-même sur 2,29 à 2,73 %, contre
-  ${m('2/p ≈ 2,06 %')} en devinant le reste à partir d’une parité juste : il apprend ce que porte le pic et presque
-  rien du reste. Schedule-Free AdamW donne 79,10 à 79,20 % et 2,01 à 2,26 % au taux ${m('10<sup>−3</sup>')}, et les
-  porte à 86,03–91,82 % et 3,27–6,78 % à 0,01 et 0,03, encore loin de la réponse ${numerical('entraînement', L)}.</li>
+  prédit la parité sur 78,68 à 79,60 % de la moitié non vue et la réponse elle-même sur 2,29 à 2,73 %, contre
+  ${m('2/p ≈ 2,06 %')} en devinant le reste à partir d’une parité juste : il apprend ce que porte le pic et presque
+  rien du reste. Schedule-Free AdamW donne 79,10 à 79,20 % et 2,01 à 2,26 % au taux ${m('10<sup>−3</sup>')}, et les
+  porte à 86,03–91,82 % et 3,27–6,78 % à 0,01 et 0,03, encore loin de la réponse ${numerical('entraînement', L)}.</li>
   <li><strong>Le rang au-dessus de 1.</strong> Pour les tables de rang ${m('r ≥ 2')}, savoir si ${m('K')} est un
   minimum est tranché ci-dessus, mais savoir s’il est le seul, c’est-à-dire s’il est retrouvé, n’a pas de critère comme
   le théorème G. Reste ouvert le cas d’un minimum ${m('K')} qui satisfait la condition nécessaire ci-dessus sans
@@ -359,11 +359,11 @@ export const fr: HomeText = {
       formes à coefficients nuls ci-dessous ${numerical('conditions', L)}.`},
     network: {title: 'Le réseau', body: `Pour ${m('p = 97')}, le réseau du cours, entraîné sur une telle moitié avec
       AdamW au taux d’apprentissage ${m('10<sup>−3</sup>')} ou avec Schedule-Free AdamW aux taux ${m('10<sup>−3</sup>')},
-      0,01 et 0,03, atteint 99 % de réponses justes sur l’autre moitié pour ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
+      0,01 et 0,03, atteint 99 % de réponses justes sur l’autre moitié pour ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
       ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')}, avec les deux graines, sauf
       ${m('(a + b)³')} avec une graine sous Schedule-Free AdamW à ${m('10<sup>−3</sup>')} ; pour ${m('a³ + ab')},
-      ${m('a² + ab')}, ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')}, il finit sous 2,2 % et
-      vaut au plus 2,3 % à chaque mesure, tous les 500 pas ${numerical('entraînement', L)}. Que l’entraînement atteigne
+      ${m('a² + ab')}, ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')}, il finit sous 2,2 % et
+      vaut au plus 2,3 % à chaque mesure, tous les 500 pas ${numerical('entraînement', L)}. Que l’entraînement atteigne
       l’optimum de la pénalité sur les poids n’est pas démontré ${heuristic('entraînement ≈ M', L)}.`},
   },
   fullTitle: 'L’énoncé complet',
