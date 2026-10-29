@@ -10,7 +10,11 @@ PREDICTED_LEARN = ("mul", "square-times", "affine-product", "sum-square", "perm-
 PREDICTED_FAIL = ("square-product", "quadratic-linear", "cubic-mixed")
 CONTROLS = ("cubic-product", "quadratic")
 CONVERSE = ("parity-cubic",)
-COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE
+#: Two tasks g(a + b) on which two predictions disagree, recorded before they ran (2026-10-29). Their
+#: κ, 0.0427 and 0.0125 at p = 97, lies below that of every task that failed, so κ predicts failure;
+#: a + b has rank one under ψ, so the hypothesis "g of a rank-one h is learned" predicts success.
+DISAGREE = ("sum-pow16", "sum-pow48")
+COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE + DISAGREE
 
 
 @dataclass(frozen=True)

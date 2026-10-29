@@ -31,7 +31,7 @@ def evaluate(model: Rotate90, a: torch.Tensor, b: torch.Tensor, answers: torch.T
 
 
 class TorchTrainer:
-    """Runs under `root/<optimizer>-lr<rate>/<task>-<seed>/`; a finished run is read back, not redone."""
+    """Runs under `root/<label>/` (`RunSpec.label`); a finished run is read back, not redone."""
 
     def __init__(self, root: Path, device: str, echo: bool = True) -> None:
         self.root, self.device, self.echo = root, torch.device(device), echo

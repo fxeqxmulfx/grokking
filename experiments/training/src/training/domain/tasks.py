@@ -2,7 +2,8 @@
 
 Ported from the scratch `tasks.py` of 2026-10-28 (the session that measured the peak κ and the
 ten training predictions): the ten operations of grokking_abmod's `scripts/grok-simple.py`
-(`OPERATIONS`), twelve more, and the two "blind" variants that drop the answer's lowest bit.
+(`OPERATIONS`), thirteen more, and the two "blind" variants that drop the answer's lowest bit;
+then (2026-10-29) two powers of a + b on which κ and the composition hypothesis disagree.
 """
 
 from collections.abc import Callable
@@ -89,6 +90,8 @@ EXTRA: dict[str, Task] = {
     "square-product": lambda a, b, p: (a * a + a * b) % p,
     "random": lambda a, b, p: random_table(p)[a][b],
     "parity-cubic": parity_cubic,
+    "sum-pow16": lambda a, b, p: pow(a + b, 16, p),
+    "sum-pow48": lambda a, b, p: pow(a + b, 48, p),
 }
 
 TASKS: dict[str, Task] = {**LAB, **EXTRA}
@@ -106,6 +109,7 @@ FORMULA = {
     "floor-product": "⌊ab/p⌋", "max": "max(a, b)", "sum-square": "(a + b)²",
     "sum-cube": "(a + b)³", "square-product": "a² + ab", "random": "random table",
     "parity-cubic": "2⌊(a³+ab)/2⌋ + parity(a+b)",
+    "sum-pow16": "(a + b)¹⁶", "sum-pow48": "(a + b)⁴⁸",
 }
 
 

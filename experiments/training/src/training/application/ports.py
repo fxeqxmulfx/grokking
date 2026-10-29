@@ -31,7 +31,11 @@ class RunSpec:
 
     @property
     def label(self) -> str:
-        return f"{self.optimizer}-lr{self.learning_rate:g}/{self.task.replace('/', '-')}-{self.seed}"
+        """`<optimizer>-lr<rate>/<task>-<seed>`, with `-w<width>`, `-d<depth>` and `-s<steps>` after the
+        rate when they differ from grok-simple's 128, 1 and 10 000."""
+        shape = ((f"-w{self.width}" if self.width != 128 else "") + (f"-d{self.depth}" if self.depth != 1 else "")
+                 + (f"-s{self.steps}" if self.steps != 10_000 else ""))
+        return f"{self.optimizer}-lr{self.learning_rate:g}{shape}/{self.task.replace('/', '-')}-{self.seed}"
 
 
 @dataclass(frozen=True)

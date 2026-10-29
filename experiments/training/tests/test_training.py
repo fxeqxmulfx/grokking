@@ -26,6 +26,12 @@ class Tasks(unittest.TestCase):
         self.assertEqual(TASKS["parity-cubic"](2, 3, p), 1)  # c = 0, a + b odd
         self.assertEqual(task("parity-cubic/blind")(2, 3, p), 0)
         self.assertEqual(sorted(permutation(p)), list(range(p)))
+        # At p = 97, x⁴⁸ is the Legendre symbol (Euler): 2 is a square mod 97, 5 is not.
+        self.assertEqual([TASKS["sum-pow48"](1, 1, 97), TASKS["sum-pow48"](2, 3, 97)], [1, 96])
+        legendre = [x for r in table("sum-pow48", 97) for x in r]
+        self.assertEqual([legendre.count(v) for v in (0, 1, 96)], [97, 48 * 97, 48 * 97])
+        # x¹⁶ maps (Z/97)^× onto the six sixth roots of unity.
+        self.assertEqual(len({x for r in table("sum-pow16", 97) for x in r}), 7)
         self.assertEqual(set(FORMULA), set(TASKS))
         self.assertTrue(set(COURSE) <= set(TASKS))
 
@@ -92,14 +98,15 @@ class Training(unittest.TestCase):
                 spec = RunSpec("add", 7, optimizer, modulus=11, width=8, steps=40, report_every=20, batch=16)
                 result = trainer.run(spec)
                 self.assertEqual([r.step for r in result.reports], [0, 20, 40])
+                self.assertEqual(spec.label, f"{optimizer}-lr0.001-w8-s40/add-7")
                 self.assertEqual(len(result.validation), 61)
                 again = trainer.run(spec)
                 self.assertEqual(again.reports, result.reports)
                 s = summarize(result)
                 self.assertTrue(0 <= s.validation_parity <= 1)
                 with self.assertRaises(ValueError):
-                    trainer.stored(RunSpec("add", 7, optimizer, modulus=11, width=8, steps=41, report_every=20,
-                                           batch=16))
+                    trainer.stored(RunSpec("add", 7, optimizer, modulus=11, width=8, steps=40, report_every=20,
+                                           batch=17))
 
     def test_runs_repeat_exactly(self) -> None:
         with tempfile.TemporaryDirectory() as one, tempfile.TemporaryDirectory() as two:

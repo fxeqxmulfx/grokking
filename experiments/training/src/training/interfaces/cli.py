@@ -20,8 +20,8 @@ HERE = Path(__file__).resolve().parents[3]
 
 
 def specs(args: argparse.Namespace) -> list[RunSpec]:
-    return [RunSpec(task, seed, args.optimizer, learning_rate=args.lr, steps=args.steps,
-                    report_every=args.report_every) for task in args.tasks for seed in args.seeds]
+    return [RunSpec(task, seed, args.optimizer, learning_rate=args.lr, width=args.width, depth=args.depth,
+                    steps=args.steps, report_every=args.report_every) for task in args.tasks for seed in args.seeds]
 
 
 def row(s: Summary) -> str:
@@ -45,6 +45,8 @@ def main() -> None:
         command.add_argument("--seeds", type=int, nargs="+", default=[7, 11])
         command.add_argument("--optimizer", choices=OPTIMIZERS, default="adamw")
         command.add_argument("--lr", type=float, default=1e-3)
+        command.add_argument("--width", type=int, default=128, help="even; 128 is grok-simple's")
+        command.add_argument("--depth", type=int, default=1, help="number of SwiGLU blocks")
         command.add_argument("--steps", type=int, default=10_000)
         command.add_argument("--report-every", type=int, default=500)
         command.add_argument("--runs", type=Path, default=HERE / "runs")
