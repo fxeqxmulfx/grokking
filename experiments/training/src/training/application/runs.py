@@ -22,6 +22,14 @@ DISAGREE = ("sum-pow16", "sum-pow48")
 #: not learned, the hypothesis that a peaked spectrum decides fails.
 SPECTRUM = ("sum-interval", "sum-interval-2", "sum-interval-4", "sum-interval-8", "sum-interval-12",
             "sum-random-half", "sum-squares")
+#: Six powers (a + b)^m on which two predictions disagree, recorded before they ran (2026-10-29).
+#: Their κ at p = 97, 0.1640, 0.1205, 0.0880, 0.0616, 0.0241 and 0.0221, lies below 0.2756, the
+#: least κ of a task that reached 99%, so κ predicts that none reaches 99%. Read through Gaussian
+#: periods, ρ(c^m) = Σ_{ζ^m = 1} ω^{ζc}, the table has rank d = gcd(m, 96): 4, 6, 8, 12, 24, 32.
+#: Model M (least nuclear norm) recovers it exactly from the training cells of seeds 7 and 11 for
+#: d ≤ 12 and not for d = 24, 32, so "M recovers ρ(F) for an injective ρ" predicts 99% for the
+#: first four.
+RECOVERY = ("sum-pow4", "sum-pow6", "sum-pow8", "sum-pow12", "sum-pow24", "sum-pow32")
 COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE + DISAGREE
 
 

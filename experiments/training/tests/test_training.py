@@ -32,6 +32,9 @@ class Tasks(unittest.TestCase):
         self.assertEqual([legendre.count(v) for v in (0, 1, 96)], [97, 48 * 97, 48 * 97])
         # x¹⁶ maps (Z/97)^× onto the six sixth roots of unity.
         self.assertEqual(len({x for r in table("sum-pow16", 97) for x in r}), 7)
+        # (a + b)^m takes 0 and the 96/gcd(m, 96) values of the m-th powers.
+        for m, count in ((4, 25), (6, 17), (8, 13), (12, 9), (24, 5), (32, 4)):
+            self.assertEqual(len({x for r in table(f"sum-pow{m}", 97) for x in r}), count)
         # The sets A of [a + b ∈ A]: one size, nested swaps, the squares.
         interval = interval_with_swaps(97, 0)
         self.assertEqual(interval, frozenset(range(48)))

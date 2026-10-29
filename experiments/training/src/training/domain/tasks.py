@@ -3,8 +3,9 @@
 Ported from the scratch `tasks.py` of 2026-10-28 (the session that measured the peak κ and the
 ten training predictions): the ten operations of grokking_abmod's `scripts/grok-simple.py`
 (`OPERATIONS`), thirteen more, and the two "blind" variants that drop the answer's lowest bit;
-then (2026-10-29) two powers of a + b on which κ and the composition hypothesis disagree, and seven
-indicators [a + b ∈ A] of sets A of one size that differ only in their spectrum.
+then (2026-10-29) two powers of a + b on which κ and the composition hypothesis disagree, seven
+indicators [a + b ∈ A] of sets A of one size that differ only in their spectrum, and six more
+powers of a + b on which κ and the recovery of model M disagree.
 """
 
 from collections.abc import Callable
@@ -125,6 +126,12 @@ EXTRA: dict[str, Task] = {
     "parity-cubic": parity_cubic,
     "sum-pow16": lambda a, b, p: pow(a + b, 16, p),
     "sum-pow48": lambda a, b, p: pow(a + b, 48, p),
+    "sum-pow4": lambda a, b, p: pow(a + b, 4, p),
+    "sum-pow6": lambda a, b, p: pow(a + b, 6, p),
+    "sum-pow8": lambda a, b, p: pow(a + b, 8, p),
+    "sum-pow12": lambda a, b, p: pow(a + b, 12, p),
+    "sum-pow24": lambda a, b, p: pow(a + b, 24, p),
+    "sum-pow32": lambda a, b, p: pow(a + b, 32, p),
     "sum-interval": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 0)),
     "sum-interval-2": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 2)),
     "sum-interval-4": lambda a, b, p: int((a + b) % p in interval_with_swaps(p, 4)),
@@ -149,7 +156,9 @@ FORMULA = {
     "floor-product": "⌊ab/p⌋", "max": "max(a, b)", "sum-square": "(a + b)²",
     "sum-cube": "(a + b)³", "square-product": "a² + ab", "random": "random table",
     "parity-cubic": "2⌊(a³+ab)/2⌋ + parity(a+b)",
-    "sum-pow16": "(a + b)¹⁶", "sum-pow48": "(a + b)⁴⁸",
+    "sum-pow16": "(a + b)¹⁶", "sum-pow48": "(a + b)⁴⁸", "sum-pow4": "(a + b)⁴",
+    "sum-pow6": "(a + b)⁶", "sum-pow8": "(a + b)⁸", "sum-pow12": "(a + b)¹²",
+    "sum-pow24": "(a + b)²⁴", "sum-pow32": "(a + b)³²",
     "sum-interval": "[a + b < (p − 1)/2]", "sum-interval-2": "[a + b ∈ I₂]",
     "sum-interval-4": "[a + b ∈ I₄]", "sum-interval-8": "[a + b ∈ I₈]",
     "sum-interval-12": "[a + b ∈ I₁₂]", "sum-random-half": "[a + b ∈ R]",
