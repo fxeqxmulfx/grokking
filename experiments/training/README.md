@@ -30,6 +30,8 @@ uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks
   sum-interval-2 sum-interval-4 sum-interval-8 sum-interval-12 sum-random-half sum-squares
 uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-pow4 \
   sum-pow6 sum-pow8 sum-pow12 sum-pow24 sum-pow32       # then --steps 100000 for the last three
+uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --steps 100000 \
+  --tasks sum-interval                     # and sum-pow12 at --width 512, --lr 0.0025 and 0.01
 uv run --locked training sums --optimizer schedule-free-adamw --lr 0.01 --steps 100000 \
   --since 30000 --tasks sum-interval sum-pow12     # accuracy from step 30 000, errors by sum
 uv run --locked training kappa runs/kappa.json 47 97 199         # κ of every task
@@ -49,9 +51,10 @@ the rate when they are not 128, 1 and 10 000.
 | `schedule-free-adamw-lr0.001` | Schedule-Free AdamW | 1e-3 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below, the seven sets `[a + b ∈ A]` and six more powers of `a + b` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.03` | Schedule-Free AdamW | 0.03 | the 15 below | 7, 11 | 10 000 |
-| `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48`, `sum-pow12`, `sum-pow24`, `sum-pow32` | 7, 11 | 100 000 |
+| `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48`, `sum-pow12`, `sum-pow24`, `sum-pow32`, `sum-interval` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.0025-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.0025 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
+| `schedule-free-adamw-lr0.01-w512-s100000`, `schedule-free-adamw-lr0.0025-w512-s100000` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01, 0.0025 | `sum-pow12` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-d2`, `-d4`, `-d8` | Schedule-Free AdamW, 2, 4 and 8 blocks | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
 
 ## What they found
@@ -285,6 +288,31 @@ its completion is right; the frequency guess is that of the held-out half, as ab
   35.35% and 38.45%, and `(a + b)³²` between 31.03% and 32.45%, below its frequency guess. The
   prediction that the network learns what M recovers, given time, failed for `d = 12`; the
   prediction that it learns neither `d = 24` nor `d = 32` held.
+- Width 512 does not give 99% either (`WIDER`, predictions recorded before). At 0.0025,
+  `(a + b)¹²` is at 89.63% at step 30 000 for both seeds and still rising at step 100 000, where
+  both are at their best, 96.09%; at 0.01 it stays between 79.04% and 86.52% (seed 7) and between
+  81.19% and 87.67% (seed 11) from step 30 000 on. Both rates stay below width 128, with the vote
+  right on all 97 sums. By the criterion recorded before, `(a + b)¹²` does not fall short for lack
+  of width; at 0.0025 the runs are still rising, so 100 000 steps do not settle that rate.
+- The control, `sum-interval` at width 128 for 100 000 steps (`CONTROL`, recorded before), stays
+  between 96.43% and 97.13% (seed 7) and between 96.88% and 97.92% (seed 11) from step 30 000 on,
+  never at 98%. Its best checks, 97.13% and 97.92%, lie below those of `(a + b)¹²`, 98.02% and
+  98.55%, but the ranges overlap, and at the last check seed 11 of the interval, at 97.15%, lies
+  above seed 7 of `(a + b)¹²`, at 97.05%. The interval does not stay below the plateau of
+  `(a + b)¹²`, so that plateau does not separate what M recovers from what it does not.
+- Where the errors lie does separate them (`training sums`; a criterion found after these runs).
+  At step 100 000 the interval has 167 and 134 wrong held-out cells, 59% and 67% of them on the
+  four sums 47, 48, 96 and 0 at the two ends of `{0, …, 47}`, and its vote is wrong on 47, 48 and
+  96 (seed 7) and on 48 and 96 (seed 11). M, filling the interval read as 0 and 1 from the same
+  training cells (`recovery interval 97`), errs on 163 and 150 hidden cells, 62% and 68% of them
+  on the same four sums; that M cannot recover this table from these cells is proved by hand in
+  `experiments/recovery`. `(a + b)¹²`, which M recovers, has 139 and 116 wrong cells spread over
+  77 and 74 sums, at most 4 and 6 on one sum; at width 512, 184 on 90 and 87 sums at 0.0025, and
+  682 and 623 on 97 and 96 sums at 0.01. A heuristic reading: on the interval the network has
+  reached the optimum of weight decay, M's table, which is wrong at the ends; on `(a + b)¹²` that
+  optimum is right everywhere and the network has not reached it. From step 10 000 to 100 000 the
+  interval's accuracy even falls to about M's, from 96.98% to 96.45% and from 97.47% to 97.15%,
+  against M's 96.54% and 96.81%.
 - On these ten powers the network reaches 99% exactly when `d ≤ 8`, in 10 000 steps, and not for
   `d = 12` in 100 000; M recovers the table exactly when `d ≤ 12` (numerical). Here M's recovery
   is needed, but not enough. A heuristic reading: the least rank of a readout counts the waves a
