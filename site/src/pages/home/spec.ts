@@ -48,6 +48,7 @@ export const FULL_LEAN = {
   rank: 'svd_hypotheses, isMinOn_iff_of_certificate, reachable_of_forall_isMinOn',
   minimum: 'isMinOn_iff_exists_isContraction, isContraction_trace_eq_iff, isMinOn_iff_exists_certificate, isMinOn_iff_of_full_rank',
   threeCells: 'forall_isMinOn_threeCells_iff, forall_isMinOn_threeCells_iff_of_det_ne_zero, forall_isMinOn_threeCells_iff_det_eq_zero, exists_ne_zero_threeCells_of_det_ne_zero',
+  growth: 'exists_pos_le_nuclearNorm_add_iff, isMinOn_iff_of_exists_pos_le_nuclearNorm_add, not_exists_pos_le_nuclearNorm_add_of_full_column_rank, not_exists_pos_le_nuclearNorm_add_of_full_row_rank, nuclearNorm_add_smul_single_threeCells, not_exists_pos_le_nuclearNorm_add_threeCells, card_mul_add_le_ncard_of_tangent, card_mul_add_le_ncard_of_exists_pos_le_nuclearNorm_add',
   margin: 'exists_norm_eq_one_of_vecMulVec, nuclearNorm_vecMulVec_of_norm_eq_one, sqrt_sq_sub_one_lt, exists_nuclearNorm_le_sqrt_vecMulVec_of_not_perm, failureMargin_vecMulVec, failureMargin_odd_vecMulVec, failureMargin_four_vecMulVec',
   weil: 'norm_sum_addChar_eval_le, norm_le_sqrt_of_mem_roots',
   oneHot: 'eq_zero_of_isMinOn_classKernel_cube_add_mul',

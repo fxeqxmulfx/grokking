@@ -72,10 +72,10 @@ const full = [
   ${eq(`x = n(${sub('E', 'a')} + J ${sub('E', 'b')}), &nbsp; x ← x + n(SwiGLU(n(x))), &nbsp; logits = n(x) E<sup>T</sup>,`)}
   avec ${m('SwiGLU(x)')} ${m(`= (SiLU(x ${sub('W', 'g')}) ⊙ x ${sub('W', 'v')}) ${sub('W', 'o')}`)}, 341 unités cachées, un seul
   bloc et aucun biais. La perte est l’entropie croisée de la réponse ; l’optimiseur est Schedule-Free AdamW, avec la
-  pénalité sur tous les poids. Les chiffres d’entraînement cités ici ont été mesurés avec AdamW : taux d’apprentissage
-  ${m('10<sup>−3</sup>')} après un échauffement linéaire de 10 pas, bêtas 0,9 et 0,98, pénalité 1, lots de 512, au plus
-  10 000 pas. La note source rapporte le même échec sur ${m('a³ + ab')} avec les deux optimiseurs, et aucun théorème ici
-  ne dépend de l’optimiseur.</li>
+  pénalité sur tous les poids. Les chiffres d’entraînement cités ici ont été mesurés avec AdamW, au taux d’apprentissage
+  ${m('10<sup>−3</sup>')} après un échauffement linéaire de 10 pas, et avec Schedule-Free AdamW aux taux
+  ${m('10<sup>−3</sup>')}, 0,01 et 0,03, avec lui aussi un échauffement de 10 pas ; tous deux avec bêtas 0,9 et 0,98,
+  pénalité 1, lots de 512 et 10 000 pas. Aucun théorème ici ne dépend de l’optimiseur.</li>
   <li><strong>Le modèle M.</strong> Une couche bilinéaire calcule ${m('X = U V<sup>ᴴ</sup>')} : la ligne ${m('a')} de la
   table porte la ligne ${m(sub('U', 'a'))} de ${m('U')}, la colonne ${m('b')} la ligne ${m(sub('V', 'b'))} de ${m('V')},
   et ${m(`${sub('X', 'ab')} = ⟨${sub('U', 'a')}, ${sub('V', 'b')}⟩`)}. La pénalité sur les poids coûte
@@ -157,6 +157,17 @@ const full = [
   n’est pas non plus nécessaire : quand ${m(`${det} K ≠ 0`)}, une matrice non nulle
   ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} est nulle sur ces trois cases, et pourtant la première des deux tables est
   retrouvée ${lean('trois cases')}.</p>${leanNames(FULL_LEAN.threeCells)}
+  <p>La condition suffisante ci-dessus a un sens propre. Supposons la diagonale de ${m('S')} positive. La condition vaut
+  exactement quand la norme nucléaire croît linéairement autour de ${m('K')} : il existe ${m('c > 0')} tel que
+  ${m(`‖K + H‖${S1} ≥ ‖K‖${S1} + c ‖H‖${S1}`)} pour toute ${m('H')} nulle sur ${m('Ω')}. La croissance linéaire fait de
+  ${m('K')} le seul minimum. Quand ${m('U')} ou ${m('V')} est carrée, comme pour ${m('K')} inversible, et qu’une case
+  est cachée, la croissance n’est jamais linéaire : la condition ne vaut donc jamais, bien que M puisse encore
+  retrouver ${m('K')}. La table de lignes ${m('(2, 1)')} et ${m('(1, 1)')} est retrouvée à partir de ses trois cases,
+  et pourtant ${m(`‖K + h E‖${S1} = √(9 + h²)`)} pour ${m('h ≤ 1')} réel, où ${m('E')} est la matrice dont le seul
+  coefficient non nul est un 1 en la case cachée ${m('(0, 1)')}, et aucun ${m('c > 0')} ne rend sa croissance
+  linéaire. La croissance linéaire demande au moins ${m('r (m + n − r)')} cases pour une table ${m('m × n')} de rang
+  ${m('r')} ; la reconstruction non : cette table de rang 2 est retrouvée à partir de 3 cases, moins que
+  ${m('2 (2 + 2 − 2) = 4')} ${lean('croissance linéaire')}.</p>${leanNames(FULL_LEAN.growth)}
   <p>Puis les tables plates.</p>
   ${box(`<p><strong>Théorème A</strong> ${lean('A')}. Soit ${m('K')} inversible, de facteur polaire
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Alors ${m('K')} a la plus petite norme nucléaire parmi les matrices égales
@@ -215,34 +226,58 @@ const full = [
   nulle mais où la recherche ne trouve pas de ${m('W')}, et sur chacun d’eux il trouve une norme nucléaire plus petite
   que celle de ${m('K')} ; et 117 des 1037 sur lesquels l’une d’elles est nulle, toutes des tables diagonales par blocs.
   Sur 5000 tables ${m('2 × 2')} aléatoires, son remplissage de ${m('(0, 1)')} à partir des trois autres cases est la
-  formule ci-dessus aux erreurs d’arrondi près ${numerical('ADMM', L)}.</li>
+  formule ci-dessus aux erreurs d’arrondi près. La variable duale ${m('Y')} d’ADMM, ramenée à une plus grande valeur
+  singulière d’au plus 1, est nulle hors de ${m('Ω')} ; aucune matrice égale à ${m('K')} sur ${m('Ω')} n’a donc de
+  norme nucléaire inférieure à la partie réelle de ${m('tr(Y<sup>ᴴ</sup>K)')}. Sur 590 des 3600 ensembles, cette borne
+  vaut au moins ${m(`(1 − 10<sup>−6</sup>) ‖K‖${S1}`)}, et ADMM en retrouve 585 ; sur les 3010 autres, ADMM trouve une
+  matrice égale à ${m('K')} sur ${m('Ω')} de norme nucléaire inférieure à ${m(`(1 − 10<sup>−6</sup>) ‖K‖${S1}`)}
+  ${numerical('ADMM', L)}.</li>
+  <li><strong>Les tables de rang plein en colonnes.</strong> Soit ${m('K = Q P')}, avec ${m('P')} définie positive et
+  ${m('Q')} à colonnes orthonormées et un seul coefficient non nul par ligne, de sorte que ${m('Q')} est le facteur
+  polaire ${m('U V<sup>ᴴ</sup>')}. De telles tables ont été tirées au hasard, 600 de chaque forme : inversibles
+  ${m('4 × 4')} et ${m('8 × 8')}, où ${m('Q')} est diagonale, et ${m('6 × 3')}, ${m('8 × 4')} et ${m('8 × 2')}. La
+  moitié reçoit un ensemble aléatoire de cases, l’autre moitié un ensemble aléatoire auquel s’ajoutent les cases non
+  nulles de ${m('Q')}. Sur ces 3000 ensembles, la même borne montre ${m('K')} minimum, à
+  ${m(`10<sup>−6</sup> ‖K‖${S1}`)} près, sur exactement les 1695 hors desquels ${m('U V<sup>ᴴ</sup>')} est nulle, comme
+  le dit le critère ci-dessus pour ${m('V')} carrée, et ADMM trouve une norme nucléaire plus petite sur les 1305
+  autres. ADMM en retrouve 1100 sur les 1695, tous sans croissance linéaire, puisque chaque ensemble cache une case
+  ${numerical('ADMM', L)}.</li>
   <li><strong>Le réseau.</strong> Le pic d’une tâche est la plus grande part de sa table que porte un mode d’interaction
   centré, pour une lecture de module 1 :
   ${eq('κ = max |Σ<sub>a,b</sub> ρ(f(a, b)) g(a) h(b)|² / p²')}
-  sur ${m('|ρ| = 1')} et les vecteurs unitaires ${m('g, h')} de somme nulle. Il est trouvé par maximisation alternée à
-  partir de 320 départs, chaque valeur est donc la meilleure trouvée. Sur 22 tâches à ${m('p = 97')}, il est compris entre
-  0,28 et 1 pour les sept tâches ci-dessous qui s’apprennent, et ne baisse pas quand ${m('p')} grandit ; pour les tâches
-  qui ne s’apprennent pas, il vaut au plus 0,106, près du 0,069 d’une table aléatoire, et décroît à peu près comme
-  ${m('1/p')} : 0,142, 0,106 et 0,057 pour ${m('a³ + ab')} à ${m('p = 47, 97, 199')}, sous le plafond de 0,213 du
-  théorème C à ${m('p = 97')}. Dix entraînements ont été prédits à partir de ${m('κ')} avant d’être lancés, et les dix ont
-  donné ce qui était prédit : ${m('a² + ab')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')} restent entre 1 et 2 % sur
-  la moitié non vue, comme les témoins ${m('a³ + ab')} et ${m('a² + ab + b²')}, tandis que ${m('ab')}, ${m('a²b')},
-  ${m('a + ab')}, ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')} atteignent 99 % en 1000 à 3000
-  pas, avec les deux graines ${numerical('entraînement', L)}.</li></ul></section>`,
+  sur ${m('|ρ| = 1')} et les vecteurs unitaires ${m('g, h')} de somme nulle. Il est trouvé par maximisation alternée à partir de 456 départs à ${m('p = 97')}, 356 à ${m('p = 47')} et 660 à
+  ${m('p = 199')}, chaque valeur est donc la meilleure trouvée. Des treize tâches entraînées ci-dessous, les sept qui
+  s’apprennent ont ${m('κ')} entre 0,275 et 1, à ${m('p = 97')} comme à ${m('p = 199')} ; des six qui ne s’apprennent
+  pas, les cinq autres que la tâche de parité ci-dessous ont ${m('κ')} au plus 0,106 à ${m('p = 97')}, près du 0,069
+  d’une table aléatoire, et au plus 0,059 à ${m('p = 199')} : 0,142, 0,106 et 0,059 pour ${m('a³ + ab')} à
+  ${m('p = 47, 97, 199')}, sous le plafond de 0,213 du théorème C à ${m('p = 97')}. Pour dix d’entre elles, l’issue a
+  été prédite à partir de ${m('κ')} avant leur premier entraînement, et les dix ont donné ce qui était prédit avec
+  AdamW au taux d’apprentissage ${m('10<sup>−3</sup>')} et les graines 7 et 11 ; la précision sur la moitié non vue
+  est mesurée tous les 500 pas. ${m('a² + ab')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')} finissent sous
+  2 %, comme les témoins ${m('a³ + ab')} et ${m('a² + ab + b²')}, et aucune ne dépasse 2,3 % ; ${m('ab')},
+  ${m('a²b')}, ${m('a + ab')}, ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')} atteignent
+  99 % en 1000 à 3000 pas, bien que ${m('(a + b)³')} finisse à 97,68 % avec la graine 7. Schedule-Free AdamW,
+  l’optimiseur du cours, sépare les douze de même aux taux ${m('10<sup>−3</sup>')}, 0,01 et 0,03 : les cinq
+  finissent sous 2,2 % et aucune ne dépasse 2,3 %, et les sept atteignent 99 % en 500 à 9500 pas, sauf
+  ${m('(a + b)³')} avec la graine 11 à ${m('10<sup>−3</sup>')}, qui finit à 97,70 %
+  ${numerical('entraînement', L)}.</li></ul></section>`,
 
   `<section id="unproved"><h3>Ce qui n’est pas démontré</h3><ul>
   <li><strong>Que l’entraînement atteigne l’optimum de la pénalité sur les poids.</strong> C’est la seule étape entre les
   théorèmes sur M et le réseau ${heuristic('entraînement ≈ M', L)}.</li>
   <li><strong>Qu’un mode fort suffise au réseau.</strong> Ce n’est pas le cas, sous cette forme. Pour
   ${m('2⌊(a³ + ab)/2⌋ + (a + b <span class="op">mod</span> 2)')}, le pic ${m('κ = 0,98')} vient de la seule parité de la
-  réponse ; sans ce mode il vaut 0,094. Le réseau prédit la parité sur 79 à 80 % de la moitié non vue et la réponse
-  elle-même sur 2,3 à 2,7 %, à peu près les ${m('2/p')} du hasard sur le reste : il apprend ce que porte le pic et rien du
-  reste ${numerical('entraînement', L)}.</li>
+  réponse ; sans le bit le plus bas de la réponse, le meilleur pic trouvé vaut 0,087. À la fin, avec AdamW, le réseau
+  prédit la parité sur 78,68 à 79,60 % de la moitié non vue et la réponse elle-même sur 2,29 à 2,73 %, contre
+  ${m('2/p ≈ 2,06 %')} en devinant le reste à partir d’une parité juste : il apprend ce que porte le pic et presque
+  rien du reste. Schedule-Free AdamW donne 79,10 à 79,20 % et 2,01 à 2,26 % au taux ${m('10<sup>−3</sup>')}, et les
+  porte à 86,03–91,82 % et 3,27–6,78 % à 0,01 et 0,03, encore loin de la réponse ${numerical('entraînement', L)}.</li>
   <li><strong>Le rang au-dessus de 1.</strong> Pour les tables de rang ${m('r ≥ 2')}, savoir si ${m('K')} est un
   minimum est tranché ci-dessus, mais savoir s’il est le seul, c’est-à-dire s’il est retrouvé, n’a pas de critère comme
-  le théorème G : les conditions suffisante et nécessaire ci-dessus laissent un écart, comblé seulement pour les trois
-  cases d’une table ${m('2 × 2')} et, par le théorème 1, pour les tables plates sans coefficient nul
-  ${open('rang r', L)}.</li>
+  le théorème G. Reste ouvert le cas d’un minimum ${m('K')} qui satisfait la condition nécessaire ci-dessus sans
+  croissance linéaire, c’est-à-dire sans la condition suffisante ; toute table inversible avec une case cachée en est
+  privée. Ce cas n’est tranché que pour les trois cases d’une table ${m('2 × 2')} et, par le théorème 1, pour les
+  tables plates sans coefficient nul ${open('rang r', L)}.</li>
   <li><strong>Les tâches hors de la famille.</strong> Pour ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et
   ${m('a³ + ab² + b')}, le pic n’est petit que numériquement ; aucun plafond comme celui du théorème C n’est démontré
   ${open('plafond de κ', L)}. Le rang effectif ${m(`(‖K‖${S1}/‖K‖<sub>S2</sub>)²`)}, où ${m('‖K‖<sub>S2</sub>')} est la
@@ -322,12 +357,14 @@ export const fr: HomeText = {
       le réseau est entraîné, avec les graines 7 et 11, remplissent les conditions sous lesquelles la pénalité sur les poids
       à son optimum retrouve ${m('[ψ(a + b)]')}, ${m('[χ(ab)]')} et ${m('[χ(a + ab)]')} : celles du théorème 2, et de ses
       formes à coefficients nuls ci-dessous ${numerical('conditions', L)}.`},
-    network: {title: 'Le réseau', body: `Pour ${m('p = 97')}, le réseau du cours, entraîné avec AdamW sur une telle moitié,
-      atteint au moins 99 % de réponses justes sur l’autre moitié pour ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
-      ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')}, et reste entre 1 et 2 % pour
-      ${m('a³ + ab')}, ${m('a² + ab')}, ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')}, avec les
-      deux graines ${numerical('entraînement', L)}. Que l’entraînement atteigne l’optimum de la pénalité sur les poids
-      n’est pas démontré ${heuristic('entraînement ≈ M', L)}.`},
+    network: {title: 'Le réseau', body: `Pour ${m('p = 97')}, le réseau du cours, entraîné sur une telle moitié avec
+      AdamW au taux d’apprentissage ${m('10<sup>−3</sup>')} ou avec Schedule-Free AdamW aux taux ${m('10<sup>−3</sup>')},
+      0,01 et 0,03, atteint 99 % de réponses justes sur l’autre moitié pour ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
+      ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} et ${m('(a + b)³')}, avec les deux graines, sauf
+      ${m('(a + b)³')} avec une graine sous Schedule-Free AdamW à ${m('10<sup>−3</sup>')} ; pour ${m('a³ + ab')},
+      ${m('a² + ab')}, ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et ${m('a³ + ab² + b')}, il finit sous 2,2 % et
+      vaut au plus 2,3 % à chaque mesure, tous les 500 pas ${numerical('entraînement', L)}. Que l’entraînement atteigne
+      l’optimum de la pénalité sur les poids n’est pas démontré ${heuristic('entraînement ≈ M', L)}.`},
   },
   fullTitle: 'L’énoncé complet',
   full,

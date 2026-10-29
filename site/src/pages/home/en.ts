@@ -67,9 +67,10 @@ const full = [
   ${eq(`x = n(${sub('E', 'a')} + J ${sub('E', 'b')}), &nbsp; x ← x + n(SwiGLU(n(x))), &nbsp; logits = n(x) E<sup>T</sup>,`)}
   with ${m('SwiGLU(x)')} ${m(`= (SiLU(x ${sub('W', 'g')}) ⊙ x ${sub('W', 'v')}) ${sub('W', 'o')}`)}, 341 hidden units, one block
   and no biases. The loss is the cross-entropy of the answer; the optimizer is Schedule-Free AdamW, with weight decay on
-  every weight. The training numbers quoted here were measured with AdamW: learning rate ${m('10<sup>−3</sup>')} after a
-  linear warmup of 10 steps, betas 0.9 and 0.98, weight decay 1, batch 512, at most 10 000 steps. The source note reports
-  the same failure on ${m('a³ + ab')} under both optimizers, and no theorem here depends on the optimizer.</li>
+  every weight. The training numbers quoted here were measured with AdamW, learning rate ${m('10<sup>−3</sup>')} after a
+  linear warmup of 10 steps, and with Schedule-Free AdamW at learning rates ${m('10<sup>−3</sup>')}, 0.01 and 0.03, also
+  with a warmup of 10 steps; both with betas 0.9 and 0.98, weight decay 1, batch 512 and 10 000 steps. No theorem here
+  depends on the optimizer.</li>
   <li><strong>The model M.</strong> A bilinear layer computes ${m('X = U V<sup>ᴴ</sup>')}: row ${m('a')} of the table
   carries the row ${m(sub('U', 'a'))} of ${m('U')}, column ${m('b')} the row ${m(sub('V', 'b'))} of ${m('V')}, and
   ${m(`${sub('X', 'ab')} = ⟨${sub('U', 'a')}, ${sub('V', 'b')}⟩`)}. Weight decay charges ${m('½(‖U‖² + ‖V‖²)')}, and the
@@ -144,6 +145,16 @@ const full = [
   the moduli alone decides, as Theorem G does at rank 1. Nor is the sufficient condition necessary: when
   ${m(`${det} K ≠ 0`)}, a nonzero ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} vanishes on these three cells, yet the first
   of the two tables is recovered ${lean('three cells')}.</p>${leanNames(FULL_LEAN.threeCells)}
+  <p>The sufficient condition above has a meaning of its own. Let the diagonal of ${m('S')} be positive. The condition
+  holds exactly when the nuclear norm grows linearly away from ${m('K')}: some ${m('c > 0')} has
+  ${m(`‖K + H‖${S1} ≥ ‖K‖${S1} + c ‖H‖${S1}`)} for every ${m('H')} that vanishes on ${m('Ω')}. Linear growth makes
+  ${m('K')} the only minimum. When ${m('U')} or ${m('V')} is square, as for an invertible ${m('K')}, and a cell is
+  hidden, the growth is never linear, so the condition never holds, though M may still recover ${m('K')}. The table
+  with rows ${m('(2, 1)')} and ${m('(1, 1)')} is recovered from its three cells, yet
+  ${m(`‖K + h E‖${S1} = √(9 + h²)`)} for real ${m('h ≤ 1')}, where ${m('E')} is the matrix whose only nonzero entry
+  is a 1 at the hidden cell ${m('(0, 1)')}, and no ${m('c > 0')} makes its growth linear. Linear growth needs at least
+  ${m('r (m + n − r)')} cells for an ${m('m × n')} table of rank ${m('r')}; recovery does not: that table of rank 2 is
+  recovered from 3 cells, fewer than ${m('2 (2 + 2 − 2) = 4')} ${lean('linear growth')}.</p>${leanNames(FULL_LEAN.growth)}
   <p>Then flat tables.</p>
   ${box(`<p><strong>Theorem A</strong> ${lean('A')}. Let ${m('K')} be invertible, with polar factor
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Then ${m('K')} has the least nuclear norm among the matrices equal to
@@ -197,32 +208,55 @@ const full = [
   nonzero ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} vanishes but the search finds no ${m('W')}, and on each of these it
   finds a smaller nuclear norm than that of ${m('K')}; and 117 of the 1037 on which one vanishes, all of them
   block-diagonal tables. On 5000 random ${m('2 × 2')} tables, its fill of ${m('(0, 1)')} from the other three cells is
-  the formula above to rounding error ${numerical('ADMM', L)}.</li>
+  the formula above to rounding error. ADMM's dual variable ${m('Y')}, scaled to largest singular value at most 1,
+  vanishes off ${m('Ω')}, so no matrix equal to ${m('K')} on ${m('Ω')} has nuclear norm below the real part of
+  ${m('tr(Y<sup>ᴴ</sup>K)')}. On 590 of the 3600 sets this bound is at least
+  ${m(`(1 − 10<sup>−6</sup>) ‖K‖${S1}`)}, and ADMM recovers 585 of them; on the other 3010, ADMM finds a matrix equal
+  to ${m('K')} on ${m('Ω')} of nuclear norm below ${m(`(1 − 10<sup>−6</sup>) ‖K‖${S1}`)} ${numerical('ADMM', L)}.</li>
+  <li><strong>Tables of full column rank.</strong> Let ${m('K = Q P')}, with ${m('P')} positive definite and ${m('Q')}
+  of orthonormal columns with one nonzero entry in each row, so that ${m('Q')} is the polar factor
+  ${m('U V<sup>ᴴ</sup>')}. Such tables were drawn at random, 600 of each shape: invertible ${m('4 × 4')} and
+  ${m('8 × 8')}, where ${m('Q')} is diagonal, and ${m('6 × 3')}, ${m('8 × 4')} and ${m('8 × 2')}. Half get a random
+  set of cells, the other half a random set with the nonzero cells of ${m('Q')} added. On these 3000 sets the same
+  bound shows ${m('K')} a minimum, to within ${m(`10<sup>−6</sup> ‖K‖${S1}`)}, on exactly the 1695 off which
+  ${m('U V<sup>ᴴ</sup>')} vanishes, as the criterion above for a square ${m('V')} says, and ADMM finds a smaller
+  nuclear norm on the other 1305. ADMM recovers 1100 of the 1695, all without linear growth, since every set hides a
+  cell ${numerical('ADMM', L)}.</li>
   <li><strong>The network.</strong> The peak of a task is the largest share of its table that one centered interaction
   mode carries under a readout of modulus 1:
   ${eq('κ = max |Σ<sub>a,b</sub> ρ(f(a, b)) g(a) h(b)|² / p²')}
-  over ${m('|ρ| = 1')} and unit vectors ${m('g, h')} with sum zero. It is found by alternating maximization from 320
-  starts, so each value is the best one found. Over 22 tasks at ${m('p = 97')}, it lies between 0.28 and 1 for the seven
-  tasks below that learn, and does not fall as ${m('p')} grows; for the tasks that do not learn it is at most 0.106, near
-  the 0.069 of a random table, and falls roughly like ${m('1/p')}: 0.142, 0.106 and 0.057 for ${m('a³ + ab')} at
-  ${m('p = 47, 97, 199')}, under Theorem C's ceiling of 0.213 at ${m('p = 97')}. Ten trainings were predicted from
-  ${m('κ')} before they ran, and all ten came out as predicted: ${m('a² + ab')}, ${m('a² + ab + b² + a')} and
-  ${m('a³ + ab² + b')} stay at 1 to 2% on the unseen half, as do the controls ${m('a³ + ab')} and ${m('a² + ab + b²')},
-  while ${m('ab')}, ${m('a²b')}, ${m('a + ab')}, ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} and
-  ${m('(a + b)³')} reach 99% within 1000 to 3000 steps, with both seeds ${numerical('training', L)}.</li></ul></section>`,
+  over ${m('|ρ| = 1')} and unit vectors ${m('g, h')} with sum zero. It is found by alternating maximization from 456
+  starts at ${m('p = 97')}, 356 at ${m('p = 47')} and 660 at ${m('p = 199')}, so each value is the best one found. Of
+  the thirteen tasks trained below, the seven that learn have ${m('κ')} between 0.275 and 1, at ${m('p = 97')} and at
+  ${m('p = 199')} alike; of the six that do not, the five other than the parity task below have ${m('κ')} at most
+  0.106 at ${m('p = 97')}, near the 0.069 of a random table, and at most 0.059 at ${m('p = 199')}: 0.142, 0.106 and
+  0.059 for ${m('a³ + ab')} at ${m('p = 47, 97, 199')}, under Theorem C's ceiling of 0.213 at ${m('p = 97')}. For ten
+  of them the outcome was predicted from ${m('κ')} before they were first trained, and all ten came out as predicted
+  with AdamW at learning rate ${m('10<sup>−3</sup>')} and seeds 7 and 11; accuracy on the unseen half is measured every
+  500 steps. ${m('a² + ab')}, ${m('a² + ab + b² + a')} and ${m('a³ + ab² + b')} end below 2%, as do the controls
+  ${m('a³ + ab')} and ${m('a² + ab + b²')}, and none passes 2.3%; ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
+  ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} and ${m('(a + b)³')} reach 99% within 1000 to 3000 steps, though
+  ${m('(a + b)³')} ends at 97.68% with seed 7. Schedule-Free AdamW, the course's optimizer, splits the twelve alike at
+  learning rates ${m('10<sup>−3</sup>')}, 0.01 and 0.03: the five end below 2.2% and none passes 2.3%, and the seven
+  reach 99% within 500 to 9500 steps, but for ${m('(a + b)³')} with seed 11 at ${m('10<sup>−3</sup>')}, which ends at
+  97.70% ${numerical('training', L)}.</li></ul></section>`,
 
   `<section id="unproved"><h3>What is not proved</h3><ul>
   <li><strong>That training reaches the optimum of weight decay.</strong> It is the one step between the theorems about M
   and the network ${heuristic('training ≈ M', L)}.</li>
   <li><strong>That a strong mode suffices for the network.</strong> It does not, in this form. For
   ${m('2⌊(a³ + ab)/2⌋ + (a + b <span class="op">mod</span> 2)')} the peak ${m('κ = 0.98')} comes from the parity of the
-  answer alone; without that mode it is 0.094. The network predicts the parity on 79 to 80% of the unseen half and the
-  answer itself on 2.3 to 2.7%, about the ${m('2/p')} of guessing the rest: it learns what the peak carries and nothing of
-  the remainder ${numerical('training', L)}.</li>
+  answer alone; without the answer's lowest bit the best peak found is 0.087. At the end, with AdamW, the network
+  predicts the parity on 78.68 to 79.60% of the unseen half and the answer itself on 2.29 to 2.73%, against
+  ${m('2/p ≈ 2.06%')} for guessing the rest from a right parity: it learns what the peak carries and almost nothing of
+  the remainder. Schedule-Free AdamW gives 79.10 to 79.20% and 2.01 to 2.26% at learning rate ${m('10<sup>−3</sup>')},
+  and raises them to 86.03 to 91.82% and 3.27 to 6.78% at 0.01 and 0.03, still far from the answer
+  ${numerical('training', L)}.</li>
   <li><strong>Rank above 1.</strong> For tables of rank ${m('r ≥ 2')}, whether ${m('K')} is a minimum is decided
-  above, but whether it is the only one, which is recovery, has no criterion like Theorem G: the sufficient and the
-  necessary conditions above leave a gap, closed only for the three cells of a ${m('2 × 2')} table and, by Theorem 1,
-  for flat tables without zero entries ${open('rank r', L)}.</li>
+  above, but whether it is the only one, which is recovery, has no criterion like Theorem G. What remains open is a
+  minimum ${m('K')} that meets the necessary condition above but lacks linear growth, that is, the sufficient
+  condition; every invertible table with a hidden cell lacks it. This case is decided only for the three cells of a
+  ${m('2 × 2')} table and, by Theorem 1, for flat tables without zero entries ${open('rank r', L)}.</li>
   <li><strong>Tasks outside the family.</strong> For ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} and
   ${m('a³ + ab² + b')} the peak is small only numerically; no ceiling like Theorem C's is proved
   ${open('ceiling on κ', L)}. The effective rank ${m(`(‖K‖${S1}/‖K‖<sub>S2</sub>)²`)}, with ${m('‖K‖<sub>S2</sub>')}
@@ -295,11 +329,13 @@ export const en: HomeText = {
       trained, with seeds 7 and 11, meet the conditions under which weight decay at its optimum recovers
       ${m('[ψ(a + b)]')}, ${m('[χ(ab)]')} and ${m('[χ(a + ab)]')}: those of Theorem 2, and of its forms with zero
       entries below ${numerical('conditions', L)}.`},
-    network: {title: 'The network', body: `At ${m('p = 97')}, the network of the course, trained with AdamW on such a
-      half, reaches at least 99% accuracy on the other half for ${m('ab')}, ${m('a²b')}, ${m('a + ab')},
-      ${m('(a + b)²')}, ${m('π(a + b)')}, ${m('a³ + b')} and ${m('(a + b)³')}, and stays at 1 to 2% for
-      ${m('a³ + ab')}, ${m('a² + ab')}, ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} and ${m('a³ + ab² + b')}, with both
-      seeds ${numerical('training', L)}. That training reaches the optimum of weight decay is not proved
+    network: {title: 'The network', body: `At ${m('p = 97')}, the network of the course, trained on such a half with
+      AdamW at learning rate ${m('10<sup>−3</sup>')} or with Schedule-Free AdamW at ${m('10<sup>−3</sup>')}, 0.01 and
+      0.03, reaches 99% accuracy on the other half for ${m('ab')}, ${m('a²b')}, ${m('a + ab')}, ${m('(a + b)²')},
+      ${m('π(a + b)')}, ${m('a³ + b')} and ${m('(a + b)³')}, with both seeds, but for ${m('(a + b)³')} with one seed
+      under Schedule-Free AdamW at ${m('10<sup>−3</sup>')}; for ${m('a³ + ab')}, ${m('a² + ab')}, ${m('a² + ab + b²')},
+      ${m('a² + ab + b² + a')} and ${m('a³ + ab² + b')} it ends below 2.2% and is at most 2.3% at each check, every 500
+      steps ${numerical('training', L)}. That training reaches the optimum of weight decay is not proved
       ${heuristic('training ≈ M', L)}.`},
   },
   fullTitle: 'The statement in full',
