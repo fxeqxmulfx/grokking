@@ -1,11 +1,14 @@
 """The patterns of the large checks, against what the first checks printed (`matching.py`)."""
 
+import math
 import unittest
+
+import torch
 
 from recovery.application.additive import random_density, survey_patterns
 from recovery.domain.matchings import block_bound, elementary, leaves, max_matching
 from recovery.domain.patterns import cross, diagonals, rigid, without
-from recovery.domain.residues import discrete_log, primitive_root
+from recovery.domain.residues import discrete_log, period_readout, period_table, primitive_root, roots_of_unity
 from recovery.domain.splits import training_pattern
 from recovery.infrastructure.draws import TorchDraws
 
@@ -44,6 +47,19 @@ class Large(unittest.TestCase):
         self.assertEqual([primitive_root(p) for p in (31, 61, 97)], [3, 2, 5])
         log = discrete_log(31)
         self.assertEqual((log[0], log[1], log[3], sorted(k for k in log if k is not None)), (None, 0, 1, list(range(30))))
+
+    def test_periods(self) -> None:
+        for p, m in ((31, 3), (31, 5), (97, 2), (97, 12), (97, 16), (97, 48)):
+            d = math.gcd(m, p - 1)
+            readout = period_readout(p, m)
+            codes = list(readout.values())
+            self.assertEqual(len(roots_of_unity(p, m)), d)
+            self.assertEqual(len(codes), (p - 1) // d + 1)
+            self.assertAlmostEqual(readout[0], d)
+            # Distinct (0.0042 apart at p = 97, m = 2, the closest pair here), so the readout is injective.
+            self.assertGreater(min(abs(x - y) for i, x in enumerate(codes) for y in codes[i + 1:]), 1e-3)
+            table = torch.tensor(period_table(p, m), dtype=torch.complex128)
+            self.assertEqual(torch.linalg.matrix_rank(table).item(), d)
 
 
 if __name__ == "__main__":

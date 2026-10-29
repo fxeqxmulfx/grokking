@@ -37,6 +37,10 @@ On `p × p` tables at a prime `p`, with `ψ(x) = e^{2πix/p}`:
   whole table (`not_isMinOn_cubicKernel`).
 - `χ(ab)` and `χ(a + ab)`, for a faithful multiplicative character `χ` with `χ(0) = 0`, are
   rank one with a zero row and a zero column: Theorem G with moduli one on the supports.
+- `(a + b)^m` read through the Gaussian periods `ρ(c^m) = Σ_{ζ^m = 1} ψ(ζc)` has rank
+  `d = gcd(m, p − 1)`, the least rank of an injective readout of `(a + b)^m` (hand,
+  `period_readout` in `domain/residues.py`). For `d > 1` no theorem here says from which `Ω` M
+  recovers it.
 
 Above rank one (*Rank above one*, added to the review):
 
@@ -87,6 +91,7 @@ uv run --locked recovery survey 31 61 97             # ψ(a + b) from random and
 uv run --locked recovery long 31 20000 100000 300000
 uv run --locked recovery cubic 31 61 97              # ψ(a³ + ab) from the training halves
 uv run --locked recovery characters 31 61 97         # χ(ab) and χ(a + ab) from them
+uv run --locked recovery periods 97 2 3 4 6 8 12 16 24 32 48   # (a + b)^m from them
 uv run --locked recovery three-cells 20000           # rank above one: 2 × 2 from three cells
 uv run --locked recovery rank 20000                  # rank 2 and 3, 4 × 4 to 8 × 8, random cells
 uv run --locked recovery polar 20000                 # full column rank, random cells: item 5.4
@@ -117,6 +122,7 @@ a `4 × 4` table took 30 s on the CPU and 555 s on an RTX 3050.
 | `long` | `31 × 31` | the survey's rigid patterns with a permutation that are not elementary | `ψ(a + b)` | up to 300 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `cubic` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `ψ(a³ + ab)` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `characters` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `χ(ab)`, `χ(a + ab)`, `χ(g^k) = e^{2πik/(p − 1)}` for the least primitive root `g` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
+| `periods` | `97 × 97` | the training halves of seeds 7 and 11 | `ρ((a + b)^m)`, `ρ` the Gaussian periods, `m` = 2, 3, 4, 6, 8, 12, 16, 24, 32, 48 | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `three-cells` | 5000 of 2 × 2, 1000 of each kind, and the five tables of Lean's examples | the three cells other than `(0, 1)` | random; rank one, `u vᵀ`; rank two with `k₀₁ = x*`; moduli one; moduli one and rank one. Moduli uniform in [0.3, 2], random phases, seed 0 | 20 000 | `\|Z₀₁ − x*\|/‖K‖` |
 | `rank` | 300 of each `N × N`, `N` = 4, 6, 8, of each rank `r` = 2, 3 and each kind | each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept | dense: `A Bᵀ` with `N × r` factors; blocks: `r` diagonal blocks of nearly equal sizes, each `a bᵀ`, and 0 off them. Factor entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `polar` | 300 of each `m × n` = 4 × 4, 8 × 8, 6 × 3, 8 × 4, 8 × 2 and each kind of pattern | random: each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept; blocks: the same, with the cells of the blocks of `Q` added | `K = Q P`: `n` blocks of consecutive rows of nearly equal sizes (on a square table, the diagonal), column `j` of `Q` a unit vector of random entries on block `j` and 0 elsewhere, `P = Gᴴ G` with `G` an `n × n` matrix of random entries. Entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
@@ -359,6 +365,13 @@ and `‖Z‖_S1` from 0.5503 to 0.5565 times `p^{3/2} = ‖K‖_S1`.
 and come back with errors 1.52e-11 to 7.53e-11, `‖Z‖_S1 = p − 1 = ‖K‖_S1` to three decimals and
 every hidden cell decoded. On the zero row and column `Z` is 0 for `χ(ab)` and below
 `5·10⁻¹⁵` for `χ(a + ab)`, rounding errors that change with the number of threads.
+
+`periods 97 2 3 4 6 8 12 16 24 32 48`, 36 s: up to `d = gcd(m, 96) = 12` both training halves
+give the table back in 98 to 275 steps, with errors 3.59e-12 to 1.50e-11 and every hidden cell
+decoded. From `d = 16` on, both fail. `‖Z‖_S1 − ‖K‖_S1` is −0.449 and −0.755 for `d = 16` and
+−110 to −1052 above; the errors are 3.94e-2 and 5.11e-2 for `d = 16` and 0.517 to 1.05 above.
+The value of `ρ` nearest `Z` is the right one on 93.33% and 90.65% of the hidden cells for
+`d = 16`, and on 49.42% to 54.58% above.
 
 Rank above one, three cells (`three-cells 20000`). On every table the solver's `Z₀₁` is Lean's
 `x*` to within `2.67·10⁻¹⁵ ‖K‖`, and the solver recovers `K` exactly when `k₀₁ = x*`:

@@ -8,6 +8,7 @@ from recovery.application.sweeps import G_CLASSES, Table, equal_weights, slow_ti
 from recovery.application.weights import cross_check, slow_tight_weights, tight_tables, weighted_tables
 from recovery.application.additive import Filled, cubic_splits, diagonal_certificate, long_diagonals, long_runs, survey, theorem_d
 from recovery.application.characters import character_check
+from recovery.application.periods import period_check
 from recovery.application.margins import off_blocks, random_margins
 from recovery.application.ranks import RANK_CLASSES, STANDINGS, RankCase, polar_check, rank_check, three_cells
 from recovery.infrastructure.admm import TorchADMM
@@ -146,6 +147,10 @@ def main() -> None:
     chars = checks.add_parser("characters", help="Theorem G: chi(ab) and chi(a + ab) from the training splits")
     chars.add_argument("primes", type=int, nargs="+")
     chars.add_argument("--cap", type=int, default=20000)
+    periods = checks.add_parser("periods", help="(a + b)^m through Gaussian periods, from the training splits")
+    periods.add_argument("prime", type=int)
+    periods.add_argument("powers", type=int, nargs="+")
+    periods.add_argument("--cap", type=int, default=20000)
     margin = checks.add_parser("margin", help="the failure margin: J off a block, and random patterns without a permutation")
     margin.add_argument("steps", type=int)
     margin.add_argument("--sizes", type=int, nargs="+", default=[3, 4, 5, 6])
@@ -235,6 +240,10 @@ def main() -> None:
                     print(f"p = {p:3d} {c.table:11s} seed {c.seed:2d}: rigid on supports={int(c.rigid)}"
                           f" bijection={int(c.matched)} error={c.error:.2e} max|X| on zero lines={c.zero_lines:.1e}"
                           f" decoded={100 * c.decoded:.2f}% ||X||_S1={c.nuclear:.3f} steps={c.steps}", flush=True)
+        case "periods":
+            for f in period_check(solver, args.prime, args.powers, args.cap):
+                print(f"p = {args.prime} (a + b)^{f.m:<2d} rank {f.rank:2d} seed {f.seed:2d}: error={f.error:.2e}"
+                      f" decoded={100 * f.decoded:6.2f}% ||Z||_S1 - ||K||_S1={f.gap:+.3e} steps={f.steps}", flush=True)
         case "zeros":
             totals: dict[str, list[ClassSummary]] = {name: [] for name in G_CLASSES}
             for table in zero_tables(TorchDraws(args.seed), args.tight):
