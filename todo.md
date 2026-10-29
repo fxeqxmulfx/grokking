@@ -79,7 +79,11 @@ fast-forward and check `main`'s head before submitting.
       `a + b = N + 1`, `a ≤ b ≤ a + 1`. `58f6f140`, `5f4dee08`: all of it for every rank-one
       table with entries of modulus one. Numerically on 3 × 3 to 7 × 7 (`30dcce5`); on the
       site: `c867838`, `e677cdd`.
-- [ ] `‖Y − Q‖_op = cos(π/p)`, the last item of *Not formalized* in `review/flat_spectrum.md`.
+- [x] **The sharp certificate.** `89bd0c70`: `‖(P_σ + P_τ)/2 − J/N‖_op = cos(π/N)` for every
+      pair with `τ σ⁻¹` one `N`-cycle and `N ≥ 2`, reached at a character read along the
+      cycle; `c (Y − Q)` is a contraction exactly when `|c| cos(π/N) ≤ 1`, so Theorem D's
+      item 1 holds with `c = 1/cos(π/N)` for `N ≥ 3`, and no larger `c` works for this `Y`
+      (review item D.11). No page quotes Theorem D's constant, so the site is unchanged.
 
 ## Site
 
@@ -115,7 +119,34 @@ fast-forward and check `main`'s head before submitting.
 
 ## Open, for the next cycles
 
-- Rank above one: when does M recover a table of rank `r`? Theorem G is `r = 1`.
+- Rank above one: when does M recover a table of rank `r`? Theorem G is `r = 1`. Plan
+  (2026-10-29): no criterion in Ω, supports and moduli alone exists for `r ≥ 2` — already
+  `2 × 2` from the three cells off `(0, 1)`: `[[2, 1], [1, 1]]` is recovered, `[[2, 1],
+  [1, −1]]`, with the same moduli, is not. Prove in Lean: the sufficient condition for every
+  rank (Theorem D's certificate with `U Vᴴ` in place of `J/N`, and no nonzero `U Aᴴ + B Vᴴ`
+  vanishing on Ω); the necessary one (the cells of Ω inside the support of `K` connect the
+  row and the column of every nonzero entry); the exact `2 × 2` criterion
+  `k₀₁ = conj(k₁₀) det K / |det K|`. Then rank-2 tables numerically.
+- **Not unique, but correct?** (user, 2026-10-29: "ok, result not unique, but maybe also
+  correct?"). Three cases: `K` the only minimum; `K` one of several (one diagonal: every
+  `X ⪰ 0` with unit diagonal after the transfer to `J`, so `K`, `Z` and the segment between
+  them, which decodes right off `Z`, but also minima with wrong signs); `K` no minimum (the
+  cross; `2 × 2` of rank 2 with moduli one from three cells, where M always fills the cell
+  as if the rank were one). The network is scored by its argmax, so the notion for learning
+  is "every minimum of M decodes to `f` on the hidden cells". State it, prove it where it
+  differs from uniqueness, and measure it.
+- **Minimum data** (user, 2026-10-29: "what minimum data we need, experiments show sometimes
+  20% random pairs enough"). For M and a rank-one table, `2p − 1` designed cells suffice and
+  are needed (*The fewest cells*); random cells recover it exactly when they connect the rows
+  with the columns and contain a permutation, which for random cells happens near the
+  fraction `log p / p` (Erdős–Rényi; about 5% at `p = 97`). Measure the network's threshold:
+  train fractions 5% to 50%, both seeds, add and mul, with the criterion computed on the same
+  splits. The gap between M and the network is the training step.
+- **Several variables, an angle per variable** (user, 2026-10-29: "what if we also test
+  multivariables? also use rotate, not only 90, every var take you own angle, as rope").
+  Tasks `f(x₁, …, x_k)` mod p for `k = 3` (`a + b + c`, `abc`, `ab + c`, …), with the input
+  `n(Σ_t R(θ_t) E[x_t])`: one angle `θ_t` per variable, and RoPE-style frequencies, the pair
+  `j` turned by `t ω_j`. In `experiments/training`.
 - Real readouts `cos/sin(2πrf/p)`: the least-norm fill is right except one cell; numerical
   only.
 - The readout-free version: the least `r_eff(φ∘f)` over readouts φ. The peak κ separates
