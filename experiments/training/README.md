@@ -2,7 +2,8 @@
 
 Does the course's network learn `f(a, b) mod 97` from half of its table, and does the peak `κ`
 of the table say beforehand which tasks it learns? Does it learn every function `g(a + b)`, as
-it learns `π(a + b)` for a permutation `π`, and if not, does the spectrum of `g` decide which?
+it learns `π(a + b)` for a permutation `π`, and if not, does the spectrum of `g` decide which,
+or the least rank of a readout of its table?
 
 The network is the Rotate90 model of grok-simple.py (`~/rust_projects/grokking_abmod/scripts`),
 ported unchanged (`infrastructure/model.py`): one table `E` embeds `a` and `b` and reads out
@@ -27,6 +28,8 @@ uv run --locked training train --tasks sum-pow16 sum-pow48 --optimizer schedule-
   --lr 0.01 --depth 2                       # also --depth 4, 8; --width 512; --steps 100000
 uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-interval \
   sum-interval-2 sum-interval-4 sum-interval-8 sum-interval-12 sum-random-half sum-squares
+uv run --locked training train --optimizer schedule-free-adamw --lr 0.01 --tasks sum-pow4 \
+  sum-pow6 sum-pow8 sum-pow12 sum-pow24 sum-pow32
 uv run --locked training kappa runs/kappa.json 47 97 199         # κ of every task
 uv run --locked python -m unittest discover -s tests
 ```
@@ -42,7 +45,7 @@ the rate when they are not 128, 1 and 10 000.
 | --- | --- | --- | --- | --- | --- |
 | `adamw-lr0.001` | AdamW with a linear warmup of 10 steps, as grok-simple.py | 1e-3 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.001` | Schedule-Free AdamW | 1e-3 | the 15 below | 7, 11 | 10 000 |
-| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below and the seven sets `[a + b ∈ A]` | 7, 11 | 10 000 |
+| `schedule-free-adamw-lr0.01` | Schedule-Free AdamW | 0.01 | the 15 below, the seven sets `[a + b ∈ A]` and six more powers of `a + b` | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.03` | Schedule-Free AdamW | 0.03 | the 15 below | 7, 11 | 10 000 |
 | `schedule-free-adamw-lr0.01-s100000` | Schedule-Free AdamW | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 100 000 |
 | `schedule-free-adamw-lr0.01-w512` | Schedule-Free AdamW, width 512 (1365 hidden units) | 0.01 | `sum-pow16`, `sum-pow48` | 7, 11 | 10 000 |
@@ -96,7 +99,8 @@ and 11; `—` means never in 10 000 steps:
   bijection, and 0.2756 at `p = 97`, 0.2755 at `p = 199`. `runs/kappa.json` holds `κ` at
   `p` = 47, 97 and 199 for the 23 tasks of `domain/tasks.py` other than the two powers and the
   seven sets `[a + b ∈ A]`, and for `abs-diff` and `parity-cubic` with the answer's lowest bit
-  dropped; at 47 and 97 for the two powers; at 97 for the seven sets.
+  dropped; at 47 and 97 for the two powers; at 97 for the seven sets and the six powers of the last
+  section.
 
 ## Two powers of `a + b`
 
@@ -222,3 +226,57 @@ whose held-out cells have the right answer as their unique most common predictio
 - `R` and `Q` are not learned. `R` ends at 53.33% and 53.56%, 3.30 and 3.56 points above the
   frequency guess, with the vote right on 59 and 53 sums; `Q` at 44.21% and 46.16%, below it, as
   `(a + b)⁴⁸` above, which is 1 on the same set.
+
+## Powers of `a + b` by rank
+
+At `p = 97`, read through the Gaussian periods `ρ(c^m) = Σ_{ζ^m = 1} ω^{ζc}`, the table of
+`(a + b)^m` is `Σ_ζ ω^{ζa} ω^{ζb}`, of rank `d = gcd(m, 96)`. `ρ` is injective, and no injective
+readout gives `(a + b)^m` a smaller rank (hand; `period_readout` in `experiments/recovery`).
+Model M fills a table from its training cells with the matrix of least nuclear norm. From the
+training cells of seeds 7 and 11 it gives this table back exactly up to `d = 12` and fails from
+`d = 16` on (`recovery periods`, numerical). M is what weight decay reaches at its optimum on a
+pure factorization `U Vᴴ`: some fit of least weight decay exists and every one multiplies to `K`
+exactly when M recovers `K` (lean, `forall_isMinOn_iff_iff_isOptimalFit` in the transformer
+repository). The network is no such factorization, so reading it through M is a heuristic.
+
+Two predictions for six more powers, recorded before they ran (`RECOVERY` in `application/runs.py`),
+disagree. Their `κ`, from 0.1640 to 0.0221 by the formula of the powers section (the solver finds
+the same, with 425 to 455 of its 456 starts within `10⁻³` of the best), lies below 0.2756, the least
+`κ` of a task that had reached 99%, so `κ` predicts that none reaches 99%. "The network learns what
+M recovers" predicts 99% for `d` = 4, 6, 8 and 12.
+
+Schedule-Free AdamW at 0.01, width 128, 10 000 steps, seeds 7 and 11, with the four powers that ran
+before. Where M fails, its column gives the share of hidden cells on which the value of `ρ` nearest
+its completion is right; the frequency guess is that of the held-out half, as above:
+
+| task | `d` | `κ`, p = 97 | M | 99% at step | validation accuracy | frequency guess |
+| --- | --- | --- | --- | --- | --- | --- |
+| sum-square | 2 | 0.4053 | recovers | 500, 500 | 100%, 100% | 2.06% |
+| sum-cube | 3 | 0.2756 | recovers | 1000, 1000 | 99.94%, 99.96% | 3.08% |
+| sum-pow4 | 4 | 0.1640 | recovers | 1000, 1000 | 99.87%, 99.89% | 4.10% to 4.11% |
+| sum-pow6 | 6 | 0.1205 | recovers | 2000, 2500 | 99.11%, 99.66% | 6.14% to 6.15% |
+| sum-pow8 | 8 | 0.0880 | recovers | 8500, 7000 | 99.11%, 99.32% | 8.19% to 8.20% |
+| sum-pow12 | 12 | 0.0616 | recovers | —, — | 96.66%, 97.58% | 12.27% |
+| sum-pow16 | 16 | 0.0427 | 93.33%, 90.65% | —, — | 79.89%, 73.20% | 16.36% |
+| sum-pow24 | 24 | 0.0241 | 52.03%, 50.82% | —, — | 32.43%, 32.07% | 24.53% |
+| sum-pow32 | 32 | 0.0221 | 49.42%, 51.20% | —, — | 31.07%, 30.31% | 32.70% to 32.71% |
+| sum-pow48 | 48 | 0.0125 | 52.79%, 54.58% | —, — | 44.12%, 44.31% | 49.03% to 49.06% |
+
+- `κ`'s prediction failed (numerical): `sum-pow4`, `sum-pow6` and `sum-pow8` reach 99% with `κ` =
+  0.1640, 0.1205 and 0.0880. No threshold on `κ` separates the tasks that reach 99% from the others:
+  `sum-pow8` does, while `cubic-product` (`κ = 0.1059`), `quadratic` and `quadratic-linear` (0.0979)
+  end near chance, and `I₄` (0.2667), `I₂` (0.3374), `I` (0.4053) and `parity-cubic` (0.9823) below
+  99%. Within the powers `κ` falls as `d` grows, so there the two order the tasks alike.
+- M's prediction held for `d` = 4, 6 and 8, and failed for `d = 12` at 10 000 steps: 96.66% and
+  97.58%, each run at its best at its last check.
+- The higher the rank, the later 99% comes: at step 500 for `d = 2`, as for the five tasks of the
+  first table of rank one under an injective readout, at 1000 for 3 and 4, at 2000 and 2500 for 6,
+  at 8500 and 7000 for 8. Every run ends with 98.43% to 100% training accuracy.
+- Where M fails, the network does too, and ends below M's share of right hidden cells. For `d ≤ 16`
+  the vote along each sum is right on all 97 sums. With `d = 24` it is right on 49 and 54 sums, and
+  the accuracy, 32.43% and 32.07%, is 7.90 and 7.54 points above the frequency guess; with `d = 32`
+  on 17 and 20, and 31.07% and 30.31% lie below it, as for `(a + b)⁴⁸`.
+- On these ten powers the network thus reaches 99% in 10 000 steps exactly when `d ≤ 8`, and M
+  recovers the table exactly when `d ≤ 12` (numerical). A heuristic reading: the least rank of a
+  readout counts the waves a fit needs, weight decay makes each wave cost, and M marks the rank
+  above which half of the table no longer pins the fit down.
