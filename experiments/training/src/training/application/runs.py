@@ -35,6 +35,15 @@ RECOVERY = ("sum-pow4", "sum-pow6", "sum-pow8", "sum-pow12", "sum-pow24", "sum-p
 #: 97.58%, still rising. If what M recovers the network learns, given time, sum-pow12 reaches 99%;
 #: sum-pow24 and sum-pow32, which M does not recover, do not, as sum-pow16 did not.
 LONGER = ("sum-pow12", "sum-pow24", "sum-pow32")
+#: sum-pow12 at width 512 for 100 000 steps, at 0.0025 = 0.01 · 128/512 and at 0.01, recorded
+#: before they ran (2026-10-29). At width 128 it stays between 97.02% and 98.55% from step 30 000
+#: on. If the network falls short for lack of width, width 512 reaches 99%; if not, it stays below.
+#: sum-interval at width 128 for 100 000 steps is the control: every injective readout of it has
+#: rank at least 96, M recovers none of the three tried, and at 10 000 steps it ends level with
+#: sum-pow12, at 96.98% and 97.47%. If it stays below the plateau of sum-pow12, that plateau
+#: separates what M recovers from what it does not.
+WIDER = ("sum-pow12",)
+CONTROL = ("sum-interval",)
 COURSE = PREDICTED_LEARN + PREDICTED_FAIL + CONTROLS + CONVERSE + DISAGREE
 
 
