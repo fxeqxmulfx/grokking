@@ -54,6 +54,17 @@ Above rank one (*Rank above one*, added to the review):
   `k₀₁ = conj(k₁₀) det K / |det K|`, and a nonzero `U Aᴴ + B Vᴴ` vanishes on the three cells
   (`exists_ne_zero_threeCells_of_det_ne_zero`); yet `[[2, 1], [1, 1]]` is recovered, so the
   certificate's second condition is not necessary.
+- **The minimum** (`isMinOn_iff_exists_isContraction`, `isContraction_trace_eq_iff`,
+  `isMinOn_iff_exists_certificate`, `isMinOn_iff_of_full_rank`): `K` is a minimum of M, not
+  necessarily the only one, exactly when some contraction `Y` (`‖Y‖_op ≤ 1`) that vanishes off
+  `Ω` has `tr(Yᴴ K) = ‖K‖_S1`. For `K = U diag(s) Vᴴ` with `s > 0` these `Y` are the matrices
+  `U Vᴴ + W` with `Uᴴ W = 0`, `W V = 0` and `‖W‖_op ≤ 1`; when `V` is square, `W = 0`, and `K`
+  is a minimum exactly when `U Vᴴ` vanishes off `Ω`.
+- **Linear growth** (`exists_pos_le_nuclearNorm_add_iff`,
+  `isMinOn_iff_of_exists_pos_le_nuclearNorm_add`,
+  `not_exists_pos_le_nuclearNorm_add_of_full_column_rank`): the certificate's hypotheses hold
+  exactly when some `c > 0` has `‖K‖_S1 + c ‖H‖_S1 ≤ ‖K + H‖_S1` for every `H` that vanishes
+  on `Ω`, and then M recovers `K`. When `V` is square this fails as soon as `Ω` misses a cell.
 
 These checks solve M by ADMM and compare. The small tables run every pattern at once, sorted
 into the classes a theorem names; the prime tables run diagonals, the cross, random cells and
@@ -78,6 +89,7 @@ uv run --locked recovery cubic 31 61 97              # ψ(a³ + ab) from the tra
 uv run --locked recovery characters 31 61 97         # χ(ab) and χ(a + ab) from them
 uv run --locked recovery three-cells 20000           # rank above one: 2 × 2 from three cells
 uv run --locked recovery rank 20000                  # rank 2 and 3, 4 × 4 to 8 × 8, random cells
+uv run --locked recovery polar 20000                 # full column rank, random cells: item 5.4
 uv run --locked python -m unittest discover -s tests
 ```
 
@@ -107,6 +119,7 @@ a `4 × 4` table took 30 s on the CPU and 555 s on an RTX 3050.
 | `characters` | `p × p`, p = 31, 61, 97 | the training halves of seeds 7 and 11 | `χ(ab)`, `χ(a + ab)`, `χ(g^k) = e^{2πik/(p − 1)}` for the least primitive root `g` | at most 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 | `three-cells` | 5000 of 2 × 2, 1000 of each kind, and the five tables of Lean's examples | the three cells other than `(0, 1)` | random; rank one, `u vᵀ`; rank two with `k₀₁ = x*`; moduli one; moduli one and rank one. Moduli uniform in [0.3, 2], random phases, seed 0 | 20 000 | `\|Z₀₁ − x*\|/‖K‖` |
 | `rank` | 300 of each `N × N`, `N` = 4, 6, 8, of each rank `r` = 2, 3 and each kind | each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept | dense: `A Bᵀ` with `N × r` factors; blocks: `r` diagonal blocks of nearly equal sizes, each `a bᵀ`, and 0 off them. Factor entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
+| `polar` | 300 of each `m × n` = 4 × 4, 8 × 8, 6 × 3, 8 × 4, 8 × 2 and each kind of pattern | random: each cell kept with one density uniform in [0.3, 0.95], drawn again when every cell is kept; blocks: the same, with the cells of the blocks of `Q` added | `K = Q P`: `n` blocks of consecutive rows of nearly equal sizes (on a square table, the diagonal), column `j` of `Q` a unit vector of random entries on block `j` and 0 elsewhere, `P = Gᴴ G` with `G` an `n × n` matrix of random entries. Entries with moduli uniform in [0.3, 2] and random phases, seed 0 | 20 000 | `‖X − K‖/‖K‖` off `Ω` |
 
 `TIGHT_WEIGHTS` (`application/weights.py`) give the shares `|a_i|²/‖a‖²` and `|b_j|²/‖b‖²` of
 `(½, ¼, ¼)` for both (A), `(½, ¼, ¼)` and `(¼, ¼, ½)` (B), and `(⅗, ⅕, ⅕)` and `(⅕, ⅖, ⅖)` (C).
@@ -141,6 +154,24 @@ pseudoinverse, the system counting as solvable when its residual is at most `10�
 its `‖G‖_op` is not below 1 and the pattern is injective, 2000 steps of projected subgradient
 descent on `‖G‖_op` look for a better one. The certificate is the least `‖W‖_op` found, and
 the gap is `‖Z‖_S1 − ‖K‖_S1`.
+
+`rank` and `polar` also read item 5 off the solver. The ADMM's `Y = −ρ U` vanishes off `Ω`, and
+at a fixed point it is a subgradient of `‖·‖_S1` at `Z`. `Ŷ = Y / max(1, ‖Y‖_op)` is a
+contraction that vanishes off `Ω`, so every `X` equal to `K` on `Ω` has
+`‖X‖_S1 ≥ Re tr(Ŷᴴ X) = Re tr(Ŷᴴ K)`: the least nuclear norm lies between `Re tr(Ŷᴴ K)` and
+`‖Z‖_S1`. A pattern is a *minimum* when `Re tr(Ŷᴴ K) ≥ (1 − 10⁻⁶) ‖K‖_S1`, *beaten* when
+`‖Z‖_S1 < (1 − 10⁻⁶) ‖K‖_S1`, and *undecided* otherwise; it cannot be both. So a minimum here
+is one to within `10⁻⁶ ‖K‖_S1`. On a beaten pattern, item 1.1 with `c = 1/‖W‖_op` and
+`H = Z − K` puts every `W` with `Uᴴ W = 0`, `W V = 0` and `U Vᴴ + W` vanishing off `Ω` at
+`‖W‖_op ≥ 1 − (‖Z‖_S1 − ‖K‖_S1)/‖Π (Z − K) Π'‖_S1`, with `Π = 1 − U Uᴴ` and `Π' = 1 − V Vᴴ`.
+In `polar`, `Kᴴ K = P²`, so when `G` is invertible `K` has rank `n` and `U Vᴴ = Q` (by hand:
+`Q` is the polar factor `K (Kᴴ K)^{−1/2}`); the check computes `U Vᴴ` from a singular value
+decomposition of `K` and calls it vanishing off `Ω` when its entries there are at most
+`10⁻⁹`. Before each singular value decomposition of the iteration, every real or imaginary part
+below machine epsilon, `2.2·10⁻¹⁶`, times the largest part of its matrix is set to 0, which
+moves each entry by less than `√2 · 2.2·10⁻¹⁶` times the largest. In cells that the minimum
+fills with 0 the iterates shrink toward 0, and on some matrices with entries of `8.3·10⁻²⁹⁷`
+or less beside entries of order 1, LAPACK returned NaN singular values without an error.
 
 ## What they found
 
@@ -360,3 +391,38 @@ a minimum. The 117 recovered patterns that are not injective are all block table
 and 3, `6 × 6` of rank 2 and 3, and `8 × 8` of rank 2 and 3. For the 749 dense tables of the
 class the system for `W` has no solution. As item 4 proves for three cells, recovery does not
 need the injectivity.
+
+Item 5 on the same run. On every pattern `Y` vanishes off `Ω` exactly, `‖Y‖_op ≤ 1 + 1.23·10⁻⁷`,
+and `‖Z‖_S1 − Re tr(Ŷᴴ K)` lies between `−3.91·10⁻¹⁴` and `3.70·10⁻⁵`. No pattern is undecided:
+
+| standing | patterns | recovered | classes | search for `W` | margin |
+| --- | --- | --- | --- | --- | --- |
+| minimum | 590 | 585 | joined, not injective 119; injective, certificate 468; injective, none found 3 | `‖W‖_op ≤ 1` for 585, above 1 for 5 | `(‖K‖_S1 − Re tr(Ŷᴴ K))/‖K‖_S1`: −1.24e-15 to 3.82e-7 |
+| beaten | 3010 | 0 | not joined 1446; joined, not injective 918; injective, none found 646 | no `W` for 2195, above 1 for 815 | gap over `‖K‖_S1`: −1.00 to −1.16e-6 |
+
+On the minima, `‖Ŷ V − U‖_F` and `‖Ŷᴴ U − V‖_F` are at most `1.76·10⁻³` and `‖Ŷ − U Vᴴ‖_op` at
+most `1 + 1.4·10⁻⁶`: to this accuracy `Ŷ` is item 5.2's `U Vᴴ + W`. On the 815 beaten patterns
+with a `W`, item 1.1 puts every `W` at or above a bound between 1.00 and 22.1, and the `W` found
+lie `2.15·10⁻³` to 148 above it. So item 5.3 holds on every pattern: a `W` with `‖W‖_op ≤ 1`
+turns up only on minima. The 5 minima not recovered are the 3 of class *injective, none found*
+and 2 that are not injective.
+
+Full column rank (`polar 20000`), all 3000 patterns. Item 5.4 decides every one: where `U Vᴴ`
+vanishes off `Ω`, `Ŷ` shows `K` a minimum, and where it does not, the solver beats `K`:
+
+| shape | random cells: `U Vᴴ` vanishes off `Ω`, minima | recovered | does not vanish, beaten | with the blocks: minima | recovered |
+| --- | --- | --- | --- | --- | --- |
+| 4 × 4 | 59 | 37 | 241 | 300 | 122 |
+| 8 × 8 | 36 | 23 | 264 | 300 | 49 |
+| 6 × 3 | 34 | 34 | 266 | 300 | 250 |
+| 8 × 4 | 38 | 38 | 262 | 300 | 222 |
+| 8 × 2 | 28 | 28 | 272 | 300 | 297 |
+
+Where `U Vᴴ` vanishes off `Ω`, its entries there are at most `9.04·10⁻¹³` and
+`‖K‖_S1 − Re tr(Ŷᴴ K)` at most `4.85·10⁻¹¹ ‖K‖_S1`; where it does not, its largest entry there
+is 0.134 to 1, and `Z` is cheaper than `K` by `8.87·10⁻⁵` to `0.872` of `‖K‖_S1`. On the square
+tables `Q` is diagonal, so `U Vᴴ` vanishes off `Ω` exactly when `Ω` holds the diagonal. With `V`
+square every matrix is a `U Aᴴ + B Vᴴ`, so no pattern is injective, and by
+`not_exists_pos_le_nuclearNorm_add_of_full_column_rank` all 1100 recoveries come without linear
+growth, where the certificate never applies. Of the 595 minima not recovered, 33 have cells
+that do not join (item 2).

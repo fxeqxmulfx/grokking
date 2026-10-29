@@ -8,13 +8,19 @@
   never recovered); they do, but a nonzero U Aᴴ + B Vᴴ vanishes on Ω; no such matrix vanishes
   and a certificate below 1 exists (item 1.2: always recovered); no such matrix vanishes and no
   certificate below 1 was found.
+- Each case also stands as item 5 decides it from the solver's dual Y: a certified minimum when
+  Ŷ = Y / max(1, ‖Y‖_op) certifies K (item 5.1), beaten when the completion's nuclear norm is
+  below ‖K‖_S1, both to within `DECIDED` ‖K‖_S1, and undecided otherwise.
+- `polar_check`: m x n tables K = Q P of full column rank, whose polar factor U Vᴴ = Q vanishes
+  off blocks while K is dense, from random patterns with or without the cells of the blocks.
+  Item 5.4: K is a minimum exactly when Q vanishes off Ω.
 """
 
 import math
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 
-from recovery.application.ports import Draws, RankCertificate, RankCertificates, Solver
+from recovery.application.ports import Draws, DualCheck, RankCertificate, RankCertificates, Solver
 from recovery.application.summary import RECOVERED
 from recovery.domain.patterns import Pattern
 from recovery.domain.ranks import joins_every_entry, three_cell_fill
@@ -120,19 +126,51 @@ def low_rank(draws: Draws, size: int, rank: int, kind: str) -> Table:
     return [[a[i] * b[j] if block[i] == block[j] else 0j for j in range(size)] for i in range(size)]
 
 
-def random_pattern(draws: Draws, size: int) -> Pattern:
-    """Each cell kept with one density uniform in [0.3, 0.95]; drawn again when full."""
+def random_pattern(draws: Draws, size: int, columns: int | None = None,
+                   keep: frozenset[tuple[int, int]] = frozenset()) -> Pattern:
+    """A `size` x `columns` pattern (square by default): each cell kept with one density uniform
+    in [0.3, 0.95], and the cells of `keep`; drawn again when full."""
+    width = size if columns is None else columns
     while True:
         (density,) = draws.uniform(1)
         density = 0.3 + 0.65 * density
-        cells = draws.uniform(size * size)
-        pattern = tuple(tuple(cells[size * i + j] < density for j in range(size)) for i in range(size))
+        cells = draws.uniform(size * width)
+        pattern = tuple(tuple(cells[width * i + j] < density or (i, j) in keep for j in range(width))
+                        for i in range(size))
         if not all(map(all, pattern)):
             return pattern
 
 
+def polar_blocks(rows: int, columns: int) -> frozenset[tuple[int, int]]:
+    """The cells (i, j) with row i in block j, for `columns` blocks of consecutive rows of nearly
+    equal sizes; for a square table, the diagonal."""
+    return frozenset((i, i * columns // rows) for i in range(rows))
+
+
+def polar_table(draws: Draws, rows: int, columns: int) -> Table:
+    """K = Q P, `rows` ≥ `columns`: Q has orthonormal columns, column j a unit vector of random
+    entries on the rows of block j and 0 elsewhere, and P = Gᴴ G for a `columns` x `columns` G of
+    random entries. When G is invertible, P is positive definite, K has full column rank, and Q is
+    its polar factor U Vᴴ; K is dense when G is."""
+    blocks = polar_blocks(rows, columns)
+    q = [[entry(draws) if (i, j) in blocks else 0j for j in range(columns)] for i in range(rows)]
+    for j in range(columns):
+        length = math.sqrt(sum(abs(q[i][j]) ** 2 for i in range(rows)))
+        for i in range(rows):
+            q[i][j] /= length
+    g = [[entry(draws) for _ in range(columns)] for _ in range(columns)]
+    p = [[sum(g[t][a].conjugate() * g[t][b] for t in range(columns)) for b in range(columns)] for a in range(columns)]
+    return [[sum(q[i][a] * p[a][j] for a in range(columns)) for j in range(columns)] for i in range(rows)]
+
+
 #: The classes of items 1 and 2, in the order they are tested.
 RANK_CLASSES = ("not joined", "joined, not injective", "injective, certificate", "injective, none found")
+
+#: How item 5 decides a case from the solver's dual, in this order.
+STANDINGS = ("minimum", "beaten", "undecided")
+
+#: The tolerance of the standings, relative to ‖K‖_S1.
+DECIDED = 1e-6
 
 
 @dataclass(frozen=True)
@@ -144,6 +182,9 @@ class RankCase:
     error: float
     #: ‖Z‖_S1 − ‖K‖_S1.
     gap: float
+    #: ‖K‖_S1.
+    nuclear: float
+    dual: DualCheck
 
     @property
     def kind(self) -> str:
@@ -154,14 +195,61 @@ class RankCase:
         best = self.certificate.best
         return RANK_CLASSES[2] if best is not None and best < 1 else RANK_CLASSES[3]
 
+    @property
+    def standing(self) -> str:
+        """`minimum` when Ŷ certifies K, Re tr(Ŷᴴ K) ≥ ‖K‖_S1 (1 − DECIDED); else `beaten` when
+        ‖Z‖_S1 < ‖K‖_S1 (1 − DECIDED); else `undecided`. Both at once is impossible: Ŷ vanishes off
+        Ω, so Re tr(Ŷᴴ K) = Re tr(Ŷᴴ Z) ≤ ‖Z‖_S1."""
+        if self.dual.defect <= DECIDED * self.nuclear:
+            return STANDINGS[0]
+        return STANDINGS[1] if self.gap < -DECIDED * self.nuclear else STANDINGS[2]
+
+    @property
+    def polar_vanishes(self) -> bool:
+        """Whether U Vᴴ vanishes off Ω, to within 1e-9: item 5.4's criterion when V is square."""
+        return self.dual.polar_off <= 1e-9
+
+    @property
+    def duality(self) -> float:
+        """‖Z‖_S1 − Re tr(Ŷᴴ K), at least 0 up to rounding: the least nuclear norm M reaches lies
+        between Re tr(Ŷᴴ K) and ‖Z‖_S1."""
+        return self.gap + self.dual.defect
+
+    @property
+    def bound(self) -> float | None:
+        """When Z beats K, item 1.1's lower bound on ‖W‖_op for every W with Uᴴ W = 0, W V = 0
+        and U Vᴴ + W vanishing off Ω: with H = Z − K, (1 − ‖W‖_op) ‖Π H Π'‖_S1 ≤ ‖Z‖_S1 − ‖K‖_S1,
+        so ‖W‖_op ≥ 1 − gap / ‖Π H Π'‖_S1."""
+        if self.gap >= 0 or self.dual.spread <= 0:
+            return None
+        return 1 - self.gap / self.dual.spread
+
+
+def solve(solver: Solver, certificates: RankCertificates, tables: Sequence[Table], patterns: Sequence[Pattern],
+          rank: int, steps: int, best_steps: int) -> Iterator[RankCase]:
+    """M on each pattern of its table, all of rank `rank` and of one shape, in one run."""
+    run = solver.start_matrices(patterns, tables)
+    run.advance(steps)
+    for table, pattern, completion, z, y in zip(tables, patterns, run.measure(), run.matrices(), run.duals()):
+        nuclear = solver.nuclear_norm(table)
+        yield RankCase(sum(map(sum, pattern)), joins_every_entry(pattern, table),
+                       certificates.certificate(table, pattern, rank, best_steps),
+                       completion.error_of_table, completion.nuclear - nuclear, nuclear,
+                       certificates.dual(table, pattern, rank, z, y))
+
 
 def rank_check(solver: Solver, certificates: RankCertificates, draws: Draws, size: int, rank: int, kind: str,
                count: int, steps: int, best_steps: int) -> Iterator[RankCase]:
     tables = [low_rank(draws, size, rank, kind) for _ in range(count)]
     patterns = [random_pattern(draws, size) for _ in range(count)]
-    run = solver.start_matrices(patterns, tables)
-    run.advance(steps)
-    for table, pattern, completion in zip(tables, patterns, run.measure()):
-        yield RankCase(sum(map(sum, pattern)), joins_every_entry(pattern, table),
-                       certificates.certificate(table, pattern, rank, best_steps),
-                       completion.error_of_table, completion.nuclear - solver.nuclear_norm(table))
+    return solve(solver, certificates, tables, patterns, rank, steps, best_steps)
+
+
+def polar_check(solver: Solver, certificates: RankCertificates, draws: Draws, rows: int, columns: int, count: int,
+                steps: int, best_steps: int, blocks: bool) -> Iterator[RankCase]:
+    """`count` tables K = Q P (`polar_table`), each from a random pattern, to which the cells of
+    the blocks are added when `blocks` is set."""
+    tables = [polar_table(draws, rows, columns) for _ in range(count)]
+    keep = polar_blocks(rows, columns) if blocks else frozenset()
+    patterns = [random_pattern(draws, rows, columns, keep) for _ in range(count)]
+    return solve(solver, certificates, tables, patterns, columns, steps, best_steps)

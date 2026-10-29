@@ -1,13 +1,14 @@
-"""Rank above one: the three-cell fill, the graph condition and the certificates against the
-Lean statements and examples."""
+"""Rank above one: the three-cell fill, the graph condition, the certificates and the solver's
+dual against the Lean statements and examples."""
 
 import math
 import unittest
 
-from recovery.application.ranks import EXAMPLES, THREE_CELLS
+from recovery.application.ranks import EXAMPLES, THREE_CELLS, polar_blocks, polar_table
 from recovery.domain.patterns import diagonals
 from recovery.domain.ranks import joins_every_entry, three_cell_fill
 from recovery.infrastructure.admm import TorchADMM
+from recovery.infrastructure.draws import TorchDraws
 from recovery.infrastructure.rank_certificates import TorchRankCertificates
 
 
@@ -53,6 +54,38 @@ class Ranks(unittest.TestCase):
             self.assertGreater(c.injectivity, 1e-3)
             # One diagonal: r_i − r_j vanishes on it, so h ↦ h on Ω is not injective (item D.6).
             self.assertLess(TorchRankCertificates().certificate(ones, diagonals(size, [0]), 1, 0).injectivity, 1e-9)
+
+    def test_dual_decides_the_minimum(self) -> None:
+        # Item 5 on Lean's examples. From the three cells, [[2, 1], [1, 1]] is recovered and its
+        # polar factor is 1; [[2, 1], [1, −1]] is not, and M's minimum [[2, −1], [1, −1]] has
+        # nuclear norm 3 < √13 (item 3). diag(1, 2) is a minimum from its diagonal
+        # (`isMinOn_iff_of_full_rank`).
+        diagonal = ((True, False), (False, True))
+        cases = [([[2 + 0j, 1], [1, 1]], THREE_CELLS, True), ([[2 + 0j, 1], [1, -1]], THREE_CELLS, False),
+                 ([[1 + 0j, 0], [0, 2]], diagonal, True)]
+        run = TorchADMM().start_matrices([pattern for _, pattern, _ in cases], [k for k, _, _ in cases])
+        run.advance(3000)
+        for (k, pattern, minimum), z, y in zip(cases, run.matrices(), run.duals()):
+            d = TorchRankCertificates().dual(k, pattern, 2, z, y)
+            self.assertLess(d.norm, 1 + 1e-9)
+            self.assertEqual(d.off, 0)
+            self.assertEqual(d.polar_off < 1e-12, minimum)
+            if minimum:
+                self.assertLess(d.defect, 1e-9)
+                self.assertLess(max(d.right, d.left), 1e-6)
+            else:
+                self.assertAlmostEqual(d.defect, math.sqrt(13) - 3, places=6)
+
+    def test_polar_table(self) -> None:
+        # K = Q P is dense, and its polar factor U Vᴴ is Q, which vanishes off the blocks.
+        draws = TorchDraws(0)
+        for rows, columns in ((4, 4), (6, 3), (8, 2)):
+            k = polar_table(draws, rows, columns)
+            blocks = polar_blocks(rows, columns)
+            pattern = tuple(tuple((i, j) in blocks for j in range(columns)) for i in range(rows))
+            zero = [[0j] * columns for _ in range(rows)]
+            self.assertLess(TorchRankCertificates().dual(k, pattern, columns, k, zero).polar_off, 1e-12)
+            self.assertTrue(all(abs(x) > 1e-6 for row in k for x in row))
 
 
 if __name__ == "__main__":

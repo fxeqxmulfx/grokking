@@ -53,6 +53,12 @@ class Run(Protocol):
         """The completion Z of every pattern, which agrees with its table on the kept cells."""
         ...
 
+    def duals(self) -> list[list[list[complex]]]:
+        """The dual Y of every pattern, which vanishes off its kept cells; where the solver has
+        converged, Y is a contraction with tr(Yᴴ Z) = ‖Z‖_S1, the certificate of *Rank above
+        one*, item 5.1, for Z."""
+        ...
+
 
 class Solver(Protocol):
     def start(self, patterns: Sequence[Pattern], a: Sequence[complex], b: Sequence[complex]) -> Run:
@@ -116,11 +122,41 @@ class RankCertificate:
     violation: float
 
 
+@dataclass(frozen=True)
+class DualCheck:
+    """*Rank above one*, item 5, on a solver's dual Y and completion Z for a table K of rank r
+    and a pattern Ω: U, V from a singular value decomposition of K, and Ŷ = Y / max(1, ‖Y‖_op),
+    a contraction that vanishes off Ω where Y does."""
+
+    #: ‖Y‖_op.
+    norm: float
+    #: The largest |Y_ij| off Ω.
+    off: float
+    #: ‖K‖_S1 − Re tr(Ŷᴴ K): at least 0, and 0 exactly when Ŷ is item 5.1's certificate for K.
+    #: Every X equal to K on Ω has ‖X‖_S1 ≥ ‖K‖_S1 − defect.
+    defect: float
+    #: ‖Ŷ V − U‖_F and ‖Ŷᴴ U − V‖_F, that is ‖W V‖_F and ‖Uᴴ W‖_F for W = Ŷ − U Vᴴ (item 5.2).
+    right: float
+    left: float
+    #: ‖Ŷ − U Vᴴ‖_op (items 5.2 and 5.3).
+    rest: float
+    #: The largest |(U Vᴴ)_ij| off Ω: 0 exactly when W = 0 makes U Vᴴ + W vanish off Ω (item 5.4).
+    polar_off: float
+    #: ‖Π (Z − K) Π'‖_S1, Π = 1 − U Uᴴ, Π' = 1 − V Vᴴ, for item 1.1's bound on every W.
+    spread: float
+
+
 class RankCertificates(Protocol):
     def certificate(self, table: Sequence[Sequence[complex]], pattern: Pattern, rank: int,
                     steps: int) -> RankCertificate:
         """The certificate for `table`, of rank `rank`, from `pattern`; the descent takes `steps`
         steps, and runs only when no W of norm below 1 is known yet and h ↦ h on Ω is injective."""
+        ...
+
+    def dual(self, table: Sequence[Sequence[complex]], pattern: Pattern, rank: int,
+             completion: Sequence[Sequence[complex]], dual: Sequence[Sequence[complex]]) -> DualCheck:
+        """Item 5 on a solver's `completion` Z and `dual` Y for `table`, of rank `rank`, from
+        `pattern`."""
         ...
 
 

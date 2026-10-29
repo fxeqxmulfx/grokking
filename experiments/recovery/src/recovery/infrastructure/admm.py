@@ -2,10 +2,11 @@
 
 min ‖X‖_S1 subject to X = K on the kept cells, split as X = Z with Z in the affine set:
 X ← SVT_{1/ρ}(Z − U), Z ← X + U with the kept cells reset to K, U ← U + X − Z, from Z = K on
-the kept cells and 0 elsewhere, U = 0, and ρ = 1/√max(m, n). A batch runs a fixed number of
-steps; one table (`fill`) stops as soon as both residuals ‖X − Z‖ and ‖Z − Z_before‖ fall below
-a tolerance. Ported from the scripts `small.py`, `weighted.py`, `cross_weights.py`,
-`zeros_check.py` and `complete.py` of the first checks, which used this iteration.
+the kept cells and 0 elsewhere, U = 0, and ρ = 1/√max(m, n); −ρ U is the dual. A batch runs a
+fixed number of steps; one table (`fill`) stops as soon as both residuals ‖X − Z‖ and
+‖Z − Z_before‖ fall below a tolerance. Ported from the scripts `small.py`, `weighted.py`,
+`cross_weights.py`, `zeros_check.py` and `complete.py` of the first checks, which used this
+iteration.
 """
 
 import math
@@ -17,10 +18,23 @@ from recovery.application.ports import Completion, Fill
 from recovery.domain.patterns import Pattern
 
 
+def flush(m: torch.Tensor) -> torch.Tensor:
+    """m with every real and imaginary part below eps times the largest part of its matrix set to
+    0, eps the double precision machine epsilon 2.2e-16. This moves each entry by less than √2·eps
+    times the largest entry, the order of the SVD's own rounding error. In cells that the minimum
+    fills with 0 the iterates shrink toward 0, and on some matrices with such entries beside
+    entries of order 1 (5.6e-316, or 8.3e-297 with an imaginary part of 1.1e-310) LAPACK returns
+    NaN singular values without an error."""
+    parts = torch.view_as_real(m)
+    level = torch.finfo(parts.dtype).eps * parts.abs().amax(dim=(-3, -2, -1), keepdim=True)
+    return torch.view_as_complex(torch.where(parts.abs() < level, torch.zeros_like(parts), parts).contiguous())
+
+
 def threshold(m: torch.Tensor, tau: float) -> torch.Tensor:
-    """Singular value thresholding: every singular value s of m becomes max(s − tau, 0). When
-    LAPACK's divide and conquer fails to converge, which it rarely does, m is perturbed by 1e-13
-    of its largest entry first, as in `complete.py` of the first checks."""
+    """Singular value thresholding: every singular value s of `flush(m)` becomes max(s − tau, 0).
+    When LAPACK's divide and conquer fails to converge, which it rarely does, m is perturbed by
+    1e-13 of its largest entry, as in `complete.py` of the first checks."""
+    m = flush(m)
     try:
         left, s, right = torch.linalg.svd(m, full_matrices=False)
     except torch.linalg.LinAlgError:
@@ -48,6 +62,9 @@ class TorchRun:
             self.step()
 
     def measure(self) -> list[Completion]:
+        broken = ~torch.isfinite(torch.view_as_real(self.z)).flatten(1).all(1)
+        if bool(broken.any()):
+            raise FloatingPointError(f"non-finite iterates in batch elements {broken.nonzero().flatten().tolist()}")
         hidden = ~self.masks
         nuclear = torch.linalg.svdvals(self.z).sum(-1)
         miss = ((self.z - self.table).abs() * hidden).flatten(1).norm(dim=1)
@@ -64,6 +81,11 @@ class TorchRun:
 
     def matrices(self) -> list[list[list[complex]]]:
         return self.z.cpu().tolist()
+
+    def duals(self) -> list[list[list[complex]]]:
+        """Y = −ρ U. The X step makes ρ (Z − U − X) a subgradient of ‖·‖_S1 at X; at a fixed point
+        X = Z, so −ρ U is one at Z. The Z step makes U vanish off the kept cells."""
+        return (-self.rho * self.u).cpu().tolist()
 
 
 class TorchADMM:

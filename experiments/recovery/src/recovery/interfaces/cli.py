@@ -9,7 +9,7 @@ from recovery.application.weights import cross_check, slow_tight_weights, tight_
 from recovery.application.additive import Filled, cubic_splits, diagonal_certificate, long_diagonals, long_runs, survey, theorem_d
 from recovery.application.characters import character_check
 from recovery.application.margins import off_blocks, random_margins
-from recovery.application.ranks import RANK_CLASSES, RankCase, rank_check, three_cells
+from recovery.application.ranks import RANK_CLASSES, STANDINGS, RankCase, polar_check, rank_check, three_cells
 from recovery.infrastructure.admm import TorchADMM
 from recovery.infrastructure.certificates import TorchCertificates
 from recovery.domain.margins import block_value, worst_block
@@ -48,6 +48,53 @@ def rank_lines(cases: list[RankCase]) -> None:
               f" gap in {span([c.gap for c in part])} error in {span([c.error for c in part])}"
               f" injectivity in {span([c.certificate.injectivity for c in part])}"
               f" certificate in {span(best)} ({len(part) - len(best)} without)", flush=True)
+
+
+def searched(case: RankCase) -> str:
+    best = case.certificate.best
+    return "no W" if best is None else "W <= 1" if best <= 1 else "W > 1"
+
+
+def dual_lines(cases: list[RankCase]) -> None:
+    """Item 5 from the solver's dual Y, Ŷ = Y / max(1, ||Y||_op): each standing, with the classes
+    of items 1 and 2 and the outcome of the search for W inside it."""
+    print(f"  item 5: ||Y||_op - 1 in {span([c.dual.norm - 1 for c in cases])},"
+          f" largest |Y| off the cells {max(c.dual.off for c in cases):.1e},"
+          f" ||Z||_S1 - Re tr(Y^H K) in {span([c.duality for c in cases])}")
+    for name in STANDINGS:
+        part = [c for c in cases if c.standing == name]
+        if not part:
+            continue
+        classes = ", ".join(f"{k} {n}" for k in RANK_CLASSES if (n := sum(c.kind == k for c in part)))
+        search = ", ".join(f"{k} {n}" for k in ("no W", "W <= 1", "W > 1") if (n := sum(searched(c) == k for c in part)))
+        text = (f"    {name:9s} patterns={len(part):4d} recovered={sum(c.error < 1e-6 for c in part):4d}"
+                f" ({classes}; search: {search})")
+        if name == STANDINGS[0]:
+            rest = [c.dual.rest for c in part]
+            text += (f" defect/||K||_S1 in {span([c.dual.defect / c.nuclear for c in part])}"
+                     f" ||YV - U|| in {span([c.dual.right for c in part])}"
+                     f" ||Y^H U - V|| in {span([c.dual.left for c in part])}"
+                     f" ||Y - UV^H||_op in {span(rest)}, largest - 1 = {max(rest) - 1:+.1e}")
+        elif name == STANDINGS[1]:
+            # Item 1.1's bound, where the search found a W to hold it against.
+            pairs = [(c.certificate.best, c.bound) for c in part if c.certificate.best is not None and c.bound is not None]
+            text += (f" gap/||K||_S1 in {span([c.gap / c.nuclear for c in part])}"
+                     f" bound where a W was found in {span([b for _, b in pairs])}"
+                     f" W - bound in {span([w - b for w, b in pairs])}")
+        else:
+            text += f" gap/||K||_S1 in {span([c.gap / c.nuclear for c in part])}"
+        print(text, flush=True)
+
+
+def polar_lines(cases: list[RankCase]) -> None:
+    """Item 5.4: the cases where U Vᴴ vanishes off the cells, and the others, by standing."""
+    for vanishes in (True, False):
+        part = [c for c in cases if c.polar_vanishes == vanishes]
+        if part:
+            counts = ", ".join(f"{name} {sum(c.standing == name for c in part)}" for name in STANDINGS)
+            print(f"  UV^H {'vanishes' if vanishes else 'does not vanish':15s} off the cells: patterns={len(part):4d}"
+                  f" ({counts}) recovered={sum(c.error < 1e-6 for c in part):4d}"
+                  f" largest |UV^H| off the cells in {span([c.dual.polar_off for c in part])}", flush=True)
 
 
 def main() -> None:
@@ -115,6 +162,13 @@ def main() -> None:
     ranked.add_argument("--count", type=int, default=300, help="tables of each size, rank and kind")
     ranked.add_argument("--best-steps", type=int, default=2000)
     ranked.add_argument("--seed", type=int, default=0)
+    polar = checks.add_parser("polar", help="Rank above one, item 5.4: K = Q P of full column rank, random cells")
+    polar.add_argument("steps", type=int)
+    polar.add_argument("--shapes", type=int, nargs="+", default=[4, 4, 8, 8, 6, 3, 8, 4, 8, 2],
+                       help="rows and columns of each shape, in pairs")
+    polar.add_argument("--count", type=int, default=300, help="tables of each shape and kind of pattern")
+    polar.add_argument("--best-steps", type=int, default=2000)
+    polar.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
     solver = TorchADMM(args.device)
     print(f"device {solver.device}", flush=True)
@@ -225,8 +279,25 @@ def main() -> None:
                                                 args.best_steps))
                         everything += cases
                         rank_lines(cases)
+                        dual_lines(cases)
             print("all")
             rank_lines(everything)
+            dual_lines(everything)
+        case "polar":
+            draws, certificates = TorchDraws(args.seed), TorchRankCertificates()
+            everything = []
+            for rows, columns in zip(args.shapes[::2], args.shapes[1::2]):
+                for blocks in (False, True):
+                    print(f"{rows} x {columns}, K = Q P of rank {columns}, random cells"
+                          f"{' and the blocks of Q' if blocks else ''}, {args.count} tables, {args.steps} steps")
+                    cases = list(polar_check(solver, certificates, draws, rows, columns, args.count, args.steps,
+                                             args.best_steps, blocks))
+                    everything += cases
+                    polar_lines(cases)
+                    dual_lines(cases)
+            print("all")
+            polar_lines(everything)
+            dual_lines(everything)
         case "slow":
             for stop, s in slow_tight_hall(solver, args.size, args.checkpoints):
                 print(f"after {stop:7d} steps:", line(s).strip(), flush=True)

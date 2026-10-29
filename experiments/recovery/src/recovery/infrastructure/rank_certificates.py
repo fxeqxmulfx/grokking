@@ -10,13 +10,17 @@ Vᴴ; T is the space of the matrices U Aᴴ + B Vᴴ.
   Frobenius norm, which is the Y of least Frobenius norm, as T and its complement are
   orthogonal. Projected subgradient descent on ‖G‖_op over the solutions then looks for a
   smaller one, as `TorchCertificates.best` does for Theorem D.
+- Item 5 on a solver's dual Y and completion Z (`dual`): Ŷ = Y / max(1, ‖Y‖_op) is a
+  contraction, so Re tr(Ŷᴴ K) ≤ ‖K‖_S1, with equality exactly when Ŷ certifies K
+  (`isMinOn_iff_exists_isContraction`); then Ŷ = U Vᴴ + W with Uᴴ W = 0, W V = 0 and W a
+  contraction (`isContraction_trace_eq_iff`).
 """
 
 from collections.abc import Sequence
 
 import torch
 
-from recovery.application.ports import RankCertificate
+from recovery.application.ports import DualCheck, RankCertificate
 from recovery.domain.patterns import Pattern
 
 #: The equations for W hold to this, entry by entry, when a W exists; |U Vᴴ| ≤ 1 entrywise.
@@ -60,3 +64,23 @@ class TorchRankCertificates:
             best = min(best, torch.linalg.matrix_norm(g.reshape(p, q), ord=2).item())
             violation = (a @ g - rhs).abs().max().item()
         return RankCertificate(injectivity, least, best, violation)
+
+    def dual(self, table: Sequence[Sequence[complex]], pattern: Pattern, rank: int,
+             completion: Sequence[Sequence[complex]], dual: Sequence[Sequence[complex]]) -> DualCheck:
+        k, z, y = (torch.tensor(x, dtype=torch.complex128) for x in (table, completion, dual))
+        hidden = ~torch.tensor(pattern, dtype=torch.bool)
+        left, s, right_h = torch.linalg.svd(k)
+        u, v = left[:, :rank], right_h.mH[:, :rank]
+        polar = u @ v.mH
+        norm = torch.linalg.matrix_norm(y, ord=2).item()
+        off = y[hidden].abs().max().item() if bool(hidden.any()) else 0.0
+        y = y / max(1.0, norm)
+        polar_off = polar[hidden].abs().max().item() if bool(hidden.any()) else 0.0
+        pairing = (y.conj() * k).sum().real.item()
+        m, n = k.shape
+        pi = torch.eye(m, dtype=k.dtype) - u @ u.mH
+        pi_right = torch.eye(n, dtype=k.dtype) - v @ v.mH
+        spread = torch.linalg.svdvals(pi @ (z - k) @ pi_right).sum().item()
+        return DualCheck(norm, off, s.sum().item() - pairing, torch.linalg.norm(y @ v - u).item(),
+                         torch.linalg.norm(y.mH @ u - v).item(), torch.linalg.matrix_norm(y - polar, ord=2).item(),
+                         polar_off, spread)
