@@ -1,7 +1,7 @@
 /** The home page in French. */
 
 import {box, eq, hand, heuristic, lean, leanNames, m, numerical, open, S1} from '../markup.ts';
-import {FULL_LEAN, frac, Kr, legendOf, ri, root, sj, sub, ui, vj, type HomeText} from './spec.ts';
+import {det, FULL_LEAN, frac, k00, k01, k10, k11, Kr, legendOf, ri, root, sj, sub, threeFill, ui, vj, type HomeText} from './spec.ts';
 
 const L = 'fr';
 
@@ -33,7 +33,8 @@ const terms = `<ul class="terms">
 /** The full statement: every term, what is proved for M, what is measured, what is not proved. */
 const full = [
   `<p>Cette partie donne chaque définition en entier, les théorèmes pour les tables de rang 1 à coefficients de modules
-  quelconques, les théorèmes sur des familles de tâches, ce qui est mesuré et ce qui n’est pas démontré. Les pages
+  quelconques, deux conditions pour les tables de rang quelconque, les théorèmes sur des familles de tâches, ce qui est
+  mesuré et ce qui n’est pas démontré. Les pages
   suivantes établissent chaque morceau pas à pas.</p>`,
 
   `<section id="setting"><h3>Le cadre</h3><ol class="terms">
@@ -126,6 +127,26 @@ const full = [
   ${m('√(k (k − 1)) + √(l (l − 1))')}, et pour l’un d’eux c’est la plus petite norme nucléaire des matrices égales à
   ${m('K')} sur ${m('Ω')} : ${m('√(N² − 1)')} pour ${m('N')} impair, ${m('√2 + √6')} pour ${m('N = 4')}
   ${lean('marge d’échec')}.</p>${leanNames(FULL_LEAN.margin)}
+  <p>Ensuite, les tables de rang quelconque. Écrivons ${m('K = U S V<sup>ᴴ</sup>')}, avec des colonnes orthonormées dans
+  ${m('U')} et dans ${m('V')} et ${m('S')} diagonale à coefficients ${m('≥ 0')}. M retrouve ${m('K')} à partir de
+  ${m('Ω')} s’il existe une matrice ${m('W')} avec ${m('U<sup>ᴴ</sup>W = 0')} et ${m('WV = 0')}, de plus grande valeur
+  singulière inférieure à 1, telle que ${m('U V<sup>ᴴ</sup> + W')} soit nulle hors de ${m('Ω')}, et si aucune matrice
+  non nulle ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} n’est nulle sur ${m('Ω')}. Si M retrouve ${m('K')} à partir de
+  ${m('Ω')}, alors les cases de ${m('Ω')} où ${m(`${sub('K', 'ab')} ≠ 0`)}, vues comme des arêtes entre lignes et
+  colonnes, relient la ligne et la colonne de chaque coefficient non nul ; au rang 1, c’est la première condition du
+  théorème G ${lean('rang r')}.</p>${leanNames(FULL_LEAN.rank)}
+  <p>Le plus petit cas au-delà du rang 1 : soit ${m('K')} une table ${m('2 × 2')}, ${m('Ω')} ses trois cases autres que
+  ${m('(0, 1)')}, ${m(`β = ${k10}`)} et ${m(`γ = ${k00} ${k11}`)}. M retrouve ${m('K')} à partir de ${m('Ω')}
+  exactement quand</p>
+  ${eq(`${k01} = ${threeFill},`)}
+  <p>le membre de droite valant 0 quand ${m('β = γ = 0')}. Quand ${m(`${det} K ≠ 0`)}, cela s’écrit
+  ${m(`${k01} = <span class="ov">β</span> ${det} K / |${det} K|`)}, et quand chaque coefficient est de module 1, cela
+  s’écrit ${m(`${det} K = 0`)}. Ainsi la table de lignes ${m('(2, 1)')} et ${m('(1, 1)')} est retrouvée, et celle de
+  lignes ${m('(2, 1)')} et ${m('(1, −1)')}, de mêmes modules, ne l’est pas : au rang 2, aucune condition portant sur
+  ${m('Ω')}, les supports et les modules seuls ne décide, comme le fait le théorème G au rang 1. La condition suffisante
+  n’est pas non plus nécessaire : quand ${m(`${det} K ≠ 0`)}, une matrice non nulle
+  ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} est nulle sur ces trois cases, et pourtant la première des deux tables est
+  retrouvée ${lean('trois cases')}.</p>${leanNames(FULL_LEAN.threeCells)}
   <p>Puis les tables plates.</p>
   ${box(`<p><strong>Théorème A</strong> ${lean('A')}. Soit ${m('K')} inversible, de facteur polaire
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Alors ${m('K')} a la plus petite norme nucléaire parmi les matrices égales
@@ -177,6 +198,14 @@ const full = [
   <li><strong>Tous les petits motifs.</strong> Les 511 motifs propres d’une table ${m('3 × 3')} à poids égaux, 510 à poids
   aléatoires, et environ 12 000 motifs de tables jusqu’à ${m('3 × 4')} avec des coefficients nuls : chaque classe se
   comporte comme le dit le théorème G ${numerical('ADMM', L)}.</li>
+  <li><strong>Les tables de rang 2 et 3.</strong> Sur 3600 ensembles aléatoires de cases de tables ${m('4 × 4')},
+  ${m('6 × 6')} et ${m('8 × 8')} de rang 2 et 3, ADMM ne retrouve aucun des 1446 ensembles qui manquent la condition
+  nécessaire. Parmi les autres, il retrouve les 468 qui remplissent la condition suffisante, avec un ${m('W')} trouvé par
+  une recherche ; aucun des 649 sur lesquels aucune matrice non nulle ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} n’est
+  nulle mais où la recherche ne trouve pas de ${m('W')}, et sur chacun d’eux il trouve une norme nucléaire plus petite
+  que celle de ${m('K')} ; et 117 des 1037 sur lesquels l’une d’elles est nulle, toutes des tables diagonales par blocs.
+  Sur 5000 tables ${m('2 × 2')} aléatoires, son remplissage de ${m('(0, 1)')} à partir des trois autres cases est la
+  formule ci-dessus aux erreurs d’arrondi près ${numerical('ADMM', L)}.</li>
   <li><strong>Le réseau.</strong> Le pic d’une tâche est la plus grande part de sa table que porte un mode d’interaction
   centré, pour une lecture de module 1 :
   ${eq('κ = max |Σ<sub>a,b</sub> ρ(f(a, b)) g(a) h(b)|² / p²')}
@@ -200,7 +229,9 @@ const full = [
   elle-même sur 2,3 à 2,7 %, à peu près les ${m('2/p')} du hasard sur le reste : il apprend ce que porte le pic et rien du
   reste ${numerical('entraînement', L)}.</li>
   <li><strong>Le rang au-dessus de 1.</strong> Pour les tables de rang ${m('r ≥ 2')}, aucun critère comme le théorème G
-  n’est démontré ${open('rang r', L)}.</li>
+  n’est démontré : les conditions suffisante et nécessaire ci-dessus laissent un écart, comblé seulement pour les trois
+  cases d’une table ${m('2 × 2')} et, par le théorème 1, pour les tables plates sans coefficient nul
+  ${open('rang r', L)}.</li>
   <li><strong>Les tâches hors de la famille.</strong> Pour ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} et
   ${m('a³ + ab² + b')}, le pic n’est petit que numériquement ; aucun plafond comme celui du théorème C n’est démontré
   ${open('plafond de κ', L)}. Le rang effectif ${m(`(‖K‖${S1}/‖K‖<sub>S2</sub>)²`)}, où ${m('‖K‖<sub>S2</sub>')} est la

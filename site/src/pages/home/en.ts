@@ -1,7 +1,7 @@
 /** The home page in English. */
 
 import {box, eq, hand, heuristic, lean, leanNames, m, numerical, open, S1} from '../markup.ts';
-import {FULL_LEAN, frac, Kr, legendOf, ri, root, sj, sub, ui, vj, type HomeText} from './spec.ts';
+import {det, FULL_LEAN, frac, k00, k01, k10, k11, Kr, legendOf, ri, root, sj, sub, threeFill, ui, vj, type HomeText} from './spec.ts';
 
 const L = 'en';
 
@@ -29,8 +29,9 @@ const terms = `<ul class="terms">
 
 /** The full statement: every term, what is proved for M, what is measured, what is not proved. */
 const full = [
-  `<p>This part gives every definition in full, the theorems for tables of rank 1 with entries of any moduli, the
-  theorems on families of tasks, what is measured, and what is not proved. The later pages derive each piece slowly.</p>`,
+  `<p>This part gives every definition in full, the theorems for tables of rank 1 with entries of any moduli, two
+  conditions for tables of any rank, the theorems on families of tasks, what is measured, and what is not proved. The
+  later pages derive each piece slowly.</p>`,
 
   `<section id="setting"><h3>The setting</h3><ol class="terms">
   <li><strong>Tasks and tables.</strong> ${m('p')} is a prime. A task is a map ${m('f : ℤ/p × ℤ/p → ℤ/p')}. A readout is
@@ -116,6 +117,24 @@ const full = [
   ${m('√(k (k − 1)) + √(l (l − 1))')}, and for one of them this is the least nuclear norm of the matrices equal to
   ${m('K')} on ${m('Ω')}: ${m('√(N² − 1)')} for odd ${m('N')}, ${m('√2 + √6')} for ${m('N = 4')}
   ${lean('failure margin')}.</p>${leanNames(FULL_LEAN.margin)}
+  <p>Next, tables of any rank. Write ${m('K = U S V<sup>ᴴ</sup>')}, with orthonormal columns in ${m('U')} and in
+  ${m('V')} and ${m('S')} diagonal with entries ${m('≥ 0')}. M recovers ${m('K')} from ${m('Ω')} if some ${m('W')}
+  with ${m('U<sup>ᴴ</sup>W = 0')} and ${m('WV = 0')}, whose largest singular value is less than 1, makes
+  ${m('U V<sup>ᴴ</sup> + W')} vanish off ${m('Ω')}, and no nonzero ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} vanishes
+  on ${m('Ω')}. If M recovers ${m('K')} from ${m('Ω')}, then the cells of ${m('Ω')} with ${m(`${sub('K', 'ab')} ≠ 0`)},
+  as edges between rows and columns, connect the row and the column of every nonzero entry; at rank 1 this is the first
+  condition of Theorem G ${lean('rank r')}.</p>${leanNames(FULL_LEAN.rank)}
+  <p>The smallest case past rank 1: let ${m('K')} be a ${m('2 × 2')} table, ${m('Ω')} its three cells other than
+  ${m('(0, 1)')}, ${m(`β = ${k10}`)} and ${m(`γ = ${k00} ${k11}`)}. M recovers ${m('K')} from ${m('Ω')} exactly
+  when</p>
+  ${eq(`${k01} = ${threeFill},`)}
+  <p>the right side read as 0 when ${m('β = γ = 0')}. When ${m(`${det} K ≠ 0`)} this says
+  ${m(`${k01} = <span class="ov">β</span> ${det} K / |${det} K|`)}, and when every entry has modulus 1 it says
+  ${m(`${det} K = 0`)}. So the table with rows ${m('(2, 1)')} and ${m('(1, 1)')} is recovered, and the one with rows
+  ${m('(2, 1)')} and ${m('(1, −1)')}, with the same moduli, is not: at rank 2 no condition on ${m('Ω')}, the supports and
+  the moduli alone decides, as Theorem G does at rank 1. Nor is the sufficient condition necessary: when
+  ${m(`${det} K ≠ 0`)}, a nonzero ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} vanishes on these three cells, yet the first
+  of the two tables is recovered ${lean('three cells')}.</p>${leanNames(FULL_LEAN.threeCells)}
   <p>Then flat tables.</p>
   ${box(`<p><strong>Theorem A</strong> ${lean('A')}. Let ${m('K')} be invertible, with polar factor
   ${m('W = K (K<sup>ᴴ</sup>K)<sup>−1/2</sup>')}. Then ${m('K')} has the least nuclear norm among the matrices equal to
@@ -163,6 +182,13 @@ const full = [
   <li><strong>Every small pattern.</strong> All 511 proper patterns of a ${m('3 × 3')} table with equal weights, 510 with
   random weights, and about 12 000 patterns of tables up to ${m('3 × 4')} with zero entries: every class behaves as
   Theorem G says ${numerical('ADMM', L)}.</li>
+  <li><strong>Tables of rank 2 and 3.</strong> ADMM on 3600 random sets of cells of ${m('4 × 4')}, ${m('6 × 6')} and
+  ${m('8 × 8')} tables of rank 2 and 3 recovers none of the 1446 sets that fail the necessary condition. Of the others,
+  it recovers all 468 that meet the sufficient condition, with a ${m('W')} found by search; none of the 649 on which no
+  nonzero ${m('U A<sup>ᴴ</sup> + B V<sup>ᴴ</sup>')} vanishes but the search finds no ${m('W')}, and on each of these it
+  finds a smaller nuclear norm than that of ${m('K')}; and 117 of the 1037 on which one vanishes, all of them
+  block-diagonal tables. On 5000 random ${m('2 × 2')} tables, its fill of ${m('(0, 1)')} from the other three cells is
+  the formula above to rounding error ${numerical('ADMM', L)}.</li>
   <li><strong>The network.</strong> The peak of a task is the largest share of its table that one centered interaction
   mode carries under a readout of modulus 1:
   ${eq('κ = max |Σ<sub>a,b</sub> ρ(f(a, b)) g(a) h(b)|² / p²')}
@@ -184,8 +210,9 @@ const full = [
   answer alone; without that mode it is 0.094. The network predicts the parity on 79 to 80% of the unseen half and the
   answer itself on 2.3 to 2.7%, about the ${m('2/p')} of guessing the rest: it learns what the peak carries and nothing of
   the remainder ${numerical('training', L)}.</li>
-  <li><strong>Rank above 1.</strong> For tables of rank ${m('r ≥ 2')}, no criterion like Theorem G is proved
-  ${open('rank r', L)}.</li>
+  <li><strong>Rank above 1.</strong> For tables of rank ${m('r ≥ 2')}, no criterion like Theorem G is proved: the
+  sufficient and the necessary conditions above leave a gap, closed only for the three cells of a ${m('2 × 2')} table
+  and, by Theorem 1, for flat tables without zero entries ${open('rank r', L)}.</li>
   <li><strong>Tasks outside the family.</strong> For ${m('a² + ab + b²')}, ${m('a² + ab + b² + a')} and
   ${m('a³ + ab² + b')} the peak is small only numerically; no ceiling like Theorem C's is proved
   ${open('ceiling on κ', L)}. The effective rank ${m(`(‖K‖${S1}/‖K‖<sub>S2</sub>)²`)}, with ${m('‖K‖<sub>S2</sub>')}

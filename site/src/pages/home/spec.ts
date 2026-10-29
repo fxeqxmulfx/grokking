@@ -45,6 +45,8 @@ export const FULL_LEAN = {
   diagonals: 'isMinOn_addKernel_iff_of_ne, exists_ne_isMinOn_addKernel_of_diagonal',
   cross: 'rigid_cross, vecMulVec_eq_of_cross, isLeast_nuclearNorm_addKernel_cross',
   characters: 'forall_isMinOn_taskKernel_mul_mulChar_iff_connected, forall_isMinOn_taskKernel_add_mul_mulChar_iff_connected',
+  rank: 'svd_hypotheses, isMinOn_iff_of_certificate, reachable_of_forall_isMinOn',
+  threeCells: 'forall_isMinOn_threeCells_iff, forall_isMinOn_threeCells_iff_of_det_ne_zero, forall_isMinOn_threeCells_iff_det_eq_zero, exists_ne_zero_threeCells_of_det_ne_zero',
   margin: 'exists_norm_eq_one_of_vecMulVec, nuclearNorm_vecMulVec_of_norm_eq_one, sqrt_sq_sub_one_lt, exists_nuclearNorm_le_sqrt_vecMulVec_of_not_perm, failureMargin_vecMulVec, failureMargin_odd_vecMulVec, failureMargin_four_vecMulVec',
   weil: 'norm_sum_addChar_eval_le, norm_le_sqrt_of_mem_roots',
   oneHot: 'eq_zero_of_isMinOn_classKernel_cube_add_mul',
@@ -79,6 +81,18 @@ export const sub = (x: string, i: string): string => `${x}<sub>${i}</sub>`;
 
 /** The fractional part, set as an operator. */
 export const frac = '<span class="op">frac</span>';
+
+/** The determinant, set as an operator. */
+export const det = '<span class="op">det</span>';
+
+/** The entries of a 2 × 2 table. */
+export const k00 = sub('K', '00'), k01 = sub('K', '01'), k10 = sub('K', '10'), k11 = sub('K', '11');
+
+/**
+ * M's fill of the cell (0, 1) of a 2 × 2 table from its other three cells (`threeCellFill`),
+ * with `β = K₁₀` and `γ = K₀₀ K₁₁`.
+ */
+export const threeFill = '<span class="ov">β</span> γ / <span class="op">max</span>(|β|², |γ|)';
 
 /** The letters of Theorem G and Theorem C, the same in every language. */
 export const ri = sub('r', 'i'), sj = sub('s', 'j'), ui = sub('u', 'i'), vj = sub('v', 'j'), Kr = sub('K', 'ρ');
