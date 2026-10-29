@@ -142,10 +142,12 @@ guess with the answers' frequencies there scores on average 16.36% for `(a + b)�
   prediction on the held-out cells of each sum `c` is the answer `c¹⁶`, for all 97 sums: a vote
   along each sum would answer every held-out cell. In the other 10, which end at 14.60% to
   31.67%, that vote is right on 10 to 88 sums. A small `κ` thus does not mean accuracy near
-  chance. Among the tasks `g(a + b)`, the order of `κ` is the order of success: `perm-add`,
+  chance. Among these five tasks `g(a + b)`, the order of `κ` is the order of success: `perm-add`,
   `sum-square` and `sum-cube` (`κ` = 1.0000, 0.4053 and 0.2756) reach 99% in all runs but one,
   `sum-pow16` (0.0427) is learned in part, `sum-pow48` (0.0125) not at all. Across families it
-  is not: `square-product`, with `κ = 0.0778`, ends near chance.
+  is not: `square-product`, with `κ = 0.0778`, ends near chance. Nor is it among all tasks
+  `g(a + b)`: in the next section, the indicator of `I₂` has `κ = 0.3374`, above that of
+  `sum-cube`, and ends at 91.33% and 91.43%.
 - Training ten times longer reaches a plateau, not 99%. The 100 000-step runs repeat the
   10 000-step runs exactly up to step 10 000. `(a + b)¹⁶` then rises from 79.89% and 73.20% and,
   from step 30 000 to 100 000, stays between 84.21% and 87.35% (seed 7) and between 78.43% and
@@ -214,7 +216,9 @@ whose held-out cells have the right answer as their unique most common predictio
   `{0, 48, 96}`, lie at the two boundaries of `I`, between 47 and 48 and between 96 and 0. On
   these four sums 33% to 65% of the held-out cells are right, against 79% to 96% on their
   neighbors 1, 46, 49 and 95. They are the four sums where the wave above is closest to 0:
-  `|cos| ≤ 0.049` there, at least 0.080 elsewhere (hand).
+  `|cos| ≤ 0.049` there, at least 0.080 elsewhere (hand). `sum-square` has exactly the `κ` of
+  `I`, `(Σ_c |cos(2πc/97)|)² / 97²` (hand), yet reaches 99% by step 500 at this learning rate:
+  equal `κ` does not give equal success.
 - `R` and `Q` are not learned. `R` ends at 53.33% and 53.56%, 3.30 and 3.56 points above the
   frequency guess, with the vote right on 59 and 53 sums; `Q` at 44.21% and 46.16%, below it, as
   `(a + b)⁴⁸` above, which is 1 on the same set.
