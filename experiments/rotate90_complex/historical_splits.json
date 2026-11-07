@@ -1,0 +1,17 @@
+{
+  "course_commit": "a3eb468",
+  "rows": [
+    {
+      "seed": 7,
+      "source": "experiments/training/runs/adamw-lr0.001/sum-cube-7/run.json",
+      "source_sha256": "966db0ce4138ac417302a77a3b7b5933bb04e791fbd69f494740969fe91f31cb",
+      "validation_u32_sha256": "95f17a8e9e169c44e1ebc5e3a49053c56c490a78a2fa250f26f735f9e056a513"
+    },
+    {
+      "seed": 11,
+      "source": "experiments/training/runs/adamw-lr0.001/sum-cube-11/run.json",
+      "source_sha256": "a324585dd8999a4c1750788c1c661afe88dcb8883f8f1e95751dfe6010210d6d",
+      "validation_u32_sha256": "fd914210039259b6ae61d4f72a535da3fc6cfcb67c38fa0875fdc08ce286c792"
+    }
+  ]
+}

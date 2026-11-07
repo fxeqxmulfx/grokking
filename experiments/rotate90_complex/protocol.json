@@ -1,0 +1,58 @@
+{
+  "arms": [
+    "real-swiglu",
+    "complex-diagonal",
+    "complex-product-radial",
+    "complex-product-plain"
+  ],
+  "backend": "Rust/Kernite FP32 CUDA; no TF32",
+  "batch": 512,
+  "betas": [
+    0.9,
+    0.98
+  ],
+  "checkpoint_every_epochs": 500,
+  "course_commit": "a3eb468",
+  "depth": 1,
+  "epochs": 1000,
+  "epsilon": 1e-8,
+  "formula": "n(E[a]+J E[b]); x+n(FF(n(x))); logits=n(x)E^T",
+  "hidden_complex": 341,
+  "hidden_real_swiglu": 341,
+  "independent_real_parameters": 143360,
+  "kernel_source_gpt_commit": "786696b",
+  "kernite_commit": "a1b6bc2c956e1a5f35960e26b209e1b6c213096c",
+  "learning_rate": 0.001,
+  "limitations": [
+    "SwiGLU comparison also changes projection constraints and hidden representation",
+    "RMS backward uses separated FP64 radial/tangent calculation from native GPT; kernels differ from Torch",
+    "initial complex component variance matches real components; compute and weight-decay geometry are not matched",
+    "numerical experiment, not a theorem or architecture promotion"
+  ],
+  "optimizer": "coordinate AdamW",
+  "order": "rotate the four-arm order across seeds",
+  "primary": "final heldout accuracy and first observed 99% crossing; report all seeds and later dips",
+  "products": {
+    "complex-diagonal": "sigmoid(sqrt(|g|^2+eps))*(gR*uR, gI*uI)",
+    "complex-product-plain": "g*u/sqrt(2)",
+    "complex-product-radial": "sigmoid(sqrt(|g|^2+eps))*g*u/sqrt(2)"
+  },
+  "ptx_sha256": "dc4e40d319937fb5175b041a0da5edca8613e9310ec7875e7e61f149131199ac",
+  "report_every_updates": 100,
+  "rms_epsilon": 1.1920928955078125e-7,
+  "seconds_cap_per_run": 600,
+  "seeds": [
+    7,
+    11
+  ],
+  "source_sha256": "14cff3b553d3afb1f9bf90bb6b50cfd7a879058ec2876f859a198e07a09a83da",
+  "steps": 10000,
+  "stop_on_99": false,
+  "tail": 96,
+  "task": "(a+b)^3 mod97",
+  "train_count": 4704,
+  "validation_count": 4705,
+  "warmup_updates": 10,
+  "weight_decay": 1.0,
+  "width_real": 128
+}
