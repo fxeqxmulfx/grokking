@@ -112,5 +112,38 @@ and checks the declared checkpoint cadence and all input hashes.
 
 ## Results
 
-Pending the frozen eight-run comparison. No training outcome has been used to
-select these arms or hyperparameters.
+All eight runs completed 10000 updates. No run failed or reached its time cap.
+All 24 saved states reproduce their exact training/validation correctness
+counts and losses. The complete histories and states remain in
+`runs/cubic-adamw/`, with the exact executable and source archive. The tracked
+[summary](results.json), [audit](audit.json) and [validation record](validation.json)
+include every declared outcome. Implementation/protocol commit: `b70811e`.
+
+| Arm | Seed 7 first 99%, epoch | Seed 11 first 99%, epoch | Seed 7 final accuracy | Seed 11 final accuracy |
+| --- | ---: | ---: | ---: | ---: |
+| Real SwiGLU | 260 | 300 | 99.43% | 99.17% |
+| Complex diagonal | 170 | 180 | 99.83% | 99.74% |
+| Complex radial product | 90 | 110 | 99.68% | 98.79% |
+| Complex plain product | **80** | **100** | **99.66%** | **99.68%** |
+
+The plain product reaches the first observed 99% crossing in 3.25 and 3 times
+fewer updates than SwiGLU, and earlier than the diagonal control in both
+seeds. The radial product also beats its paired diagonal control, by factors
+1.89 and 1.64. Removing the radial gate advances the first crossing by one
+report interval (10 epochs) in each seed; this modest difference does not
+establish a general advantage of removing gates.
+
+All eight runs later dip below 99%. Their lowest observed accuracy after the
+first crossing is 89.84%/91.56% for SwiGLU, 89.56%/91.88% for the diagonal
+control, 97.81%/97.11% for the radial product and 98.45%/97.32% for the plain
+product. The radial product's second seed ends on a dip. First crossing is
+therefore not stable recovery, and the diagonal control has the highest final
+accuracy in this cohort despite its later crossing.
+
+These two-seed results support faster early generalization from complex
+products at the frozen AdamW settings, not optimality of the block or optimizer.
+They do not prove that the learned features are characters or satisfy a
+flat-spectrum recovery certificate. No width, depth, optimizer or learning-rate
+sweep was performed here. The runs total 84.32 seconds including evaluation,
+setup within each run and checkpoint I/O; cohort wall time is 85.08 seconds.
+Timing is descriptive, not a controlled throughput benchmark.

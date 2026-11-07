@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-07",
+  "implementation_commit": "b70811e0e0e7ebdc4a8a2e48044c180332f7c40d",
+  "kernite_commit": "a1b6bc2c956e1a5f35960e26b209e1b6c213096c",
+  "kernite_worktree_clean": true,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU, 4096 MiB",
+  "executable_sha256": "dfc7c79296e4512f8a66fcc76db3a398ec2df136c05267333f1d73143afb0ec3",
+  "source_archive_sha256": "762ed5113cbd7df5307f276a91004de671f50dd8a49f2ecd5ccfae0f5552b633",
+  "protocol_file_sha256": "39bb5e8960925f19cf349d4d572870f114f018896ad3b9198a63446e080d5034",
+  "raw_results_sha256": "5435f5c22a2d4b1873632e314c5125b5f2e510fa1604d53de584524f881b5bfc",
+  "checks": [
+    {
+      "command": "cargo test --offline --release -- --include-ignored --test-threads=1",
+      "result": "8 passed; 0 failed; 0 ignored"
+    },
+    {
+      "command": "cargo clippy --offline --release --all-targets -- -D warnings",
+      "result": "passed"
+    },
+    {
+      "command": "cargo fmt --check",
+      "result": "passed"
+    },
+    {
+      "command": "npm run typecheck (site)",
+      "result": "passed"
+    },
+    {
+      "command": "npm test (site)",
+      "result": "6 passed; 0 failed"
+    },
+    {
+      "command": "native-executable audit runs/cubic-adamw",
+      "result": "24 checkpoints replay exactly; all hashes, history prefixes, metrics, first99 and cadence pass"
+    },
+    {
+      "command": "compare aggregate against every audited per-run result",
+      "result": "all eight match exactly"
+    }
+  ],
+  "raw_directory": "experiments/rotate90_complex/runs/cubic-adamw",
+  "command": "native-executable run experiments/rotate90_complex/runs/cubic-adamw"
+}

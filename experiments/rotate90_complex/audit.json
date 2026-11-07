@@ -1,0 +1,150 @@
+{
+  "checkpoints": [
+    {
+      "arm": "real-swiglu",
+      "seed": 7,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "real-swiglu",
+      "seed": 7,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "real-swiglu",
+      "seed": 7,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 7,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 7,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 7,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 7,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 7,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 7,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 7,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 7,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 7,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "real-swiglu",
+      "seed": 11,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "real-swiglu",
+      "seed": 11,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "real-swiglu",
+      "seed": 11,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 11,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 11,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-diagonal",
+      "seed": 11,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 11,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 11,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-product-radial",
+      "seed": 11,
+      "status": "pass",
+      "step": 10000
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 11,
+      "status": "pass",
+      "step": 0
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 11,
+      "status": "pass",
+      "step": 5000
+    },
+    {
+      "arm": "complex-product-plain",
+      "seed": 11,
+      "status": "pass",
+      "step": 10000
+    }
+  ],
+  "source_sha256": "14cff3b553d3afb1f9bf90bb6b50cfd7a879058ec2876f859a198e07a09a83da",
+  "status": "pass"
+}
