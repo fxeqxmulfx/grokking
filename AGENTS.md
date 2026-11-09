@@ -41,5 +41,15 @@ Its mathematics is proved in Lean in `~/lean_projects/transformer`.
 - Code other than the frontend follows clean architecture: domain → application →
   infrastructure → interfaces, each layer importing only its own or earlier ones;
   third-party packages only in the last two.
-- Experiments use PyTorch with uv (`uv run --locked` inside the experiment's project) or
-  Rust.
+- Use Rust/Kernite and native tooling for new experiments, scripts, wrappers and
+  regression suites. Do not use Python; existing Python sources are reference material.
+
+## Generated files
+
+- Do not commit reproducible generated reports, rendered summaries, plots, logs,
+  caches or build artifacts. Keep them ignored and local.
+- Exception: `INDEX.md` must still be generated and committed with any applicable
+  `src/` change in the transformer repository; never edit it by hand.
+- Commit sources, generators, configuration, required reproducibility inputs and
+  documented regeneration commands. Keep authored findings in experiment READMEs.
+- Preserve generated evidence needed for review before removing a temporary worktree.

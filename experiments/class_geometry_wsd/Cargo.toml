@@ -1,0 +1,62 @@
+[package]
+name = "class-geometry-wsd"
+version = "0.1.0"
+edition = "2024"
+publish = false
+build = "build.rs"
+
+[workspace]
+
+[workspace.metadata.kernite]
+name = "rotate90_complex"
+
+[features]
+lr003 = []
+lr01 = []
+settle = []
+
+[[bin]]
+name = "rotate90-complex-kernite"
+path = "src/main.rs"
+
+[[bin]]
+name = "analyze"
+path = "../class_geometry/src/bin/analyze.rs"
+
+[[bin]]
+name = "active-answers"
+path = "../geometry_gap/active.rs"
+
+[[bin]]
+name = "geometry-dynamics"
+path = "../geometry_dynamics/support.rs"
+
+[[bin]]
+name = "geometry-motion"
+path = "../geometry_dynamics/motion.rs"
+
+[[bin]]
+name = "geometry-persistence"
+path = "../geometry_persistence/main.rs"
+
+[[bin]]
+name = "future-forcing"
+path = "../future_forcing/main.rs"
+
+[[bin]]
+name = "ce-lyapunov"
+path = "../ce_lyapunov/main.rs"
+
+[dependencies]
+kernite-cuda = { path = "/home/misha/rust_projects/kgen/crates/cuda" }
+kernite-macros = { path = "/home/misha/rust_projects/kgen/crates/macros" }
+num-complex = "=0.4.6"
+serde_json = { version = "=1.0.154", features = ["float_roundtrip"] }
+sha2 = "=0.11.1"
+
+[build-dependencies]
+sha2 = "=0.11.1"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"

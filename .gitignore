@@ -5,3 +5,14 @@ node_modules/
 __pycache__/
 .venv/
 runs/
+
+# Native experiment build artifacts and generated evidence.
+/.lake/
+/experiments/**/target/
+/experiments/*/report.json
+/experiments/*/report.json.gz
+/experiments/*/summary.json
+/experiments/*/*-report.json
+/experiments/*/*-summary.json
+/experiments/**/*.log
+/experiments/**/*.features.bin
